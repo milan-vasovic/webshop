@@ -1,0 +1,44 @@
+<link rel="stylesheet" href="/css/galery.css">
+
+<div class="gallery__container">
+  <div class="gallery__main-media">
+    <!-- Glavna slika koja se menja prilikom promene varijacije -->
+    <img id="main-media" src="/images/<%= selectedImage.URL %>" alt="<%= selectedImage.Opis %>">
+  </div>
+  <!-- Ostale slike -->
+  <div class="gallery__thumbnails">
+    <% if (video && video.URL) { %>
+      <video 
+          class="gallery__thumbnail" 
+          data-type="video" 
+          data-url="<%= video.URL %>" 
+          data-description="<%= video.Opis %>" 
+          nonce="<%= cspNonce %>">
+        <source src="/videos/<%= video.URL %>" type="video/mp4">
+        <%= video.Opis %>
+      </video>
+    <% } %>
+    <img 
+        class="gallery__thumbnail" 
+        src="/images/<%= selectedImage.URL %>" 
+        alt="<%= selectedImage.Opis %>" 
+        data-type="image" 
+        data-url="<%= selectedImage.URL %>" 
+        data-description="<%= selectedImage.Opis %>" 
+        nonce="<%= cspNonce %>">
+    <% if (images.length > 0) { %>
+      <% images.forEach((image) => { %>
+        <img 
+            class="gallery__thumbnail" 
+            src="/images/<%= image.URL %>" 
+            alt="<%= image.Opis %>" 
+            data-type="image" 
+            data-url="<%= image.URL %>" 
+            data-description="<%= image.Opis %>" 
+            nonce="<%= cspNonce %>">
+      <% }); %>
+    <% } %>
+  </div>
+</div>
+
+<script src="/js/galery.js"></script>

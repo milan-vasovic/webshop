@@ -1,0 +1,51 @@
+<%- include('../../include/head.ejs') %>
+<link rel="stylesheet" href="/css/table.css">
+<link rel="stylesheet" href="/css/tabs.css">
+<%- include('../../include/navigation.ejs') %>
+<section class="main__container">
+    <h1 class="main__title"><%= pageTitle %></h1>
+    <div class="flex flex-column flex-between width-100 align-center">
+        <%- include('../../include/info.ejs', {
+            data: [
+                { "Kod": coupon.Kod.value },
+                { "Status" : coupon.Status.value },
+                { "Popust u %": coupon.Popust.value },
+                { "Količina": coupon.Količina.value },
+                { "Broj Upotreba": coupon["Broj Upotreba"].value },
+                { "Datum Početka": coupon["Datum Početka"].value },
+                { "Datum Završetka": coupon["Datum Završetka"].value },
+            ]
+        }) %>
+
+        <div class="tabs-header">
+            <button class="tab-btn active" data-tab="Korisnici">Korisnici</button>
+            <button class="tab-btn" data-tab="Kupci">Kupci</button>
+        </div>
+        <div class="tabs-content">
+            <div class="tab-content active" data-tab="Korisnici">
+                <%- include('../../include/table.ejs', {
+                    items: coupon.Korisnici.value,
+                    showId: false,
+                    caption: 'Korisnici',
+                    hasActions: false,
+                    hasFooter: true,
+                    totals: false,
+                    actions: []
+                }) %>
+            </div>
+            <div class="tab-content" data-tab="Kupci">
+                <%- include('../../include/table.ejs', {
+                    items: coupon.Kupci.value,
+                    showId: false,
+                    caption: 'Kupci',
+                    hasActions: false,
+                    hasFooter: true,
+                    totals: false,
+                    actions: []
+                }) %>
+            </div>
+        </div>
+    </div>
+</section>
+<script src="/js/tabs.js"></script>
+<%- include('../../include/end.ejs') %>

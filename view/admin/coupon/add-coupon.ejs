@@ -1,0 +1,90 @@
+<%- include('../../include/head.ejs') %>
+<link rel="stylesheet" href="/css/form.css">
+<%- include('../../include/navigation.ejs') %>
+<section class="main__container ">
+    <div class="main-form__container">
+        <h1 class="main-form__title"><%= pageTitle %></h1>
+
+        <form action="<% if (editing) { %>/admin/kupon-izmena<% } else { %>/admin/kupon-dodavanje<% } %>" method="POST" class="main-form width-100">
+            <% if(errorMessage) { %>
+                <div class="user-message--error"><%= errorMessage %></div>
+            <% } %>
+
+            <div class="main-form__group">
+                <label for="code" class="main-form__label">Kod:</label>
+                <input type="text" id="code" name="code" class="main-form__input"  value="<%= existingData ? existingData.Kod.value : '' %>" required>
+            </div>
+
+            <div class="main-form__group" id="statusContainer">
+                <label for="status0" class="main-form__label">Status:</label>
+                <% 
+                    const allStatuses = ["acitve", "inactive", "single-use", "multiple-use","time-sensitive","amoun-sensitive"];
+                    let selectedStatuses = [];
+                    if (existingData && existingData.Status) {
+                        if (Array.isArray(existingData.Status.value)) {
+                            selectedStatuses = existingData.Status.value;
+                        } else if (typeof existingData.Status.value === 'string') {
+                            selectedStatuses = [existingData.Status.value];
+                        }
+                    }
+                %>
+                <% if (selectedStatuses.length > 0) { %>
+                    <% selectedStatuses.forEach((status, index) => { %>
+                        <div class="dynamic-group">
+                            <select 
+                                id="status<%= index %>" 
+                                name="status[]" 
+                                class="main-form__select" 
+                                required>
+                                <% allStatuses.forEach(st => { %>
+                                    <option value="<%= st %>" <%= st === status ? 'selected' : '' %>><%= st %></option>
+                                <% }); %>
+                            </select>
+                            <button type="button" class="btn btn-danger removeField">Izbriši</button>
+                        </div>
+                    <% }); %>
+                <% } else { %>
+                    <div class="dynamic-group">
+                        <select id="status0" name="status[]" class="main-form__select" required>
+                            <% allStatuses.forEach(st => { %>
+                                <option value="<%= st %>"><%= st %></option>
+                            <% }); %>
+                        </select>
+                    </div>
+                <% } %>
+            </div>
+            <button id="addStatus" type="button" class="btn">Dodajte Status</button>
+
+            <div class="main-form__group">
+                <label for="discountInput" class="main-form__label">Popust U %:</label>
+                <input type="number" id="discountInput" name="discount" min="5" max="100" class="main-form__input" value="<%= existingData ? existingData.Popust.value : '' %>" required>
+            </div>
+
+            <div class="main-form__group">
+                <label for="amountInput" class="main-form__label">Količina:</label>
+                <input type="number" id="amountInput" name="amount" min="0" class="main-form__input" value="<%= existingData ? existingData.Količina.value : '' %>">
+            </div>
+
+            <div class="main-form__group">
+                <label for="startDateInput" class="main-form__label">Datum Početka:</label>
+                <input class="main-form__datetime" type="datetime-local" id="startDateInput" name="startDate" value="<%= existingData ? existingData['Datum Početka'].value : '' %>">
+            </div>
+
+            <div class="main-form__group">
+                <label for="endDateInput" class="main-form__label">Datum Završetka:</label>
+                <input class="main-form__datetime" type="datetime-local" id="endDateInput" name="endDate" value="<%= existingData ? existingData['Datum Završetka'].value : '' %>">
+            </div>
+
+            <% if (editing && existingData) { %>
+                <input class="main-form__input" id="couponId" type="hidden" name="couponId" value="<%= existingData.ID.value ? existingData.ID.value : existingData.ID %>">
+            <% } %>
+            <input class="main-form__input" type="hidden" name="CSRFToken" value="<%= csrfToken %>" required>
+            <input name="honeypot" type="hidden">
+            <div class="main-form__group">
+                <button type="submit" class="btn"><% if (editing && existingData) { %>Izmenite Kupon<% } else { %>Dodajte Kupon<% } %></button>
+            </div>
+        </form>
+    </div>
+</section>
+<script src="/js/dinamicFiledsToAddCoupon.js"></script>
+<%- include('../../include/end.ejs') %>

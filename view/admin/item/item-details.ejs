@@ -1,0 +1,106 @@
+<%- include('../../include/head.ejs') %>
+<link rel="stylesheet" href="/css/table.css">
+<link rel="stylesheet" href="/css/tabs.css">
+<%- include('../../include/navigation.ejs') %>
+<section class="main__container">
+    <h1 class="main__title"><%= item.Naziv.value %></h1>
+    <div class="flex flex-row flex-between width-100 align-start">
+        <div class="flex flex-column width-30">
+            <a href="/admin/izmenite-artikal/<%= item.ID.value %>">
+                <button>Izmenite</button>
+            </a>
+            <%- include('../../include/galery.ejs', {
+                images: item.Slike.Slike,
+                selectedImage: item.Slike["Istaknuta Slika"],
+                video: item.Video
+            }) %>
+        </div>
+        <div class="flex flex-column width-70">
+            <%- include('../../include/info.ejs', {
+                data: [
+                    { "Opis": item.Opis.value },
+                    { "Ključne Reči": item["Ključne Reči"].value },
+                    { "Status" : item.Status.value },
+                    { "Kategorije": item.Kategorije.value },
+                    { "Tagovi": item.Tagovi.value },
+                    { "Cena": item.Cena.value },
+                    { "Akcijska Cena": item["Akcijska Cena"].value },
+                    { "Backorder": item.Backorder.Dozvoljeno },
+                    { "Broj Prodatih": item["Broj Prodatih"].value },
+                    { "Broj Vraćenih": item["Broj Vraćenih"].value }
+                ]
+            }) %>
+            <br>
+            <div class="tabs-header">
+                <button class="tab-btn active" data-tab="Varijacije">Varijacije</button>
+                <% if (item.Backorder.Dozvoljeno) { %>
+                    <button class="tab-btn" data-tab="Backorder">Backorder</button>
+                <% } %>
+                <button class="tab-btn" data-tab="UpSell Artikli">UpSell Artikli</button>
+                <button class="tab-btn" data-tab="CrossSell Artikli">CrossSell Artikli</button>
+                <button class="tab-btn" data-tab="Partneri">Partneri</button>
+            </div>
+            <div class="tabs-content">
+                <div class="tab-content active" data-tab="Varijacije">
+                    <%- include('../../include/table.ejs', {
+                        items: item.Varijacije,
+                        showId: false,
+                        caption: 'Varijacije',
+                        hasActions: false,
+                        hasFooter: true,
+                        totals: false,
+                        actions: []
+                    }) %>
+                </div>
+                <% if (item.Backorder.Dozvoljeno) { %>
+                    <div class="tab-content" data-tab="Backorder">
+                        <%- include('../../include/table.ejs', {
+                            items: item.Backorder.Naručeno,
+                            showId: false,
+                            caption: 'Backorder',
+                            hasActions: false,
+                            hasFooter: true,
+                            totals: false,
+                            actions: []
+                        }) %>
+                    </div>
+                <% } %>
+                <div class="tab-content" data-tab="UpSell Artikli">
+                    <%- include('../../include/table.ejs', {
+                        items: item["UpSell Artikli"],
+                        showId: false,
+                        caption: 'UpSell Artikli',
+                        hasActions: false,
+                        hasFooter: true,
+                        totals: false,
+                        actions: []
+                    }) %>
+                </div>
+                <div class="tab-content" data-tab="CrossSell Artikli">
+                    <%- include('../../include/table.ejs', {
+                        items: item["CrossSell Artikli"],
+                        showId: false,
+                        caption: 'CrossSell Artikli',
+                        hasActions: false,
+                        hasFooter: true,
+                        totals: false,
+                        actions: []
+                    }) %>
+                </div>
+                <div class="tab-content" data-tab="Partneri">
+                    <%- include('../../include/table.ejs', {
+                        items: item.Partneri,
+                        showId: false,
+                        caption: 'Partneri',
+                        hasActions: false,
+                        hasFooter: true,
+                        totals: false,
+                        actions: []
+                    }) %>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<script src="/js/tabs.js"></script>
+<%- include('../../include/end.ejs') %>

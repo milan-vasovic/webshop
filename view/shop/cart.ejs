@@ -1,0 +1,38 @@
+<%- include('../include/head.ejs') %>
+<link rel="stylesheet" href="/css/table.css">
+<%- include('../include/navigation.ejs') %>
+
+<section class="flex flex-column main__container">
+    <h1 class="main__title"><%= pageTitle %></h1>
+    <div class="flex flex-column flex-between width-100">
+        <% if (cart.length > 0) { %>
+            <div class="flex flex-row align-center">
+                <a class="btn" href="/prodavnica/porudzbina">Nastavite Sa Poručivanjem</a>
+                <div>
+                    <form action="">
+                        <button class="btn btn-danger">Izpraznite Korpu</button>
+                    </form>
+                </div>
+
+            </div>
+        <% } %>
+        <%- include('../include/table.ejs', {
+            items: cart,
+            showId: false,
+            caption: "Artikli",
+            hasActions: true,
+            hasFooter: true,
+            totals: true,
+            actions: [
+                {
+                    type: 'form',
+                    formAction: "/prodavnica/korpa-izbacivanje",
+                    buttonName: 'Izbacite'
+                }
+            ]
+        }) %>
+
+    </div>
+</section>
+
+<%- include('../include/end.ejs') %>

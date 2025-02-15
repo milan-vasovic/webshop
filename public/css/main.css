@@ -1,0 +1,294 @@
+:root {
+    /* Boje */
+    --primary-color: #353535;
+    --secondary-color: #f4f4f4;
+    --accent-color: #1fcbff;
+    --text-color: #333333;
+    --accent-text-color: #fc3232;
+    --title-color: #000000;
+    --white-color: #ffffff;
+    --black-color: #000000;
+    --neutral-color: #e0e0e0;
+    --danger-color: #fc3232;
+    --border-color: #dcdcdc;
+    --shadow-box-color: rgba(0, 0, 0, 0.1);
+    --shadow-hover-color: rgba(0, 0, 0, 0.2);
+
+    /* Font */
+    --font-family: 'Roboto', sans-serif;
+    --font-size-extra-small: 0.75rem;
+    --font-size-small: 0.875rem;
+    --font-size-base: 1rem;
+    --font-size-large: 1.25rem;
+    --font-size-extra-large: 2rem;
+    --font-weight-regular: 400;
+    --font-weight-bold: 700;
+
+    /* Razmaci */
+    --padding-small: 0.3rem;
+    --padding-normal: 1rem;
+    --padding-big: 1.5rem;
+    --margin-small: 0.5rem;
+    --margin-normal: 1rem;
+    --margin-big: 1.5rem;
+
+    /* Border */
+    --border-radius-small: 4px;
+    --border-radius-normal: 8px;
+    --border-radius-large: 12px;
+
+    /* Grid */
+    --grid-gap-small: 0.2rem;
+    --grid-gap-medium: 1rem;
+    --grid-gap-large: 1.5rem;
+
+    /* Visine */
+    --header-footer-height: 7vh;
+
+    /* Animacije */
+    --transition-fast: 0.2s ease;
+    --transition-medium: 0.4s ease;
+    --transition-slow: 0.6s ease;
+}
+
+/* Reset osnovnih stilova */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html, body {
+    font-family: var(--font-family);
+    font-size: var(--font-size-base);
+    line-height: 1.6;
+    color: var(--text-color);
+    background-color: var(--secondary-color);
+}
+
+/* Linkovi */
+a {
+    text-decoration: none;
+    color: var(--accent-color);
+    transition: color var(--transition-fast);
+}
+
+a:hover {
+    color: var(--accent-text-color);
+}
+
+/* Dugmad */
+button {
+    display: inline-block;
+    padding: 0.25rem 1rem;
+    text-decoration: none;
+    font: inherit;
+    border: 1px solid var(--primary-one);
+    cursor: pointer;
+    margin: 5px;
+    border-radius: var(--border-radius-small);
+    background-color: var(--primary-color);
+    color: var(--white-color);
+    transition: background-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+button:hover {
+    background-color: var(--accent-color);
+    box-shadow: 0px 4px 6px var(--shadow-box-color);
+}
+
+.btn {
+    padding: var(--padding-small) var(--padding-big);
+    border-radius: var(--border-radius-normal);
+    background-color: var(--primary-color);
+    color: var(--white-color);
+    font-weight: var(--font-weight-bold);
+    transition: background-color var(--transition-fast), transform var(--transition-fast);
+}
+
+.btn:hover {
+    background-color: var(--accent-color);
+}
+
+.btn-secondary {
+    background-color: var(--secondary-color);
+    color: var(--primary-color);
+    border: 1px solid var(--primary-color);
+}
+
+.btn-secondary:hover {
+    background-color: var(--primary-color);
+    color: var(--white-color);
+}
+
+.btn-danger {
+    background-color: var(--danger-color);
+    color: white;
+}
+
+/* Forme */
+.input {
+    width: 100%;
+    padding: var(--padding-small);
+    margin-bottom: var(--margin-small);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-small);
+    font-size: var(--font-size-base);
+    color: var(--text-color);
+}
+
+.input:focus {
+    border-color: var(--accent-color);
+    outline: none;
+    box-shadow: 0 0 5px var(--accent-color);
+}
+
+textarea {
+    resize: none;
+}
+
+/* Naslovi */
+h1, h2, h3, h4, h5, h6 {
+    color: var(--title-color);
+    margin-bottom: var(--margin-normal);
+}
+
+h1 {
+    font-size: var(--font-size-extra-large);
+    font-weight: var(--font-weight-bold);
+}
+
+h2 {
+    font-size: var(--font-size-large);
+}
+
+h3 {
+    font-size: var(--font-size-base);
+}
+
+/* Sekcije */
+section {
+    padding: var(--padding-big);
+    margin: var(--margin-normal);
+    background-color: var(--white-color);
+    border-radius: var(--border-radius-large);
+    box-shadow: 0px 4px 6px var(--shadow-box-color);
+}
+
+.main__container {
+    min-height: 82.6vh;
+}
+
+.main__title {
+    text-align: center;
+}
+
+/* Layout */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--padding-normal);
+}
+
+/* Flex klasovi */
+.flex {
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* Justify Content */
+.justify-start { justify-content: flex-start; }
+.justify-center { justify-content: center; }
+.justify-end { justify-content: flex-end; }
+.justify-between { justify-content: space-between; }
+.justify-around { justify-content: space-around; }
+.justify-evenly { justify-content: space-evenly; }
+
+/* Align Items */
+.align-start { align-items: flex-start; }
+.align-center { align-items: center; }
+.align-end { align-items: flex-end; }
+.align-stretch { align-items: stretch; }
+.align-baseline { align-items: baseline; }
+
+/* Align Self (pojedinačni elementi) */
+.self-start { align-self: flex-start; }
+.self-center { align-self: center; }
+.self-end { align-self: flex-end; }
+.self-stretch { align-self: stretch; }
+.self-baseline { align-self: baseline; }
+
+/* Flex Direction */
+.flex-row { flex-direction: row; }
+.flex-row-reverse { flex-direction: row-reverse; }
+.flex-column { flex-direction: column; }
+.flex-column-reverse { flex-direction: column-reverse; }
+
+/* Flex Wrap */
+.flex-nowrap { flex-wrap: nowrap; }
+.flex-wrap { flex-wrap: wrap; }
+.flex-wrap-reverse { flex-wrap: wrap-reverse; }
+
+
+/* Grid klasovi */
+.grid {
+    display: grid;
+    gap: var(--grid-gap-medium);
+}
+
+.grid-2 {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.grid-3 {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.grid-4 {
+    grid-template-columns: repeat(4, 1fr);
+}
+
+/* Width i height */
+.width-10 { width: 10%; }
+.width-20 { width: 20%; }
+.width-30 { width: 30%; }
+.width-40 { width: 40%; }
+.width-50 { width: 50%; }
+.width-60 { width: 60%; }
+.width-70 { width: 70%; }
+.width-80 { width: 80%; }
+.width-90 { width: 90%; }
+.width-100 { width: 100%; }
+
+.height-50 { height: 50%; }
+.height-100 { height: 100%; }
+
+/* Responsivni dizajn */
+@media (min-width: 768px) {
+    .grid-2 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .width-50 { width: 50%; }
+    .width-75 { width: 75%; }
+}
+
+@media (min-width: 1024px) {
+    .grid-3 {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .section {
+        padding: var(--padding-big);
+    }
+
+    .width-33 { width: 33%; }
+    .width-66 { width: 66%; }
+    .max-width-1200 { max-width: 1200px; }
+}
+
+@media (min-width: 1440px) {
+    .width-25 { width: 25%; }
+    .width-50 { width: 50%; }
+    .width-75 { width: 75%; }
+    .max-width-1440 { max-width: 1440px; }
+}

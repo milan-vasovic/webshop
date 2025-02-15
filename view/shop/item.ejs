@@ -1,0 +1,81 @@
+<%- include('../include/head.ejs') %>
+<link rel="stylesheet" href="/css/form.css">
+<%- include('../include/navigation.ejs') %>
+
+<section class="main__container">
+  <h1 class="main__title"><%= item.Naziv.value %></h1>
+  <div class="flex flex-row flex-between width-100 align-start">
+    <!-- Galerija -->
+    <div class="flex flex-column width-30">
+      <%- include('../include/galery.ejs', {
+            images: item.Slike.Slike,
+            selectedImage: item.Slike['Istaknuta Slika'],
+            video: item.Video
+        }) %>
+    </div>
+
+    <!-- Opis i forma -->
+    <div class="flex flex-column width-70">
+      <div>
+        <p><%= item.Opis.value %></p>
+        <ul>
+          <% item.Kategorije.value.forEach(c => { %>
+            <li><%= c %></li>
+          <% }) %>
+        </ul>
+        <ul>
+          <% item.Tagovi.value.forEach(t => { %>
+            <li><%= t %></li>
+          <% }) %>
+        </ul>
+        <div>
+          <% if (item.Status.value && item.Status.value[0] === 'action') { %>
+            <h2><s><%= item.Cena.value %></s> <%= item["Akcijska Cena"].value %> RSD</h2>
+          <% } else { %>
+            <h2><%= item.Cena.value %> RSD</h2>
+          <% } %>
+        </div>
+      </div>
+
+      <div>
+        <form id="productForm" action="/prodavnica/korpa-dodavanje" method="post">
+          <div>
+            <label for="variationsSelect">Izaberite:</label>
+            <select class="main-form__input" name="variationsSelect" id="variationsSelect">
+              <% item.Varijacije.forEach((v, index) => { %>
+                <option value="<%= index %>"><%= v.Veličina %> <%= v.Boja %></option>
+              <% }) %>
+            </select>
+          </div>
+          <div>
+            <label for="amountInput">Količina:</label>
+            <input class="main-form__input" type="number" name="amount" id="amountInput" min="1" placeholder="1" required>
+          </div>
+          <!-- Mesto za prikaz poruke o stanju -->
+          <div id="stockMessage"></div>
+          <!-- Container u koji će se dinamički ubacivati dugme (ili neće biti ubaceno ništa) -->
+          <div id="formSubmitContainer">
+            <!-- Na početku se može ubaciti default dugme, a kasnije ga menja skripta -->
+            <button type="submit" id="submitBtn">Dodaj u korpu</button>
+          </div>
+          <input class="main-form__input" type="hidden" name="itemId" value="<%= item.ID.value %>">
+          <input class="main-form__input" type="hidden" name="CSRFToken" value="<%= csrfToken %>">
+          <input type="hidden" name="variationId" id="variationId" value="<%= item.Varijacije[0].ID %>">
+          <input name="honeypot" type="hidden">
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Skriveni element sa podacima potrebnim za JS (preko data atributa) -->
+  <div id="item-data"
+       data-variations='<%- JSON.stringify(item.Varijacije) %>'
+       data-backorder='<%= item.Backorder.Dozvoljeno %>'
+       data-default-image='<%= item.Slike["Istaknuta Slika"].URL %>'
+       style="display: none;">
+  </div>
+</section>
+
+<!-- Uključujemo eksterni JS fajl -->
+<script src="/js/product.js"></script>
+<%- include('../include/end.ejs') %>

@@ -1,0 +1,67 @@
+<%- include('../../include/head.ejs') %>
+<link rel="stylesheet" href="/css/table.css">
+<link rel="stylesheet" href="/css/tabs.css">
+<%- include('../../include/navigation.ejs') %>
+<section class="main__container">
+    <h1 class="main__title"><%= pageTitle %></h1>
+    <div class="flex flex-row flex-between width-100">
+        <div class="flex flex-column width-20">
+            <%- include('../../include/info.ejs', {
+                data: [
+                    { "Ime": customer.Ime.value },
+                    { "Prezime" : customer.Prezime.value },
+                    { "Email": customer.Email.value },
+                ]
+            }) %>
+        </div>
+        <div class="flex flex-column width-80">
+            <div class="tabs-header">
+                <button class="tab-btn active" data-tab="Brojevi Telefona">Brojevi Telefona</button>
+                <button class="tab-btn" data-tab="Adrese">Adrese</button>
+                <button class="tab-btn" data-tab="Porudžbine">Porudžbine</button>
+            </div>
+            <div class="tabs-content">
+                <div class="tab-content active" data-tab="Brojevi Telefona">
+                    <%- include('../../include/table.ejs', {
+                        items: customer["Brojevi Telefona"],
+                        showId: false,
+                        caption: 'Brojevi Telefona',
+                        hasActions: false,
+                        hasFooter: true,
+                        totals: false,
+                        actions: []
+                    }) %>
+                </div>
+                <div class="tab-content" data-tab="Adrese">
+                    <%- include('../../include/table.ejs', {
+                        items: customer.Adrese,
+                        showId: false,
+                        caption: 'Adrese',
+                        hasActions: false,
+                        hasFooter: true,
+                        totals: false,
+                        actions: []
+                    }) %>
+                </div>
+                <div class="tab-content" data-tab="Porudžbine">
+                    <%- include('../../include/table.ejs', {
+                        items: customer.Porudžbine,
+                        showId: false,
+                        caption: 'Porudžbine',
+                        hasActions: true,
+                        hasFooter: true,
+                        totals: false,
+                        actions: [
+                        {
+                            type: 'link',
+                            link: "/admin/porudzbina-detalji/",
+                            linkName: 'Detalji'
+                        }]
+                    }) %>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<script src="/js/tabs.js"></script>
+<%- include('../../include/end.ejs') %>

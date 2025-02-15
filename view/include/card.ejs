@@ -1,0 +1,59 @@
+<div class="card__container">
+    <!-- Header kartice -->
+    <div class="card__header <%= item.Status?.value ? item.Status.value.toLowerCase() : 'normal' %>">
+        <% if (item.Naziv) { %>
+            <h2 class="card__title"><%= item.Naziv.value || "N/A" %></h2>
+        <% } %>
+        <% if (item.Slika && item.Slika.value) { %>
+            <!-- Prikaz slike u zaglavlju ako postoji -->
+            <img class="card__image" src="/images/<%= item.Slika.value %>" alt="<%= item.title?.value || 'N/A' %>">
+        <% } %>
+    </div>
+
+    <!-- Sadržaj kartice -->
+    <div class="card__content">
+        <% Object.entries(item).forEach(([key, field], index) => { %>
+            <% if (!(index === 0 && key === "ID" && showId === false) &&
+                   !(field && typeof field.value === 'object' && Array.isArray(field.value)) &&
+                   !(field && typeof field.value === 'object' && Object.keys(field.value).length === 0) &&
+                   !(key.toLowerCase() === "slika") &&
+                   !(key.toLowerCase() === "status")) { %>
+                <div class="card__field">
+                    <strong><%= key %>:</strong>
+                    <% if (field && typeof field === 'object' && field.link) { %>
+                        <!-- Link -->
+                        <a class="card__link" href="<%= field.link %>"><%= field.value %></a>
+                    <% } else if (field && typeof field === 'object' && field.value) { %>
+                        <% if (typeof field.value === 'object' && !Array.isArray(field.value)) { %>
+                            <%= Object.entries(field.value).filter(([subKey, _]) => subKey !== 'ID').map(([subKey, subValue]) => `${subValue.value || 'N/A'}`).join(', ') %>
+                        <% } else { %>
+                            <%= field.value %>
+                        <% } %>
+                    <% } else { %>
+                        <%= field || "N/A" %>
+                    <% } %>
+                </div>
+            <% } %>
+        <% }) %>
+    </div>
+
+    <!-- Akcije kartice -->
+    <% if (hasActions) { %>
+        <div class="card__actions">
+            <% actions.forEach(action => { %>
+                <% if (action.type === 'form') { %>
+                    <form action="<%= action.formAction %>" method="POST">
+                        <input type="hidden" name="<%= itemName %>" value="<%= item._id || item.ID.value %>">
+                        <input name="honeypot" type="hidden">
+                        <input type="hidden" name="CSRFToken" value="<%= csrfToken %>">
+                        <button class="btn" type="submit"><%= action.buttonName %></button>
+                    </form>
+                <% } else if (action.type === 'link-name') { %>
+                    <a class="btn card__link" href="<%= action.link %><%= item.Naziv.value %>"><%= action.linkName %></a>
+                <% } else { %>
+                    <a class="btn card__link" href="<%= action.link %><%= item.ID?.value || item._id %>"><%= action.linkName %></a>
+                <% } %>
+            <% }) %>
+        </div>
+    <% } %>
+</div>

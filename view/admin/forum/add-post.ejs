@@ -1,0 +1,23 @@
+<%- include('../include/head.ejs') %>
+<link rel="stylesheet" href="/css/form.css">
+<%- include('../include/navigation.ejs') %>
+<section class="flex flex-column main__container">
+    <h1 class="main__title">
+        <%= pageTitle %>
+    </h1>
+    <form class="main-form width-50" action="/napravite-objavu" method="post">
+        <div class="main-form__group">
+            <label class="" for="nameInput">Ime:</label>
+            <input class="main-form__input" id="nameInput" name="name" type="text" required>
+        </div>
+        <input class="main-form__input" type="hidden" name="CSRFToken" value="<%= csrfToken %>" required>
+        <input name="honeypot" type="hidden">
+        <button class="btn" type="submit">Pošaljite</button>
+        <% if (errorMessage) { %>
+            <p>
+                <%= errorMessage %>
+            </p>
+        <% } %>
+    </form>
+</section>
+<%- include('../include/end.ejs') %>

@@ -1,0 +1,95 @@
+<%- include('../include/head.ejs') %>
+<link rel="stylesheet" href="/css/table.css">
+<link rel="stylesheet" href="/css/tabs.css">
+<link rel="stylesheet" href="/css/form.css">
+<%- include('../include/navigation.ejs') %>
+<section class="flex flex-column main__container">
+    <h1 class="main__title"><%= pageTitle %></h1>
+    <div class="flex flex-row justify-between width-100">
+        <div class="flex flex-column width-20">
+            <%- include('../include/info.ejs', {
+                data: [
+                    { "Email": user.Email.value },
+                    { "Ime": user.Ime.value },
+                    { "Prezime" : user.Prezime.value },
+                    { "Status" : user.Status.value },
+                    { "Uloga" : user.Uloga.value },
+                ]
+            }) %>
+        </div>
+        <div class="flex flex-column width-80">
+            <div class="tabs-header">
+                <button class="tab-btn active" data-tab="Brojevi Telefona">Telefoni</button>
+                <button class="tab-btn" data-tab="Adrese">Adrese</button>
+                <% if (user.Partner.Partner) { %>
+                    <button class="tab-btn" data-tab="Partner">Partner</button>
+                <% } %>
+                <button class="tab-btn" data-tab="Porudžbine">Porudžbine</button>
+            </div>
+            <div class="tabs-content">
+                <div class="tab-content active" data-tab="Brojevi Telefona">
+                    <button class="btn">Dodajte Broj</button>
+                    <div id="newTelephone">
+                        <input type="hidden" id="csrfToken" name="CSRFToken" value="<%= csrfToken %>">
+                        <input name="honeypot" type="hidden">
+                    </div>
+                    <%- include('../include/table.ejs', {
+                        items: user['Brojevi Telefona'],
+                        showId: false,
+                        caption: 'Brojevi Telefona',
+                        hasActions: true,
+                        hasFooter: true,
+                        totals: false,
+                        actions: [{
+                            type: 'form',
+                            formAction: "/korisnik/izbrisite-broj",
+                            buttonName: 'Izbrišite'
+                        }]
+                    }) %>
+                </div>
+                <div class="tab-content" data-tab="Adrese">
+                    <button class="btn">Dodajte Adresu</button>
+                    <div id="newAddres">
+                        <input type="hidden" id="csrfToken" name="CSRFToken" value="<%= csrfToken %>">
+                        <input name="honeypot" type="hidden">
+                    </div>
+                    <%- include('../include/table.ejs', {
+                        items: user.Adrese,
+                        showId: false,
+                        caption: 'Adrese',
+                        hasActions: true,
+                        hasFooter: true,
+                        totals: false,
+                        actions: [{
+                            type: 'form',
+                            formAction: "/korisnik/izbrisite-adresu",
+                            buttonName: 'Izbrišite'
+                        }]
+                    }) %>
+                </div>
+                <% if (user.Partner.Partner) { %>
+                    <div class="tab-content" data-tab="Partner"><%= JSON.stringify(user.Partner) %></div>
+                <% } %>
+                <div class="tab-content" data-tab="Porudžbine">
+                    <%- include('../include/table.ejs', {
+                        items: user["Porudžbine"],
+                        showId: false,
+                        caption: 'Porudžbine',
+                        hasActions: true,
+                        hasFooter: true,
+                        totals: false,
+                        actions: [{
+                            type: 'link',
+                            link: "/korisnik/porudzbina-detalji/",
+                            linkName: 'Detalji'
+                        }]
+                    }) %>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<script src="/js/tabs.js"></script>
+<script src="/js/telephones.js"></script>
+<script src="/js/adresses.js"></script>
+<%- include('../include/end.ejs') %>

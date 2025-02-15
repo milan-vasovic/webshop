@@ -1,0 +1,137 @@
+/* Kontejner za kartice */
+.cards__container {
+    margin: auto;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--grid-gap-medium);
+}
+
+/* Pojedinačna kartica */
+.card__container {
+    min-width: 300px;
+    max-width: 350px;
+    padding: var(--padding-normal);
+    border-radius: var(--border-radius-normal);
+    box-shadow: 0 4px 6px var(--shadow-box-color);
+    background-color: var(--white-color);
+    color: var(--text-color);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-content: space-between;
+    text-align: left;
+    transition: box-shadow var(--transition-fast), transform var(--transition-fast);
+}
+
+.card__container:hover {
+    box-shadow: 0 6px 12px var(--shadow-hover-color);
+    transform: translateY(-5px);
+    cursor: pointer;
+}
+
+/* Zaglavlje kartice */
+.card__header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--grid-gap-small);
+}
+
+/* Autor kartice */
+.author__box {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: var(--font-size-small);
+    color: var(--text-color);
+}
+
+.author-box__image {
+    max-width: 30px;
+    max-height: 30px;
+    border-radius: var(--border-radius-small);
+}
+
+/* Naslov kartice */
+.card__title {
+    width: 100%;
+    text-align: center;
+    font-size: var(--font-size-large);
+    font-weight: var(--font-weight-bold);
+    color: var(--title-color);
+}
+
+/* Slika kartice */
+.card__image {
+    width: 100%;
+    height: auto;
+    max-height: 300px;
+    border-radius: var(--border-radius-normal);
+    object-fit: cover;
+    cursor: pointer;
+    transition: transform var(--transition-fast);
+}
+
+.card__image:hover {
+    transform: scale(1.05);
+}
+
+/* Kategorije kartice */
+.card__categories {
+    margin-top: var(--margin-small);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    font-size: var(--font-size-small);
+    gap: var(--grid-gap-small);
+    color: var(--accent-color);
+}
+
+/* Vreme kartice */
+.card__time {
+    font-size: var(--font-size-small);
+    color: var(--text-color);
+}
+
+/* Sadržaj kartice */
+.card__content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--grid-gap-small);
+    margin: var(--margin-small);
+}
+
+/* Akcije na kartici */
+.card__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: var(--grid-gap-small);
+}
+
+/* Opis */
+.description {
+    text-align: left;
+    font-size: var(--font-size-base);
+    color: var(--text-color);
+    margin: var(--margin-small) 0;
+}
+
+.card__header.normal {
+    background-color: var(--neutral-color);
+    color: var(--text-color);
+}
+
+.card__header.featured {
+    background-color: var(--accent-color);
+    color: var(--white-color);
+}
+
+.card__header.action {
+    background-color: var(--accent-text-color);
+    color: var(--white-color);
+}

@@ -1,0 +1,144 @@
+<%- include('../include/head.ejs') %>
+<link rel="stylesheet" href="/css/card.css">
+<link rel="stylesheet" href="/css/form.css">
+<%- include('../include/navigation.ejs') %>
+
+<section class="flex flex-column main__container">
+    <h1 class="main__title"><%= pageTitle %></h1>
+    <div class="flex flex-row flex-between width-100">
+        <!-- Glavna sekcija sa artiklima -->
+        <div class="flex flex-column width-80">
+            <div>
+                <form class="width-100 flex flex-row" action="/pretraga" method="post">
+                    <div class="main-form__group">
+                        <input class="main-form__input" type="text" name="search">
+                        <input name="honeypot" type="hidden">
+                        <input class="main-form__input" type="hidden" name="CSRFToken" value="<%= csrfToken %>">
+                        <input name="honeypot" type="hidden">
+                    </div>
+                    <button type="submit" class="btn">Pretraga</button>
+                </form>
+            </div>
+                <!-- Prikaz svih sekcija kada nema filtera -->
+                <% if (shop["Istaknuti Artikli"] && shop["Istaknuti Artikli"].length > 0) { %>
+                    <div>
+                        <h1>Istaknuto:</h1>
+                        <div class="cards__container">
+                            <% shop["Istaknuti Artikli"].forEach(item => { %>
+                                <%- include('../include/card.ejs', {
+                                    item: item,
+                                    hasActions: true,
+                                    actions: [
+                                        {
+                                            type: 'link-name',
+                                            link: "/prodavnica/artikal/",
+                                            linkName: 'Pogledajte'
+                                        }
+                                    ],
+                                    showId: false
+                                }) %>
+                            <% }) %>
+                        </div>
+                    </div>
+                <% } %>
+                
+                <% if (shop["Artikli Na Akciji"] && shop["Artikli Na Akciji"].length > 0) { %>
+                    <div>
+                        <h1>Artikli na Akciji:</h1>
+                        <div class="cards__container">
+                            <% shop["Artikli Na Akciji"].forEach(item => { %>
+                                <%- include('../include/card.ejs', {
+                                    item: item,
+                                    hasActions: true,
+                                    actions: [
+                                        {
+                                            type: 'link-name',
+                                            link: "/prodavnica/artikal/",
+                                            linkName: 'Pogledajte'
+                                        }
+                                    ],
+                                    showId: false
+                                }) %>
+                            <% }) %>
+                        </div>
+                    </div>
+                <% } %>
+                
+                <% if (shop["Artikli Po Kategorijama"] && shop["Artikli Po Kategorijama"].length > 0) { %>
+                    <div>
+                        <% shop["Artikli Po Kategorijama"].forEach(item => { %>
+                            <h1><%= item.Kategorija.value %></h1>
+                            <div class="cards__container">
+                                <% item.Artikli.forEach(a => { %>
+                                    <%- include('../include/card.ejs', {
+                                        item: a,
+                                        hasActions: true,
+                                        actions: [
+                                            {
+                                                type: 'link-name',
+                                                link: "/prodavnica/artikal/",
+                                                linkName: 'Pogledajte'
+                                            }
+                                        ],
+                                        showId: false
+                                    }) %>
+                                <% }) %>
+                            </div>
+                        <% }) %>
+                    </div>
+                <% } %>
+                
+                <% if (shop.Artikli && shop.Artikli.length > 0) { %>
+                    <div>
+                        <h1>Ostali Artikli:</h1>
+                        <div class="cards__container">
+                            <% shop.Artikli.forEach(item => { %>
+                                <%- include('../include/card.ejs', {
+                                    item: item,
+                                    hasActions: true,
+                                    actions: [
+                                        {
+                                            type: 'link-name',
+                                            link: "/prodavnica/artikal/",
+                                            linkName: 'Pogledajte'
+                                        }
+                                    ],
+                                    showId: false
+                                }) %>
+                            <% }) %>
+                        </div>
+                    </div>
+                <% } %>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="flex flex-column width-20 align-end">
+            <% if (shop.Kategorije && shop.Kategorije.value) { %>
+                <div>
+                    <h1>Kategorije:</h1>
+                    <ul>
+                        <% shop.Kategorije.value.forEach(c => { %>
+                            <li>
+                                <a href="/prodavnica/kategorija/<%= c %>"><%= c %></a>
+                            </li>
+                        <% }) %>
+                    </ul>
+                </div>
+            <% } %>
+            <% if (shop.Tagovi && shop.Tagovi.value) { %>
+                <div>
+                    <h1>Tagovi:</h1>
+                    <ul>
+                        <% shop.Tagovi.value.forEach(t => { %>
+                            <li>
+                                <a href="/prodavnica/oznaka/<%= t %>"><%= t %></a>
+                            </li>
+                        <% }) %>
+                    </ul>
+                </div>
+            <% } %>
+        </div>
+    </div>
+</section>
+
+<%- include('../include/end.ejs') %>

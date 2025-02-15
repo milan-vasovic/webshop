@@ -1,0 +1,28 @@
+<%- include('../include/head.ejs') %>
+<link rel="stylesheet" href="/css/form.css">
+<%- include('../include/navigation.ejs') %>
+<section class="flex flex-column main__container">
+    <div class="main-form__container">
+        <h1 class="main-form__title"><%= pageTitle %></h1>
+        <form class="main-form" action="/prijava" method="post">
+            <div class="main-form__group">
+                <label class="main-form__label" for="email">Email:</label>
+                <input class="main-form__input" id="email" name="email" type="email" <% if (existingData) { %>value='<%= existingData.email %>'<% } %> required>
+            </div>
+            <div class="main-form__group">
+                <label class="main-form__label" for="password">Šifra:</label>
+                <input class="main-form__input" id="password" name="password" type="password" required>
+            </div>
+            <input class="main-form__input" type="hidden" name="CSRFToken" value="<%= csrfToken %>">
+            <input name="honeypot" type="hidden">
+            <input type="hidden" name="redirectTo" value="<%= redirectTo %>">
+            <button class="btn" type="submit">Prijavite Se</button>
+            <% if (errorMessage) { %>
+                <div class="user-message--error"><%= errorMessage %></div>
+                <a href="/zatrazite-novu-sifru" class="main__link">Zaboravili ste lozinku?</a>
+            <% } %>
+            <a href="/registracija" class="main__link">Nemate nalog? Registrujte se!</a>
+        </form>
+    </div>
+</section>
+<%- include('../include/end.ejs') %>

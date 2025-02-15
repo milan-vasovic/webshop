@@ -1,0 +1,41 @@
+<link rel="stylesheet" href="/css/tabs.css">
+
+<div class="tabs-container">
+    <!-- Header tabova -->
+    <div class="tabs-header">
+        <% tabsData.forEach((tab, index) => { %>
+            <button 
+                class="tab-btn <%= index === 0 ? 'active' : '' %>" >
+                <%= tab.title %>
+            </button>
+        <% }); %>
+    </div>
+
+    <!-- Sadržaj tabova -->
+    <div class="tabs-content">
+        <% tabsData.forEach((tab, index) => { %>
+            <div class="tab-content <%= index === 0 ? 'active' : '' %>" data-tab="<%= index %>">
+                <% if (tab.type === 'table') { %>
+                    <%- include('../include/table.ejs', {
+                        items: tab.data,
+                        showId: true,
+                        caption: tab.title,
+                        hasActions: false,
+                        hasFooter: false,
+                        totals: false,
+                        actions: []
+                    }) %>
+                <% } else if (tab.type === 'card') { %>
+                    <%- include('../include/card.ejs', {
+                        item: tab.data,
+                        hasActions: false,
+                        actions: [],
+                        showId: false
+                    }) %>
+                <% } else { %>
+                    <p>Tip sadržaja nije podržan za "<%= tab.title %>".</p>
+                <% } %>
+            </div>
+        <% }); %>
+    </div>
+</div>
