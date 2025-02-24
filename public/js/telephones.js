@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-    const addPhoneButton = document.querySelector(".tab-content.active button.btn");
+    const addPhoneButton = document.getElementById("addNewTelephoneBtn");
     const newTelephoneContainer = document.getElementById("newTelephone");
 
     // Dohvati CSRF token iz hidden inputa
@@ -29,13 +29,13 @@ document.addEventListener("DOMContentLoaded", () => {
         const removeButton = document.createElement("button");
         removeButton.type = "button";
         removeButton.textContent = "Izbriši";
-        removeButton.classList.add("btn", "btn-danger");
+        removeButton.classList.add("btn-primary", "btn-danger");
 
         // Dugme za slanje
         const submitButton = document.createElement("button");
         submitButton.type = "submit";
         submitButton.textContent = "Dodajte";
-        submitButton.classList.add("btn", "btn-success");
+        submitButton.classList.add("btn-primary");
 
         // Dodavanje elemenata u formu
         form.appendChild(input);

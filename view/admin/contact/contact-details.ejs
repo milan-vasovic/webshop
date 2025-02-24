@@ -1,0 +1,41 @@
+<%- include('../../include/head.ejs') %>
+<link rel="stylesheet" href="/css/contact-details.css">
+<%- include('../../include/navigation.ejs') %>
+
+<section class="main__container">
+  <h1 class="main__title"><%= pageTitle %></h1>
+  
+  <!-- Kontejner za detalje kontakta -->
+  <div class="contact-details">
+    <div class="field">
+      <span class="label">ID:</span>
+      <span class="value"><%= contact.ID.value %></span>
+    </div>
+    <div class="field">
+      <span class="label">Ime:</span>
+      <span class="value"><%= contact.Ime.value %></span>
+    </div>
+    <div class="field">
+      <span class="label">Email:</span>
+      <span class="value"><%= contact.Email.value %></span>
+    </div>
+    <div class="field">
+      <span class="label">Broj Telefona:</span>
+      <span class="value"><%= contact["Broj Telefona"].value %></span>
+    </div>
+    <div class="field">
+      <span class="label">Naslov:</span>
+      <span class="value"><%= contact.Naslov.value %></span>
+    </div>
+    <div class="field">
+      <span class="label">Poruka:</span>
+      <span class="value"><%= contact.Poruka.value %></span>
+    </div>
+    <div class="field">
+      <span class="label">Datum:</span>
+      <span class="value"><%= contact.Datum.value %></span>
+    </div>
+  </div>
+</section>
+
+<%- include('../../include/end.ejs') %>

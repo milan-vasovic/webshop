@@ -1,10 +1,9 @@
 import { Router } from "express";
-
-const router = Router();
+import { body } from 'express-validator';
 
 import ShopController from '../controller/shopController.js';
 
-import { body, param, query, validationResult } from 'express-validator';
+const router = Router();
 
 router.get("", ShopController.getShopPage);
 
@@ -13,6 +12,10 @@ router.get("/pretraga/:search", ShopController.getShopPageBySearch);
 router.get("/kategorija/:category", ShopController.getShopPageByCategory);
 
 router.get("/oznaka/:tag", ShopController.getShopPageByTag);
+
+router.get('/istaknuto', ShopController.getFeautredShopPage);
+
+router.get('/akcija', ShopController.getActionedShopPage);
 
 router.get("/artikal/:itemName", ShopController.getItemByName);
 

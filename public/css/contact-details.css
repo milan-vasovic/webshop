@@ -1,0 +1,45 @@
+.contact-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-width: 600px; /* Po želji ograniči širinu */
+  margin: 0 auto; /* Centriraj na većim ekranima */
+}
+
+.field {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  background: var(--white-color);
+  padding: var(--padding-normal);
+  border-radius: var(--border-radius-small);
+  box-shadow: 0 1px 2px var(--shadow-box-color);
+}
+
+.field .label {
+  font-weight: var(--font-weight-bold);
+  color: var(--title-color);
+  margin-right: 1rem;
+}
+
+.field .value {
+  flex: 1;
+  text-align: right;
+  color: var(--text-color);
+  /* Po želji dodaš prelomanje reči: */
+  word-wrap: break-word;
+}
+
+/* Mobile-friendly prilagođavanje */
+/* Na manjim ekranima, možemo prebaciti u kolonu ako želiš 
+     da labela i value budu jedan ispod drugog */
+@media (max-width: 768px) {
+  .field {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .field .value {
+    text-align: left;
+    margin-top: 0.3rem;
+  }
+}

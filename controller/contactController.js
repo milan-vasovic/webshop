@@ -1,7 +1,15 @@
-import ErrorHelper from '../helper/errorHelper.js';
-import ContactService from '../service/contactService.js';
 import sanitize from 'mongo-sanitize';
 
+import ContactService from '../service/contactService.js';
+
+/**
+ * Renders the contacts page.
+ * 
+ * @param {Object} req - The request object.
+ * @param {Object} res - The response object.
+ * @param {Function} next - The next middleware function.
+ * @returns {Promise<void>}
+ */
 async function getContactsPage(req, res, next) {
     try {
         const search = req.query.search;
@@ -39,23 +47,35 @@ async function getContactsPage(req, res, next) {
         })
 
     } catch (error) {
-        ErrorHelper.throwServerError(error);
+        next(error)
     }
 }
 
+/**
+ * Renders the contact details page.
+ */
 async function getContactDetailsPage(req, res, next) {
     try {
         const contactId = req.params.contactId;
 
         const contact = await ContactService.findContactById(contactId);
 
-        return res.send(({contact: contact}))
+        return res.render("admin/contact/contact-details", {
+            path: "/admin/kontakt-detlji",
+            pageTitle: "Detalji kontakta",
+            pageDescription: "Prikaz detalja kontakta za admina",
+            pageKeyWords: "Admin, Kontakti, Detalji",
+            contact: contact
+        })
 
     } catch (error) {
-        ErrorHelper.throwServerError(error);
+        next(error)
     }
 }
 
+/**
+ * Handles the search form submission for contacts.
+ */
 async function postSearchContact(req, res, next) {
     try {
         const search = sanitize(req.body.search);

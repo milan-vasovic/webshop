@@ -1,15 +1,15 @@
 <%- include('../../include/head.ejs') %>
 <link rel="stylesheet" href="/css/table.css">
 <%- include('../../include/navigation.ejs') %>
-<section class="flex flex-column main__container">
+<section class="main__container">
     <h1 class="main__title"><%= pageTitle %></h1>
-    <div class="flex flex-row justify-between width-100">
-        <div class="width-20">
+    <div class="column-row__container">
+        <div class="left__container-20">
             <h2>Broj Porudžbine: <%= order.ID.value %></h2>
             <h3>Datum: <%= order.Datum.value %></h3>
             <h3>Status: <%= order.Status.value %></h3>
             <hr><br>
-            <h3>Kupac: <a href="/admin/<% if (order.Kupac.Tip === 'User') { %>korisnik-detalji<% } else { %>kupac-detalji<% } %>/<%= order.Kupac.ID.value %>" class="main__title"><%= order.Kupac.Ime.value %> <%= order.Kupac.Prezime.value %></a></h3>
+            <h3>Kupac: <a href="/admin/<% if (order.Kupac.Tip.value === 'User') { %>korisnik-detalji<% } else { %>kupac-detalji<% } %>/<%= order.Kupac.ID.value %>" class="main__title"><%= order.Kupac.Ime.value %> <%= order.Kupac.Prezime.value %></a></h3>
             <p>Broj Telefona: <%= order.Telefon.value %></p>
             <p>Adresa: <%= order.Adresa.Grad.value %>, <%= order.Adresa.Ulica.value %>, <%= order.Adresa.Broj.value %>, <%= order.Adresa["Poštanski Broj"].value %></p>
             <br><hr><br>
@@ -18,7 +18,7 @@
             <p>Poštarina: <strong><%= order.Poštarina.value %> RSD</strong></p>
             <h2>Ukupna Cena: <%= order['Ukupna Cena'].value %></h2>
         </div>
-        <div class="width-70">
+        <div class="right__container-80">
             <%- include('../../include/table.ejs', {
                 items: order.Artikli,
                 showId: false,

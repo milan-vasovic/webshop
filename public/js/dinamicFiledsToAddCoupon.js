@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const removeButton = document.createElement('button');
         removeButton.type = 'button';
-        removeButton.classList.add('btn', 'btn-danger', 'removeField');
+        removeButton.classList.add('btn-danger', 'removeField');
         removeButton.textContent = 'Izbriši';
 
         group.appendChild(select);

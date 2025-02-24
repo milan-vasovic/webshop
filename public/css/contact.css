@@ -1,0 +1,25 @@
+/* Kontakt stranica – raspored forme i mape */
+.contact__content {
+    display: flex;
+    flex-direction: column; /* Po defaultu, mobile: elementi jedan ispod drugog */
+    gap: var(--grid-gap-medium);
+    width: 100%;
+}
+
+.contact__form,
+.contact__map {
+    width: 100%;
+}
+
+/* Na većim ekranima, postavi elemente u red */
+@media (min-width: 768px) {
+    .contact__content {
+        flex-direction: row;
+    }
+    .contact__form {
+        width: 50%;
+    }
+    .contact__map {
+        width: 50%;
+    }
+}

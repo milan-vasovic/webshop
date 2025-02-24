@@ -1,3 +1,6 @@
+/* info.css */
+
+/* Kontejner za info sekciju */
 .info-container {
     display: flex;
     flex-direction: column;
@@ -6,34 +9,50 @@
     background-color: var(--secondary-color);
     border-radius: var(--border-radius-normal);
     box-shadow: 0 2px 4px var(--shadow-box-color);
-}
-
-.info-item {
-    padding: var(--padding-small);
+  }
+  
+  /* Svaki info item izgleda kao red u "tabeli" */
+  .info-item {
     background-color: var(--white-color);
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius-small);
-}
-
-.info-key-value {
-    display: flex;
+    overflow: hidden;
+  }
+  
+  /* Kontejner za ključ i vrednost – koristi grid za responsivno poravnanje */
+  .info-key-value {
+    display: grid;
     gap: var(--grid-gap-small);
-    justify-content: space-between;
     padding: var(--padding-small);
-}
-
-.info-key {
+    grid-template-columns: 1fr; /* Na mobilnim uređajima, elementi se slažu vertikalno */
+  }
+  
+  @media (min-width: 768px) {
+    .info-key-value {
+      grid-template-columns: 1fr 2fr; /* Na većim ekranima, ključ i vrednost se prikazuju u dva stupca */
+      align-items: center;
+    }
+  }
+  
+  /* Stil za ključ (label) */
+  .info-key {
     font-weight: var(--font-weight-bold);
     color: var(--primary-color);
-}
-
-.info-value {
+    background-color: var(--neutral-color);
+    padding: var(--padding-small);
+  }
+  
+  /* Stil za vrednost */
+  .info-value {
     color: var(--text-color);
+    padding: var(--padding-small);
     word-wrap: break-word;
-}
-
-.info-list {
+  }
+  
+  /* Opcioni stil za listu, ako se koristi */
+  .info-list {
     margin: 0;
     padding-left: var(--padding-small);
     list-style-type: none;
-}
+  }
+  

@@ -1,11 +1,9 @@
-import ErrorHelper from '../helper/errorHelper.js';
-
 async function getHistoryPage(req, res, next) {
     try {
         return res.render("shop/shop")
 
     } catch (error) {
-        ErrorHelper.throwServerError(error);
+        next(error)
     }
 }
 
@@ -14,7 +12,7 @@ async function getHistoryDetailsPage(req, res, next) {
         return res.render("shop/shop")
 
     } catch (error) {
-        ErrorHelper.throwServerError(error);
+        next(error)
     }
 }
 

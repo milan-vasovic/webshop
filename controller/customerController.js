@@ -1,6 +1,15 @@
-import ErrorHelper from '../helper/errorHelper.js';
+import sanitize from 'mongo-sanitize';
+
 import CustomerService from '../service/customerService.js';
 
+/**
+ * Renders the customers page for the admin.
+ * 
+ * @param {Object} req - The request object.
+ * @param {Object} res - The response object.
+ * @param {Function} next - The next middleware function.
+ * @returns {Promise<void>}
+ */
 async function getCustomersPage(req, res, next) {
     try {
         const search = req.query.search;
@@ -21,10 +30,13 @@ async function getCustomersPage(req, res, next) {
         })
 
     } catch (error) {
-        ErrorHelper.throwServerError(error);
+        next(error);
     }
 }
 
+/**
+ * Renders the customer profile page for the admin.
+ */
 async function getCustomerProfilePage(req, res, next) {
     try {
         const customerId = req.params.customerId;
@@ -40,11 +52,28 @@ async function getCustomerProfilePage(req, res, next) {
         })
 
     } catch (error) {
-        ErrorHelper.throwServerError(error);
+        next(error);
+    }
+}
+
+/**
+ * Handles the search form submission for customers.
+ */
+function postSearchCustomer(req, res, next) {
+    try {
+        const search = sanitize(req.body.search);
+        if (!search) {
+            return res.redirect("/admin/kupci");
+        }
+
+        return res.redirect(`/admin/kupci?search=${search}`);
+    } catch (error) {
+        next(error);
     }
 }
 
 export default {
     getCustomersPage,
-    getCustomerProfilePage
+    getCustomerProfilePage,
+    postSearchCustomer
 }

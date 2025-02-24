@@ -1,0 +1,11 @@
+@media (max-width: 767px) {
+    .column-row__container {
+      flex-direction: column; /* već je kolona, ali želimo promijeniti redoslijed */
+    }
+    .right__container-50 {
+      order: -1; /* desna kolona ide na vrh */
+    }
+    .left__container-50 {
+      order: 1; /* leva kolona ide nakon desne */
+    }
+  }

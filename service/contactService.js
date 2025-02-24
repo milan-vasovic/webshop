@@ -1,7 +1,9 @@
 import ContactModel from '../model/contact.js';
-import ErrorHelper from '../helper/errorHelper.js';
-import CryptoService from '../service/cryptoService.js';
+
+import CryptoService from './cryptoService.js';
 import EmailService from './emailService.js';
+
+import ErrorHelper from '../helper/errorHelper.js';
 
 class ContactService {
     static async findAllContacts() {
@@ -48,13 +50,13 @@ class ContactService {
     static async createContact(name, email, title, msg, phone=null) {
         try {
             const securePhone = await CryptoService.encryptData(phone);
-
+            const secrueMsg = await CryptoService.encryptData(msg);
             const newContact = new ContactModel({
                 firstName: name,
                 email: email,
                 telephoneNuber: securePhone,
                 title: title,
-                message: msg,
+                message: secrueMsg,
             })
 
             newContact.save();
@@ -85,7 +87,7 @@ class ContactService {
             Email: {value: contact.email },
             "Broj Telefona": {value: CryptoService.decryptData(contact.telephoneNuber) },
             Naslov: {value: contact.title },
-            Poruka: {value: contact.message },
+            Poruka: {value: CryptoService.decryptData(contact.message) },
             Datum: {value: contact.date },
         }
     }

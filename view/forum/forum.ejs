@@ -1,0 +1,75 @@
+<%- include('../include/head.ejs') %>
+<link rel="stylesheet" href="/css/card.css">
+<link rel="stylesheet" href="/css/form.css">
+<link rel="stylesheet" href="/css/table.css">
+<%- include('../include/navigation.ejs') %>
+
+<section class="main__container">
+  <h1 class="main__title"><%= pageTitle %></h1>
+  <div class="column-row__container">
+    <!-- Lijeva kolona: Pretraga i objave -->
+    <div class="left__container-80">
+      <!-- Pretraga -->
+      <div>
+        <form class="width-100 flex flex-row" action="/forum-pretraga" method="post">
+          <div class="main-form__group">
+            <input class="main-form__input" type="text" name="search" placeholder="Pretražite objave...">
+            <input name="honeypot" type="hidden">
+            <input class="main-form__input" type="hidden" name="CSRFToken" value="<%= csrfToken %>">
+          </div>
+          <button type="submit" class="btn-secondary">Pretraga</button>
+        </form>
+      </div>
+      <!-- Lista objava -->
+      <div class="cards__container" style="margin-top: var(--margin-big);">
+        <% posts.forEach(item => { %>
+          <%- include('../include/card.ejs', {
+              item: item,
+              showId: false,
+              hasActions: true,
+              actions: [
+                {
+                  type: 'link-name',
+                  link: "/objava/",
+                  linkName: 'Pogledajte'
+                }
+              ]
+          }) %>
+        <% }) %>
+      </div>
+    </div>
+    <!-- Desna kolona: Sidebar s kategorijama i tagovima -->
+    <div class="right__container-20">
+      <% if (!isAuthenticated) { %>
+        <%- include('../include/newsletter.ejs') %>
+      <% } %>
+      <% if (categories && categories.length > 0) { %>
+        <div style="margin-bottom: var(--margin-big);">
+          <h1>Kategorije:</h1>
+          <ul>
+            <% categories.forEach(c => { %>
+              <li>
+                <a href="/forum/kategorija/<%= encodeURIComponent(c) %>"><%= c %></a>
+              </li>
+            <% }) %>
+          </ul>
+        </div>
+      <% } %>
+      <% if (tags && tags.length > 0) { %>
+        <div>
+          <h1>Tagovi:</h1>
+          <ul>
+            <% tags.forEach(t => { %>
+              <li>
+                <a href="/forum/oznaka/<%= encodeURIComponent(t) %>"><%= t %></a>
+              </li>
+            <% }) %>
+          </ul>
+        </div>
+      <% } %>
+      
+    </div>
+  </div>
+</section>
+
+<%- include('../include/end.ejs') %>

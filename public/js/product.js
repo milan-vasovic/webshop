@@ -11,21 +11,18 @@ document.addEventListener('DOMContentLoaded', function() {
   const stockMessage = document.getElementById('stockMessage');
   const productForm = document.getElementById('productForm');
   const formSubmitContainer = document.getElementById('formSubmitContainer');
+  const quantityContainer = document.getElementById('amountInput'); // novi kontejner
 
-  // Funkcija koja ažurira prikaz na osnovu izabrane varijacije
   function updateVariation(index) {
     const variation = variations[index];
 
-    // Ažuriranje glavnog medija – ovde, čak i ako je prethodno bio video, želimo prikazati sliku
+    // Ažuriranje glavnog medija
     if (variation.Slika && variation.Slika.URL) {
-      // Koristimo selectMedia da uvek prikažemo sliku
       selectMedia("image", variation.Slika.URL, variation.Slika.Opis || '');
     } else {
-      // Ako nema specifične slike, koristimo podrazumevanu sliku
       selectMedia("image", defaultImage, "Default slika");
     }
 
-    // Ažuriranje input polja i forme (prema dostupnoj količini)
     const availableQuantity = variation.Količina;
     formSubmitContainer.innerHTML = ''; // reset dugmeta
 
@@ -35,16 +32,31 @@ document.addEventListener('DOMContentLoaded', function() {
         stockMessage.textContent = "Nema na stanju, ali poručivanje (backorder) je dozvoljeno.";
         amountInput.removeAttribute('max');
 
+        // Prikazujemo količinu (možda kao 1) – ili ostavite vidljivo
+        if (quantityContainer) {
+          quantityContainer.style.display = ''; // ostaje vidljivo
+        }
+
         const backorderBtn = document.createElement('button');
         backorderBtn.type = 'submit';
         backorderBtn.id = 'submitBtn';
+        backorderBtn.classList.add('btn-primary');
         backorderBtn.textContent = 'Poruči (backorder)';
         formSubmitContainer.appendChild(backorderBtn);
       } else {
         stockMessage.textContent = "Nema na stanju.";
-        productForm.action = ''; // poništavamo akciju forme
+        productForm.action = '';
+        // Sakrij polje za količinu
+        if (quantityContainer) {
+          quantityContainer.style.display = 'none';
+        }
+        formSubmitContainer.innerHTML = '';
       }
     } else {
+      // Ako ima zaliha, obezbediti da je polje za količinu vidljivo
+      if (quantityContainer) {
+        quantityContainer.style.display = '';
+      }
       productForm.action = '/prodavnica/korpa-dodavanje';
       stockMessage.textContent = "";
       amountInput.max = availableQuantity;
@@ -52,6 +64,7 @@ document.addEventListener('DOMContentLoaded', function() {
       const addToCartBtn = document.createElement('button');
       addToCartBtn.type = 'submit';
       addToCartBtn.id = 'submitBtn';
+      addToCartBtn.classList.add('btn-primary');
       addToCartBtn.textContent = 'Dodaj u korpu';
       formSubmitContainer.appendChild(addToCartBtn);
     }
@@ -63,9 +76,34 @@ document.addEventListener('DOMContentLoaded', function() {
   // Inicijalno postavljanje – prikaz prve varijacije
   updateVariation(0);
 
-  // Event listener za promenu varijacije
   variationsSelect.addEventListener('change', function(e) {
     const selectedIndex = parseInt(e.target.value, 10);
     updateVariation(selectedIndex);
   });
+
+   // Pronađi sve slike koje se mogu kliknuti (sličice)
+   const thumbnail = document.getElementById('main-media');
+
+   // Pronađi overlay element i sliku unutar overlay-a
+   const overlay = document.getElementById('overlay');
+   const overlayImg = document.getElementById('overlay-img');
+   const closeBtn = document.querySelector('.close-btn');
+
+   // Kada se klikne na sličicu, prikaži je u overlay-u
+    thumbnail.addEventListener('click', function() {
+      overlay.style.display = 'flex';
+      overlayImg.src = this.src;
+    });
+
+   // Kada se klikne na dugme za zatvaranje, sakrij overlay
+   closeBtn.addEventListener('click', function() {
+   overlay.style.display = 'none';
+   });
+
+   // Opcionalno: Zatvori overlay klikom na pozadinu
+   overlay.addEventListener('click', function(event) {
+   if (event.target === overlay) {
+       overlay.style.display = 'none';
+   }
+   });
 });

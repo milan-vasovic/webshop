@@ -1,12 +1,12 @@
 <%- include('../include/head.ejs') %>
 <link rel="stylesheet" href="/css/form.css">
+<link rel="stylesheet" href="/css/card.css">
 <%- include('../include/navigation.ejs') %>
 
 <section class="main__container">
   <h1 class="main__title"><%= item.Naziv.value %></h1>
-  <div class="flex flex-row flex-between width-100 align-start">
-    <!-- Galerija -->
-    <div class="flex flex-column width-30">
+  <div class="column-row__container">
+    <div class="left__container-30">
       <%- include('../include/galery.ejs', {
             images: item.Slike.Slike,
             selectedImage: item.Slike['Istaknuta Slika'],
@@ -14,8 +14,7 @@
         }) %>
     </div>
 
-    <!-- Opis i forma -->
-    <div class="flex flex-column width-70">
+    <div class="right__container-70">
       <div>
         <p><%= item.Opis.value %></p>
         <ul>
@@ -40,7 +39,7 @@
       <div>
         <form id="productForm" action="/prodavnica/korpa-dodavanje" method="post">
           <div>
-            <label for="variationsSelect">Izaberite:</label>
+            <label class="main-form__label" for="variationsSelect">Izaberite:</label>
             <select class="main-form__input" name="variationsSelect" id="variationsSelect">
               <% item.Varijacije.forEach((v, index) => { %>
                 <option value="<%= index %>"><%= v.Veličina %> <%= v.Boja %></option>
@@ -48,15 +47,12 @@
             </select>
           </div>
           <div>
-            <label for="amountInput">Količina:</label>
-            <input class="main-form__input" type="number" name="amount" id="amountInput" min="1" placeholder="1" required>
+            <label class="main-form__label" for="amountInput">Količina:</label>
+            <input class="main-form__input" type="number" name="amount" id="amountInput" min="1" placeholder="1" required >
           </div>
-          <!-- Mesto za prikaz poruke o stanju -->
           <div id="stockMessage"></div>
-          <!-- Container u koji će se dinamički ubacivati dugme (ili neće biti ubaceno ništa) -->
           <div id="formSubmitContainer">
-            <!-- Na početku se može ubaciti default dugme, a kasnije ga menja skripta -->
-            <button type="submit" id="submitBtn">Dodaj u korpu</button>
+            <button class="btn-primary" type="submit" id="submitBtn">Dodaj u korpu</button>
           </div>
           <input class="main-form__input" type="hidden" name="itemId" value="<%= item.ID.value %>">
           <input class="main-form__input" type="hidden" name="CSRFToken" value="<%= csrfToken %>">
@@ -64,10 +60,31 @@
           <input name="honeypot" type="hidden">
         </form>
       </div>
+
+      <div>
+        <% if (item["CrossSell Artikli"].length > 0) { %>
+          <h2>Idealni Artikli uz Ovaj:</h2>
+          <div class="grid grid-3">
+            <% item["CrossSell Artikli"].forEach(i => { %>
+              <%- include('../include/card.ejs', {
+                item: i,
+                hasActions: true,
+                actions: [
+                    {
+                        type: 'link-name',
+                        link: "/prodavnica/artikal/",
+                        linkName: 'Pogledajte'
+                    }
+                ],
+                showId: false
+              }) %>
+            <% }) %>
+          <% } %>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- Skriveni element sa podacima potrebnim za JS (preko data atributa) -->
   <div id="item-data"
        data-variations='<%- JSON.stringify(item.Varijacije) %>'
        data-backorder='<%= item.Backorder.Dozvoljeno %>'
@@ -76,6 +93,5 @@
   </div>
 </section>
 
-<!-- Uključujemo eksterni JS fajl -->
 <script src="/js/product.js"></script>
 <%- include('../include/end.ejs') %>

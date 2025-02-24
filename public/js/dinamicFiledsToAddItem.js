@@ -112,6 +112,13 @@ document.addEventListener('DOMContentLoaded', () => {
     updateSelectedCategories();
     updateCategoryOptions();
 
+    const existingCategories = categoriesContainer.querySelectorAll('.dynamic-group .removeField');
+    existingCategories.forEach(button => {
+        button.addEventListener('click', (event) => {
+            const group = event.target.closest('.dynamic-group');
+            if (group) group.remove();
+        });
+    });
 
     // Referenca na container i dugme za dodavanje tagova
     const tagsContainer = document.getElementById('tagsContainer');
@@ -273,7 +280,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const removeButton = document.createElement('button');
         removeButton.type = 'button';
-        removeButton.classList.add('btn', 'btn-danger', 'removeField');
+        removeButton.classList.add('btn-danger', 'removeField');
         removeButton.textContent = 'Izbriši';
 
         group.appendChild(select);
@@ -312,120 +319,146 @@ document.addEventListener('DOMContentLoaded', () => {
     updateSelectedStatuses();
     updateStatusOptions();
 
+    const existingStatuses = statusesContainer.querySelectorAll('.dynamic-group .removeField');
+    existingStatuses.forEach(button => {
+        button.addEventListener('click', (event) => {
+            const group = event.target.closest('.dynamic-group');
+            if (group) group.remove();
+        });
+    });
+
     const variationsContainer = document.getElementById('variations-container');
     const addVariationButton = document.getElementById('addVariation');
-
+    
     // Funkcija za dodavanje nove varijacije
     const addVariationField = () => {
-        const index = variationsContainer.querySelectorAll('.dynamic-group').length; // Indeks nove varijacije
-
-        // Kreiranje wrapper div-a za novu varijaciju
-        const group = document.createElement('div');
-        group.classList.add('variation', 'dynamic-group');
-
-        // Select za veličinu
-        const sizeLabel = document.createElement('label');
-        sizeLabel.textContent = 'Veličina:';
-        sizeLabel.setAttribute('for', `variationSize${index}`);
-        sizeLabel.classList.add('main-form__label');
-
-        const sizeSelect = document.createElement('select');
-        sizeSelect.id = `variationSize${index}`;
-        sizeSelect.name = `variations[${index}][size]`;
-        sizeSelect.classList.add('main-form__select');
-        sizeSelect.required = true;
-
-        const sizes = ["XS", "S", "M", "L", "XL", "2XL", "3XL", "4XL", "S/M", "M/L", "L/XL", "XL/2XL", "Uni"];
-        sizes.forEach(size => {
-            const option = document.createElement('option');
-            option.value = size;
-            option.textContent = size;
-            sizeSelect.appendChild(option);
-        });
-
-        // Input za boju
-        const colorLabel = document.createElement('label');
-        colorLabel.textContent = 'Boja:';
-        colorLabel.setAttribute('for', `variationColor${index}`);
-        colorLabel.classList.add('main-form__label');
-
-        const colorInput = document.createElement('input');
-        colorInput.type = 'text';
-        colorInput.id = `variationColor${index}`;
-        colorInput.name = `variations[${index}][color]`;
-        colorInput.classList.add('main-form__input');
-        colorInput.required = true;
-
-        // Input za količinu
-        const amountLabel = document.createElement('label');
-        amountLabel.textContent = 'Količina:';
-        amountLabel.setAttribute('for', `variationAmount${index}`);
-        amountLabel.classList.add('main-form__label');
-
-        const amountInput = document.createElement('input');
-        amountInput.type = 'number';
-        amountInput.id = `variationAmount${index}`;
-        amountInput.name = `variations[${index}][amount]`;
-        amountInput.classList.add('main-form__input');
-        amountInput.min = '0';
-        amountInput.required = true;
-
-        // Input za sliku
-        const imageLabel = document.createElement('label');
-        imageLabel.textContent = 'Slika:';
-        imageLabel.setAttribute('for', `variationImage${index}`);
-        imageLabel.classList.add('main-form__label');
-
-        const imageInput = document.createElement('input');
-        imageInput.type = 'file';
-        imageInput.id = `variationImage${index}`;
-        imageInput.name = 'variationImages';
-        imageInput.classList.add('main-form__file');
-        imageInput.accept = 'image/*';
-
-        // Input za opis slike
-        const imageDescLabel = document.createElement('label');
-        imageDescLabel.textContent = 'Opis slike:';
-        imageDescLabel.setAttribute('for', `variationImageDesc${index}`);
-        imageDescLabel.classList.add('main-form__label');
-
-        const imageDescInput = document.createElement('input');
-        imageDescInput.type = 'text';
-        imageDescInput.id = `variationImageDesc${index}`;
-        imageDescInput.name = `variations[${index}][imgDesc]`;
-        imageDescInput.classList.add('main-form__input');
-        imageDescInput.required = true;
-
-        // Dugme za brisanje polja
-        const removeButton = document.createElement('button');
-        removeButton.type = 'button';
-        removeButton.classList.add('btn', 'btn-danger', 'removeField');
-        removeButton.textContent = 'Izbriši';
-
-        // Dodavanje event listener-a za brisanje
-        removeButton.addEventListener('click', () => {
-            group.remove();
-        });
-
-        // Sklapanje svih elemenata u grupu
-        group.appendChild(sizeLabel);
-        group.appendChild(sizeSelect);
-        group.appendChild(colorLabel);
-        group.appendChild(colorInput);
-        group.appendChild(amountLabel);
-        group.appendChild(amountInput);
-        group.appendChild(imageLabel);
-        group.appendChild(imageInput);
-        group.appendChild(imageDescLabel);
-        group.appendChild(imageDescInput);
-        group.appendChild(removeButton);
-
-        // Dodavanje grupe u container
-        variationsContainer.appendChild(group);
-    };
+      // Broj već postojećih varijacija kao indeks
+      const index = variationsContainer.querySelectorAll('.dynamic-group').length;
+      
+      // Kreiranje wrapper div-a za novu varijaciju
+      const group = document.createElement('div');
+      group.classList.add('variation', 'dynamic-group');
+    
+      // Kreiraj privremeni ID, na primer: "new-" + timestamp
+      const tempId = "new-" + Date.now();
+    
+      // Skriveno polje za privremeni ID varijacije
+      const variationIdInput = document.createElement('input');
+      variationIdInput.type = 'hidden';
+      variationIdInput.name = `variations[${index}][variationId]`;
+      variationIdInput.value = tempId;
+    
+      // Label i select za veličinu
+      const sizeLabel = document.createElement('label');
+      sizeLabel.textContent = 'Veličina:';
+      sizeLabel.setAttribute('for', `variationSize${index}`);
+      sizeLabel.classList.add('main-form__label');
+    
+      const sizeSelect = document.createElement('select');
+      sizeSelect.id = `variationSize${index}`;
+      sizeSelect.name = `variations[${index}][size]`;
+      sizeSelect.classList.add('main-form__select');
+      sizeSelect.required = true;
+    
+      const sizes = ["XS", "S", "M", "L", "XL", "2XL", "3XL", "4XL", "S/M", "M/L", "L/XL", "XL/2XL", "Uni"];
+      sizes.forEach(size => {
+        const option = document.createElement('option');
+        option.value = size;
+        option.textContent = size;
+        sizeSelect.appendChild(option);
+      });
+    
+      // Input za boju
+      const colorLabel = document.createElement('label');
+      colorLabel.textContent = 'Boja:';
+      colorLabel.setAttribute('for', `variationColor${index}`);
+      colorLabel.classList.add('main-form__label');
+    
+      const colorInput = document.createElement('input');
+      colorInput.type = 'text';
+      colorInput.id = `variationColor${index}`;
+      colorInput.name = `variations[${index}][color]`;
+      colorInput.classList.add('main-form__input');
+      colorInput.required = true;
+    
+      // Input za količinu
+      const amountLabel = document.createElement('label');
+      amountLabel.textContent = 'Količina:';
+      amountLabel.setAttribute('for', `variationAmount${index}`);
+      amountLabel.classList.add('main-form__label');
+    
+      const amountInput = document.createElement('input');
+      amountInput.type = 'number';
+      amountInput.id = `variationAmount${index}`;
+      amountInput.name = `variations[${index}][amount]`;
+      amountInput.classList.add('main-form__input');
+      amountInput.min = '0';
+      amountInput.required = true;
+    
+      // Input za sliku – preimenuj file input tako da uključuje tempId
+      const imageLabel = document.createElement('label');
+      imageLabel.textContent = 'Slika:';
+      imageLabel.setAttribute('for', `variationImage${index}`);
+      imageLabel.classList.add('main-form__label');
+    
+      const imageInput = document.createElement('input');
+      imageInput.type = 'file';
+      imageInput.id = `variationImage${index}`;
+      // Ime file inputa sadrži privremeni ID, npr. "variationImage_new-<timestamp>"
+      imageInput.name = `variationImage_${tempId}`;
+      imageInput.classList.add('main-form__file');
+      imageInput.accept = 'image/*';
+    
+      // Input za opis slike
+      const imageDescLabel = document.createElement('label');
+      imageDescLabel.textContent = 'Opis slike:';
+      imageDescLabel.setAttribute('for', `variationImageDesc${index}`);
+      imageDescLabel.classList.add('main-form__label');
+    
+      const imageDescInput = document.createElement('input');
+      imageDescInput.type = 'text';
+      imageDescInput.id = `variationImageDesc${index}`;
+      imageDescInput.name = `variations[${index}][imgDesc]`;
+      imageDescInput.classList.add('main-form__input');
+      imageDescInput.required = true;
+    
+      // Dugme za brisanje polja
+      const removeButton = document.createElement('button');
+      removeButton.type = 'button';
+      removeButton.classList.add('btn-danger', 'removeField');
+      removeButton.textContent = 'Izbriši';
+      removeButton.addEventListener('click', () => {
+        group.remove();
+      });
+    
+      // Sklapanje svih elemenata u grupu
+      group.appendChild(sizeLabel);
+      group.appendChild(sizeSelect);
+      group.appendChild(colorLabel);
+      group.appendChild(colorInput);
+      group.appendChild(amountLabel);
+      group.appendChild(amountInput);
+      group.appendChild(imageLabel);
+      group.appendChild(imageInput);
+      group.appendChild(imageDescLabel);
+      group.appendChild(imageDescInput);
+      group.appendChild(variationIdInput);
+      group.appendChild(removeButton);
+    
+      // Dodavanje grupe u container
+      variationsContainer.appendChild(group);
+    }; 
 
     // Event listener za dugme "Dodajte"
     addVariationButton.addEventListener('click', addVariationField);
+
+    const existingVariations = variationsContainer.querySelectorAll('.dynamic-group .removeField');
+    existingVariations.forEach(button => {
+        button.addEventListener('click', (event) => {
+            const group = event.target.closest('.dynamic-group');
+            if (group) group.remove();
+        });
+    });
 
     let availableUpSellItems = [];
     let availableCrossSellItems = [];

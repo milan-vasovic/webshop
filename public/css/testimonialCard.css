@@ -1,0 +1,99 @@
+.testimonials {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  justify-items: center;
+  gap: 1rem;
+}
+
+.testimonial-card {
+  display: flex;
+  flex-direction: row; /* Mobilni uređaji – kolona */
+  width: 100%;
+  gap: 1rem;
+  padding: 1rem;
+  background-color: var(--white-color);
+  border-radius: var(--border-radius-normal);
+  box-shadow: 0 2px 4px var(--shadow-box-color);
+  margin-bottom: var(--margin-normal);
+}
+
+/* Leva strana: slika i ime */
+.testimonial-left {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 120px; /* ili prilagodite širinu */
+  gap: 0.5rem;
+}
+
+.testimonial-image img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%; /* da bude kružna slika */
+  object-fit: cover;
+  box-shadow: 0 1px 2px var(--shadow-box-color);
+}
+
+.testimonial-name {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-bold);
+  color: var(--title-color);
+  text-align: center;
+}
+
+/* Desna strana: zvezdice i tekst */
+.testimonial-right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.testimonial-stars {
+  display: flex;
+  gap: 0.1rem;
+}
+
+.star {
+  font-size: 1.2rem;
+  color: var(--border-color); /* "prazna" zvezdica */
+}
+
+.star.filled {
+  color: var(--accent-color); /* "popunjena" zvezdica */
+}
+
+.testimonial-text {
+  font-size: var(--font-size-small);
+  line-height: 1.4;
+  color: var(--text-color);
+}
+
+/* Responsive prilagođavanje – na mobilnom možda želimo kolonu umesto reda */
+@media (max-width: 768px) {
+  .testimonials {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .testimonial-stars {
+    justify-content: center;
+  }
+
+  .testimonial-card {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .testimonial-left {
+    flex-direction: column;
+    min-width: auto;
+  }
+
+  .testimonial-right {
+    margin-top: 1rem;
+  }
+}

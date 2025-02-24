@@ -1,9 +1,10 @@
 import { Router } from "express";
+import { body } from 'express-validator';
+import sanitizeHtml from 'sanitize-html';
+
+import DefaultController from '../controller/defaultController.js';
 
 const router = Router();
-import { body, param, query } from 'express-validator';
-import DefaultController from '../controller/defaultController.js';
-import sanitizeHtml from 'sanitize-html';
 
 router.get("/", DefaultController.getHomePage);
 

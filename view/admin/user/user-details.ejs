@@ -1,11 +1,12 @@
 <%- include('../../include/head.ejs') %>
 <link rel="stylesheet" href="/css/table.css">
+<link rel="stylesheet" href="/css/info.css">
 <link rel="stylesheet" href="/css/tabs.css">
 <%- include('../../include/navigation.ejs') %>
 <section class="main__container">
     <h1 class="main__title"><%= pageTitle %></h1>
-    <div class="flex flex-row flex-between width-100">
-        <div class="flex flex-column width-20">
+    <div class="column-row__container">
+        <div class="left__container-20>
             <%- include('../../include/info.ejs', {
                 data: [
                     { "Ime": user.Ime.value },
@@ -16,7 +17,7 @@
                 ]
             }) %>
         </div>
-        <div class="flex flex-column width-80">
+        <div class="right__container-80">
             <div class="tabs-header">
                 <button class="tab-btn active" data-tab="Brojevi Telefona">Brojevi Telefona</button>
                 <button class="tab-btn" data-tab="Adrese">Adrese</button>
@@ -53,10 +54,14 @@
                         items: user.Porudžbine,
                         showId: false,
                         caption: 'Porudžbine',
-                        hasActions: false,
+                        hasActions: true,
                         hasFooter: true,
                         totals: false,
-                        actions: []
+                        actions: [{
+                            type: 'link',
+                            link: "/admin/porudzbina-detalji/",
+                            linkName: 'Detalji'
+                        }]
                     }) %>
                 </div>
                 <% if (user.Partner.Partner) { %>

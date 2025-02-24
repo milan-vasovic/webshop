@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
-    const addAddressButton = document.querySelector(".tab-content[data-tab='Adrese'] button.btn");
-    const newAddressContainer = document.getElementById("newAddres");
+    const addAddressButton = document.getElementById("addNewAddressBtn");
+    const newAddressContainer = document.getElementById("newAddress");
 
     // Dohvati CSRF token iz hidden inputa
     const csrfToken = document.getElementById("csrfToken").value;
@@ -37,7 +37,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const submitButton = document.createElement("button");
         submitButton.type = "submit";
         submitButton.textContent = "Dodajte";
-        submitButton.classList.add("btn", "btn-success");
+        submitButton.classList.add("btn-primary");
 
         // 📌 Dodavanje elemenata u formu
         form.appendChild(cityGroup);

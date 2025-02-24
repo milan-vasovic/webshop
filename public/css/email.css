@@ -1,0 +1,33 @@
+.main__container {
+  text-align: center;
+  padding: var(--padding-big) var(--padding-normal);
+}
+
+.main__title {
+  margin-bottom: var(--margin-big);
+  font-size: var(--font-size-extra-large);
+  color: var(--title-color);
+}
+
+.main__container p {
+  font-size: var(--font-size-base);
+  color: var(--text-color);
+  margin-bottom: var(--margin-normal);
+  line-height: 1.5;
+}
+
+.main__container a.btn-primary {
+  display: inline-block;
+  padding: var(--padding-small) var(--padding-big);
+  background-color: var(--accent-color);
+  color: var(--white-color);
+  border-radius: var(--border-radius-normal);
+  text-decoration: none;
+  font-weight: var(--font-weight-bold);
+  transition: background-color var(--transition-fast);
+  margin-top: var(--margin-normal);
+}
+
+.main__container a.btn-primary:hover {
+  background-color: var(--accent-hover-color);
+}

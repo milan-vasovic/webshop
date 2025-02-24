@@ -1,0 +1,53 @@
+<%- include('../include/head.ejs') %>
+<link rel="stylesheet" href="/css/table.css">
+<style>
+    .feature-image img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto; /* centriranje, opcionalno */
+  border-radius: var(--border-radius-normal); /* ako želite zaobljene ivice */
+  object-fit: cover; /* ako želite da slika popuni prostor bez distorzije */
+}
+
+</style>
+<%- include('../include/navigation.ejs') %>
+<section class="main__container">
+    <h1 class="main__title"><%= pageTitle %></h1>
+    <div class="column-row__container">
+        <div class="left__container-70">
+            <div class="feature-image">
+                <img src="/images/<%= post.Slika.value %>" alt="<%= post.Slika.Opis.value %>">
+            </div>
+            <div>
+                <% post.Sadržaj.value.forEach(content => { %>
+                    <%- content %>
+                <% }) %>
+            </div>
+            <p><%= post.Opis.value %></p>
+        </div>
+        <div class="right__container-30">
+            <div>
+                <h1>Kategorije:</h1>
+                <ul>
+                    <% post.Kategorije.value.forEach(c => { %>
+                        <li>
+                            <a href="/forum/kategorija/<%= c %>"><%= c %></a>
+                        </li>
+                    <% }) %>
+                </ul>
+            </div>
+            <div>
+                <h1>Tagovi:</h1>
+                <ul>
+                    <% post.Tagovi.value.forEach(t => { %>
+                        <li>
+                            <a href="/forum/tag/<%= t %>"><%= t %></a>
+                        </li>
+                    <% }) %>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+<%- include('../include/end.ejs') %>

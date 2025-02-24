@@ -1,15 +1,23 @@
+/* tabs.css */
+
+/* Kontejner za tabove – pokriva punu širinu i centrira sadržaj */
 .tabs-container {
     width: 100%;
     margin: auto;
-}
-
-.tabs-header {
+    padding: var(--padding-normal);
+  }
+  
+  /* Zaglavlje tabova – fleks kontejner koji obezbeđuje wrap i centriranje */
+  .tabs-header {
     display: flex;
+    flex-wrap: wrap;
     gap: var(--grid-gap-small);
     margin-bottom: var(--padding-big);
-}
-
-.tab-btn {
+    justify-content: center;
+  }
+  
+  /* Dugmići tabova */
+  .tab-btn {
     padding: var(--padding-small) var(--padding-normal);
     background-color: var(--secondary-color);
     border: 1px solid var(--border-color);
@@ -17,56 +25,76 @@
     cursor: pointer;
     transition: var(--transition-fast);
     border-radius: var(--border-radius-small);
-}
-
-.tab-btn.active {
+  }
+  
+  /* Aktivni tab – drugačija boja za pozadinu i tekst */
+  .tab-btn.active {
     background-color: var(--accent-color);
     color: var(--white-color);
-}
-
-.tabs-content {
+  }
+  
+  /* Sadržaj tabova – kontejner sa obrubom, paddingom i senkom */
+  .tabs-content {
     border: 1px solid var(--border-color);
     padding: var(--padding-normal);
-    background: var(--white-color);
+    background-color: var(--white-color);
     border-radius: var(--border-radius-normal);
-    box-shadow: var(--shadow-box-color);
-}
-
-.tab-content {
+    box-shadow: 0 2px 4px var(--shadow-box-color);
+  }
+  
+  /* Svaki tab sadržaj je po defaultu skriven */
+  .tab-content {
     display: none;
-}
-
-.tab-content.active {
+  }
+  
+  .tab-content.active {
     display: block;
-}
-
-.card-container {
+  }
+  
+  /* Sekcija za kartice unutar tabova */
+  .card-container {
     display: flex;
     flex-wrap: wrap;
     gap: var(--grid-gap-medium);
-}
-
-.card {
+    justify-content: center;
+  }
+  
+  /* Kartica – mobile-first: na manjim ekranima kartica zauzima punu širinu uz ograničenje maksimalne širine */
+  .card {
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius-small);
     overflow: hidden;
-    width: calc(33.333% - var(--grid-gap-medium));
     background-color: var(--secondary-color);
     box-shadow: var(--shadow-box-color);
-    transition: var(--transition-fast);
-}
-
-.card:hover {
-    box-shadow: var(--shadow-hover-color);
-}
-
-.card-image {
+    transition: box-shadow var(--transition-fast);
+    width: 100%;
+    max-width: 300px;
+  }
+  
+  /* Na većim ekranima, rasporedi kartice u tri kolone */
+  @media (min-width: 768px) {
+    .card {
+      width: calc(33.333% - var(--grid-gap-medium));
+    }
+  }
+  
+  /* Slika unutar kartice – prilagođavanje dimenzija */
+  .card-image {
     width: 100%;
     height: auto;
-}
-
-.card-content {
+  }
+  
+  /* Sadržaj kartice */
+  .card-content {
     padding: var(--padding-small);
     font-family: var(--font-family);
     color: var(--text-color);
-}
+  }
+  
+  /* Hover efekat za kartice (samo na uređajima koji podržavaju hover) */
+  @media (hover: hover) {
+    .card:hover {
+      box-shadow: 0 4px 8px var(--shadow-hover-color);
+    }
+  }
+  

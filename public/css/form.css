@@ -1,3 +1,6 @@
+/* form.css */
+
+/* Kontejner za formu – centriran, mobile-first pristup */
 .main-form__container {
     margin: auto;
     padding: var(--padding-normal);
@@ -5,9 +8,10 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-}
-
-.main-form {
+  }
+  
+  /* Glavna forma – jednostavan, čist dizajn */
+  .main-form {
     margin: auto;
     padding: var(--padding-big);
     background-color: var(--white-color);
@@ -16,148 +20,181 @@
     box-shadow: 0 2px 4px var(--shadow-box-color);
     display: flex;
     flex-direction: column;
-    align-items: start;
-    justify-content: start;
-}
-
-.main-form__label {
+    align-items: flex-start;
+    justify-content: flex-start;
+    width: 100%;
+    max-width: 600px; /* Opcionalno ograničenje širine za veće ekrane */
+  }
+  
+  /* Stilizacija label-eva */
+  .main-form__label {
     cursor: pointer;
     font-weight: var(--font-weight-bold);
-}
-
-.main-form__datetime,
-.main-form__input,
-.main-form__textarea,
-.main-form__select {
+    margin-bottom: var(--margin-small);
+  }
+  
+  /* Stilovi za input, textarea, select i datetime elemente */
+  .main-form__datetime,
+  .main-form__input,
+  .main-form__textarea,
+  .main-form__select {
     font: inherit;
     padding: var(--padding-small);
     margin: var(--margin-small) 0;
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius-small);
-}
-
-.main-form__file {
+    width: 100%;
+  }
+  
+  /* Stilizacija file input-a */
+  .main-form__file {
     width: 100%;
     font: inherit;
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius-small);
     margin: var(--margin-small) 0;
     padding: var(--padding-small);
-}
-
-.main-form__datetime:focus,
-.main-form__input:focus,
-.main-form__textarea:focus,
-.main-form__select:focus,
-.main-form__file:focus {
-    border: 1px solid var(--accent-color);
+  }
+  
+  /* Fokus stanje za inpute */
+  .main-form__datetime:focus,
+  .main-form__input:focus,
+  .main-form__textarea:focus,
+  .main-form__select:focus,
+  .main-form__file:focus {
+    border-color: var(--accent-color);
     box-shadow: 0 0 5px var(--accent-color);
     outline: none;
-}
-
-.main-form__select {
+  }
+  
+  /* Select elementi */
+  .main-form__select {
     cursor: pointer;
-}
-
-.main-form__select option {
+  }
+  
+  .main-form__select option {
     padding: var(--padding-small);
     font-size: var(--font-size-small);
     cursor: pointer;
-}
-
-.main-form__group {
+  }
+  
+  /* Grupa elemenata unutar forme */
+  .main-form__group {
     display: flex;
     flex-direction: column;
-    margin:  0;
+    margin: 0;
     width: 100%;
-}
+  }
 
-.main-form__group-acceptance {
+  .dynamic-group {
+    margin-bottom: 0.5rem;
+  }
+  
+  /* Grupa za prihvatanje – podrazumevano u koloni za mobilni prikaz */
+  .main-form__group-acceptance {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     margin: var(--margin-small) 0;
     width: 100%;
-}
-
-.main-form__step-container textarea {
+  }
+  
+  /* Na većim ekranima, postavljamo grupu za prihvatanje u red */
+  @media (min-width: 768px) {
+    .main-form__group-acceptance {
+      flex-direction: row;
+      align-items: center;
+      justify-content: flex-start;
+    }
+  }
+  
+  /* Kontejner za više koraka u formi */
+  .main-form__step-container textarea {
     width: 100%;
-}
-
-.main-form__step-container button {
+  }
+  
+  .main-form__step-container button {
     margin-left: 0;
-}
-
-.main-form__user-message {
+  }
+  
+  /* Poruke korisniku (npr. greške ili obaveštenja) – mobile: puna širina */
+  .main-form__user-message {
     margin-top: var(--margin-small);
-    width: 20%;
+    width: 100%;
     padding: var(--padding-small);
     text-align: center;
     border: 1px solid var(--primary-color);
     border-radius: var(--border-radius-small);
     background: var(--danger-color);
     color: var(--white-color);
-}
-
-.main-form__option {
+  }
+  
+  /* Na većim ekranima postavljamo fiksnu širinu poruke */
+  @media (min-width: 768px) {
+    .main-form__user-message {
+      width: 30rem;
+    }
+  }
+  
+  /* Stil opcija (npr. za radio dugmad ili checkbox-e) */
+  .main-form__option {
     font-size: var(--font-size-small);
-}
-
-.main-form__option:checked {
+  }
+  
+  .main-form__option:checked {
     background-color: var(--neutral-color);
-}
-
-.user-message--error {
+  }
+  
+  /* Greške – poruka zauzima punu širinu */
+  .user-message--error {
     text-align: center;
     width: 100%;
     padding: var(--padding-small);
     border: 1px solid var(--accent-text-color);
     background: var(--danger-color);
     color: var(--white-color);
-}
-
-.input-container {
+  }
+  
+  /* Kontejner za inpute – na mobilnim uređajima u koloni */
+  .input-container {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-items: start;
-}
-
-.main-form__category-container input,
-.main-form__image-container input {
+  }
+  
+  /* Za kategorije, slike i sastojke, inputi zauzimaju punu širinu */
+  .main-form__category-container input,
+  .main-form__image-container input,
+  .main-form__ingredient input {
     width: 100%;
-}
-
-.main-form__ingredient input {
-    width: 100%;
-}
-
-.main-form__select optgroup {
+  }
+  
+  /* Stilizacija za optgroup u select elementima */
+  .main-form__select optgroup {
     font-weight: var(--font-weight-bold);
     color: var(--black-color);
     font-size: var(--font-size-base);
-}
-
-.sub-optgroup {
+  }
+  
+  /* Sub-optgroup stilovi */
+  .sub-optgroup {
     font-weight: var(--font-weight-regular);
     font-size: var(--font-size-small);
-}
-
-.sub-optgroup2 {
+  }
+  
+  .sub-optgroup2 {
     font-size: var(--font-size-extra-small) !important;
-}
-
-.sub-optgroup3 {
+  }
+  
+  .sub-optgroup3 {
     font-size: calc(var(--font-size-extra-small) - 0.1rem) !important;
-}
-
-@media (min-width: 768px) {
-    .user-message {
-        width: 30rem;
-    }
-
+  }
+  
+  /* Na većim ekranima, input container postaje raspoređen u red radi bolje preglednosti */
+  @media (min-width: 768px) {
     .input-container {
-        display: flex;
-        flex-direction: row;
-        justify-content: space-evenly;
+      flex-direction: row;
+      justify-content: space-evenly;
     }
-}
+  }
+  

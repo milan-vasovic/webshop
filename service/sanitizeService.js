@@ -1,7 +1,7 @@
 import sanitizeHtml from 'sanitize-html';
 
 const sanitizeInput = (input) => {
-    if (typeof input !== 'string') return input; // Ako nije string, ne menjaj
+    if (typeof input !== 'string') return input;
     return sanitizeHtml(input, {
         allowedTags: ['b', 'i', 'em', 'strong', 'a', 'p', 'ul', 'li'],
         allowedAttributes: {

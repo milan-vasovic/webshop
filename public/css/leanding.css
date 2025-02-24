@@ -1,0 +1,53 @@
+/* Policies */
+.policies {
+  padding: var(--padding-normal);
+  gap: var(--grid-gap-medium);
+}
+.policy-badge {
+  text-align: center;
+  width: 8rem;
+}
+
+/* Shop featured */
+.shop-featured {
+  margin: var(--margin-big) 0;
+}
+.shop-featured h2 {
+  margin-bottom: var(--margin-normal);
+  text-align: center;
+}
+
+/* Social proof */
+.social-proof {
+  margin: var(--margin-big) 0;
+}
+.reviews {
+  gap: var(--grid-gap-medium);
+}
+.review-card {
+  background: var(--neutral-color);
+  padding: var(--padding-normal);
+  border-radius: var(--border-radius-small);
+}
+
+/* Blog section */
+.blog-section {
+  margin: var(--margin-big) 0;
+  text-align: center;
+}
+
+/* CTA 2 */
+.cta2 {
+  background: var(--accent-color);
+  padding: var(--padding-normal);
+  border-radius: var(--border-radius-normal);
+}
+.cta2-text {
+  flex: 1;
+}
+.cta2-form {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}

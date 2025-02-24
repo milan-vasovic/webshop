@@ -1,14 +1,13 @@
-import ShopService from "../service/shopService.js";
 import sanitizeHtml from 'sanitize-html';
 import sanitize from 'mongo-sanitize';
+import mongoose from 'mongoose';
+import {validationResult} from 'express-validator';
+
+import ShopService from "../service/shopService.js";
 import ItemService from "../service/itemService.js";
 import UserService from "../service/userService.js";
 import CouponService from "../service/couponService.js";
 import CustomerService from "../service/customerService.js";
-
-import mongoose from 'mongoose';
-
-import {validationResult} from 'express-validator';
 import OrderService from "../service/orderService.js";
 import EmailService from "../service/emailService.js";
 
@@ -70,6 +69,35 @@ async function getShopPageBySearch(req, res, next) {
         return res.render("shop/shop", {
             path: "/prodavnica",
             pageTitle: `Prodavnica ${search}`,
+            shop: shop,
+        })
+
+    } catch (error) {
+        next(error);
+    }
+}
+
+async function getFeautredShopPage(req, res, next) {
+    try {
+        const shop = await ShopService.findFeaturedItems();
+
+        return res.render("shop/shop", {
+            path: "/prodavnica",
+            pageTitle: "Prodavnica",
+            shop: shop,
+        })
+    } catch (error) {
+        next(error);
+    }
+}
+
+async function getActionedShopPage(req, res, next) {
+    try {
+        const shop = await ShopService.findActionedItems();
+
+        return res.render("shop/shop", {
+            path: "/prodavnica",
+            pageTitle: "Prodavnica",
             shop: shop,
         })
 
@@ -267,8 +295,7 @@ async function postCouponValidation(req, res, next) {
     try {
         const coupon = sanitize(req.body.coupon);
 
-        console.log(coupon);
-        const couponData = await CouponService.findAndValidateCouponByCode(coupon);
+        const couponData = await CouponService.validateAndUseCoupon(coupon);
 
         return res.json({ success: true, couponId: couponData._id ,discount: couponData.discount, message: `Uspešno ste aktivirali kupon: ${couponData.code}!` });
     } catch (error) {
@@ -371,7 +398,7 @@ async function postOrder(req, res, next) {
         // Validate and apply coupon (only for logged-in users)
         let coupon;
         if (couponId && userId) {
-            coupon = await CouponService.validateAndUseCoupon(couponId, userId, session);
+            coupon = await CouponService.findCouponStatusByIdAndUpdate(couponId, userId, session);
 
             if (!coupon.status) {
                 return res.render("shop/checkout", {
@@ -461,6 +488,8 @@ export default {
     getShopPageByCategory,
     getShopPageByTag,
     getShopPageBySearch,
+    getFeautredShopPage,
+    getActionedShopPage,
     getCartPage,
     getCheckOutPage,
     getItemByName,

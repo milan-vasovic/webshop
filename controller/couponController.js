@@ -1,10 +1,21 @@
-import CouponService from '../service/couponService.js';
 import {validationResult} from 'express-validator';
 import sanitize from 'mongo-sanitize';
 
+import CouponService from '../service/couponService.js';
+
+/**
+ * Renders the coupons page and check for search query params.
+ */
 async function getCouponsPage(req, res, next) {
     try {
-        const coupons = await CouponService.findCoupons();
+        const search = sanitize(req.query.search);
+        let coupons;
+
+        if (search) {
+            coupons = await CouponService.findCoupons(search);
+        } else {
+            coupons = await CouponService.findCoupons();
+        }
 
         return res.render("admin/coupon/coupons", {
             path: '/admin/kuponi',
@@ -19,6 +30,9 @@ async function getCouponsPage(req, res, next) {
     }
 }
 
+/**
+ * Renders the coupon details page using copuonId.
+ */
 async function getCouponDetailsPage(req, res, next) {
     try {
         const couponId = req.params.couponId;
@@ -38,6 +52,9 @@ async function getCouponDetailsPage(req, res, next) {
     }
 }
 
+/**
+ * Renders the add new coupon page.
+ */
 async function getAddCouponPage(req, res, next) {
     try {
         return res.render("admin/coupon/add-coupon", {
@@ -55,6 +72,9 @@ async function getAddCouponPage(req, res, next) {
     }
 }
 
+/**
+ * Renders the edit coupon page.
+ */
 async function getEditCouponPage(req, res, next) {
     try {
         const cupnId = req.params.couponId;
@@ -77,6 +97,9 @@ async function getEditCouponPage(req, res, next) {
     }
 }
 
+/**
+ * Handles the submission of a new coupon.
+ */
 async function postNewCoupon(req, res, next) {
     try {
         const code = sanitize(req.body.code);
@@ -115,6 +138,26 @@ async function postNewCoupon(req, res, next) {
     }
 }
 
+/**
+ * Handles the search form submission for coupons.
+ */
+function postSearchCoupon(req, res, next) {
+    try {
+        const search = sanitize(req.body.search);
+        if (!search) {
+            return res.redirect("/admin/kuponi");
+        }
+
+        return res.redirect(`/admin/kuponi?search=${search}`);
+
+    } catch (error) {
+        next(error);
+    }
+}
+
+/**
+ * Deletes a coupon by its ID.
+ */
 async function deleteCouponById(req, res, next) {
     try {
         const couponId = sanitize(req.body.itemId);
@@ -135,5 +178,6 @@ export default {
     getAddCouponPage,
     getEditCouponPage,
     postNewCoupon,
+    postSearchCoupon,
     deleteCouponById
 }

@@ -41,14 +41,17 @@ const itemSchema = new Schema({
     },
 
     video: {
-        vid: {
-            type: String,
-            required: true
-        },
-        vidDesc: {
-            type: String,
-            requried: true
-        }
+        type: new Schema({
+            vid: {
+                type: String,
+                required: true
+            },
+            vidDesc: {
+                type: String,
+                required: true
+            }
+        }),
+        required: false
     },
 
     categories: [{

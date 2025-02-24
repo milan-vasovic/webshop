@@ -57,6 +57,7 @@ app.use(methodOverride('_method'));
 
 import authRoutes from "./routes/auth.js";
 import defaultRoutes from "./routes/default.js";
+import forumRoutes from "./routes/forum.js";
 import shopRoutes from "./routes/shop.js";
 import adminRoutes from "./routes/admin.js";
 import userRoutes from './routes/user.js';
@@ -66,11 +67,7 @@ import UserService from "./service/userService.js";
 app.use(json({limit:'1gb'}));
 app.use(urlencoded({ limit:'1gb', extended: true }));
 
-app.use(multerConfig.fields([
-  { name: "featureImage", maxCount: 1 },
-  { name: "video", maxCount: 1 },
-  { name: "variationImages", maxCount: 100 },
-]));
+app.use(multerConfig.any());
 
 app.use(express.static(join(__dirname, "public")));
 app.use('/images', express.static(join(__dirname, 'data', 'images')));
@@ -126,6 +123,7 @@ app.use(async (req, res, next) => {
 
 app.use(authRoutes);
 app.use(defaultRoutes);
+app.use(forumRoutes)
 app.use("/prodavnica", shopRoutes);
 app.use(userRoutes);
 app.use("/admin", adminRoutes);

@@ -3,12 +3,12 @@ const sideDrawer = document.querySelector('.mobile-nav');
 const menuToggle = document.querySelector('#side-menu-toggle');
 
 function backdropClickHandler() {
-  backdrop.style.display = 'none';
+  backdrop.classList.remove('active');
   sideDrawer.classList.remove('open');
 }
 
 function menuToggleClickHandler() {
-  backdrop.style.display = 'block';
+  backdrop.classList.add('active');
   sideDrawer.classList.add('open');
 }
 

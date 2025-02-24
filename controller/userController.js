@@ -1,13 +1,22 @@
 import sanitize from 'mongo-sanitize';
-import ErrorHelper from '../helper/errorHelper.js';
+
 import UserService from '../service/userService.js';
 import OrderService from '../service/orderService.js';
 
 async function getUsersPage(req, res, next) {
     try {
+        // Getting user _id from logged user so i don't show him
         const userId = req.session.user._id;
 
-        const users = await UserService.findUsers(userId);
+        const search = sanitize(req.query.search);
+        let users;
+
+        // Passing userId that needs to be skipped
+        if (search) {
+            users = await UserService.findUsers(userId, search);
+        } else {
+            users = await UserService.findUsers(userId);
+        }
 
         return res.render("admin/user/users", {
             path: "/admin/korisnici",
@@ -76,7 +85,6 @@ async function getUserOrderDetails(req, res, next) {
         if (userId) {
             const order = await OrderService.findUserOrderDetails(orderId, userId);
 
-            console.log(order);
             return res.render('user/order-details', {
                 path: "/porudzbina-detalji",
                 pageTitle: "Porudžbina Detalji",
@@ -126,6 +134,19 @@ async function postAddAddress(req, res, next) {
     }
 }
 
+function postSearchUser(req, res, next) {
+    try {
+        const search = sanitize(req.body.search);
+        if (!search) {
+            return res.redirect("/admin/korisnici");
+        }
+
+        return res.redirect(`/admin/korisnici?search=${search}`);
+    } catch (error) {
+        next(error);
+    }
+}
+
 async function deleteNumber(req, res, next) {
     try {
         const numberId = req.body.itemId;
@@ -166,5 +187,6 @@ export default {
     postAddNumber,
     deleteNumber,
     postAddAddress,
+    postSearchUser,
     deleteAdressById
 }

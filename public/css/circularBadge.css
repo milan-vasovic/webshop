@@ -1,0 +1,61 @@
+.circular-badge {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--primary-color);
+    color: var(--white-text-color);
+    padding: 1rem;
+    border-radius: 50%;  /* Okrugla forma */
+    width: 150px;        /* Veličina – prilagodi po potrebi */
+    height: 150px;
+    text-align: center;
+    box-shadow: 0 2px 4px var(--shadow-box-color);
+    transition: transform var(--transition-fast);
+    margin: 0.5rem;      /* Razmak između bedževa */
+  }
+  
+  .circular-badge:hover {
+    transform: scale(1.05);
+  }
+  
+  .circular-badge .badge-image {
+    width: 60%;
+    height: auto;
+    margin-bottom: 0.5rem;
+  }
+  
+  .circular-badge .badge-image img {
+    max-width: 100%;
+    max-height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  
+  .circular-badge .badge-title {
+    font-size: var(--font-size-large);
+    font-weight: var(--font-weight-bold);
+    margin-bottom: 0.3rem;
+  }
+  
+  .circular-badge .badge-text {
+    font-size: var(--font-size-small);
+    line-height: 1.2;
+  }
+  
+  /* Kontejner za više bedževa */
+  .circular-badges-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--grid-gap-medium);
+    justify-content: space-evenly;
+  }
+  
+  /* Na mobilnim uređajima, rasporedi bedževe u kolonu */
+  @media (max-width: 767px) {
+    .circular-badges-container {
+      flex-direction: column;
+      align-items: center;
+    }
+  }
+  

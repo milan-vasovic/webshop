@@ -116,9 +116,16 @@ const orderSchema = new Schema({
     status: {
         type: String,
         required: true,
-        enum: ["processing","pending-paiment","refund period","fulfilled", "pending-return", "exchanged", "returned", "cancelled", "failed"],
+        enum: ["processing", "sent-exchange", "pending-payment", "refund-period", "fulfilled", "exchanged", "returned", "cancelled", "failed"],
         default: "processing"
-    }
+    },
+    refundDate: {
+        type: Date
+    },
+    exchangedOrderId: {
+        type: Schema.Types.ObjectId,
+        ref: "Order"
+    },
 })
 
 export default model('Order', orderSchema);

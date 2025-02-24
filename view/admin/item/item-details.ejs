@@ -4,10 +4,10 @@
 <%- include('../../include/navigation.ejs') %>
 <section class="main__container">
     <h1 class="main__title"><%= item.Naziv.value %></h1>
-    <div class="flex flex-row flex-between width-100 align-start">
-        <div class="flex flex-column width-30">
-            <a href="/admin/izmenite-artikal/<%= item.ID.value %>">
-                <button>Izmenite</button>
+    <div class="column-row__container">
+        <div class="left__container-30">
+            <a class="btn-secondary" href="/admin/izmenite-artikal/<%= item.ID.value %>">
+                Izmenite
             </a>
             <%- include('../../include/galery.ejs', {
                 images: item.Slike.Slike,
@@ -15,7 +15,7 @@
                 video: item.Video
             }) %>
         </div>
-        <div class="flex flex-column width-70">
+        <div class="right__container-70">
             <%- include('../../include/info.ejs', {
                 data: [
                     { "Opis": item.Opis.value },
@@ -59,7 +59,7 @@
                             showId: false,
                             caption: 'Backorder',
                             hasActions: false,
-                            hasFooter: true,
+                            hasFooter: false,
                             totals: false,
                             actions: []
                         }) %>

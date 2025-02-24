@@ -1,130 +1,137 @@
 <%- include('../include/head.ejs') %>
 <link rel="stylesheet" href="/css/form.css">
 <link rel="stylesheet" href="/css/table.css">
+<link rel="stylesheet" href="/css/checkout.css">
 <%- include('../include/navigation.ejs') %>
 
-<section class="flex flex-column main__container">
-    <h1 class="main__title"><%= pageTitle %></h1>
-    <div class="flex flex-row flex-between align-start width-100">
-        <div class="flex flex-column width-50">
-            <form  class="main-form width-100" action="/prodavnica/porucivanje" method="post">
-                <% if(errorMessage) { %>
-                    <div class="user-message--error"><%= errorMessage %></div>
-                <% } %>
-                <div class="main-form__group">
-                    <label class="main-form__label" for="firstNameInput">Ime:</label>
-                    <input id="firstNameInput" name="firstName" class="main-form__input" type="text" value="<% if (userInfo && userInfo.Ime) { %><%= userInfo.Ime %><% } %>">
-                </div>
-                <div class="main-form__group">
-                    <label class="main-form__label" for="lastNameInput">Prezime:</label>
-                    <input id="lastNameInput" name="lastName" class="main-form__input" type="text" value="<% if (userInfo && userInfo.Prezime) { %><%= userInfo.Prezime %><% } %>">
-                </div>
-                <div class="main-form__group">
-                    <label class="main-form__label" for="emailInput">Email:</label>
-                    <input id="emailInput" name="email" class="main-form__input" type="email" value="<% if (userInfo && userInfo.Email) { %><%= userInfo.Email %><% } %>">
-                </div>
-                <div class="main-form__group">
-                    <label class="main-form__label" for="telephoneInput">Broj Telefona:</label>
-                    <% if (userInfo && userInfo.Telefoni) { %>
-                        <select class="main-form__select" name="telephone" id="telephoneInput">
-                            <% userInfo.Telefoni.forEach(tel => { %>
-                                <option value="<%= tel.Broj %>"><%= tel.Broj %></option>
-                            <% }) %>
-                        </select>
-                        <button id="addNewTelephoneBtn" class="btn width-40" type="button">Novi Broj</button>
-                        <div id="newNumber"></div>
-                    <% } else { %>
-                        <input id="telephoneInput" name="newTelephone" class="main-form__input" type="text">
-                        <input type="hidden" name="isNewTelephone" value="true">
-                    <% } %>
-                </div>
-                <% if (userInfo && userInfo.Adrese) { %>
-                    <div class="main-form__group">
-                        <label class="main-form__label" for="addressInput">Adrese:</label>
-                        <select class="main-form__select" name="address" id="addressInput">
-                            <% userInfo.Adrese.forEach(add => { %>
-                                <option value="<%= add.Adresa.Grad %>,<%= add.Adresa.Ulica %>,<%= add.Adresa.Broj %>,<%= add.Adresa['Poštanski Broj'] %>"><%= add.Adresa.Grad %>, <%= add.Adresa.Ulica %>, <%= add.Adresa.Broj %>, <%= add.Adresa["Poštanski Broj"] %></option>
-                            <% }) %>
-                        </select>
-                        <button id="addNewAddressBtn" class="btn width-40" type="button">Nova Adresa</button>
-                        <div id="newAddress"></div>
-                    </div>
-                <% } else { %>
-                    <div class="grid grid-2 width-100">
-                        <div class="main-form__group">
-                            <label class="main-form__label" for="cityInput">Grad:</label>
-                            <input id="cityInput" name="newCity" class="main-form__input" type="text" required>
-                        </div>
-                        <div class="main-form__group">
-                            <label class="main-form__label" for="streetInput">Ulica:</label>
-                            <input id="streetInput" name="newStreet" class="main-form__input" type="text" required>
-                        </div>
-                        <div class="main-form__group">
-                            <label class="main-form__label" for="numberInput">Broj Ulice:</label>
-                            <input id="numberInput" name="newAddressNumber" class="main-form__input" type="text" required>
-                        </div>
-                        <div class="main-form__group">
-                            <label class="main-form__label" for="postalCodeInput">Poštanski Broj:</label>
-                            <input id="postalCodeInput" name="newPostalCode" class="main-form__input" type="text">
-                        </div>
-                    </div>
-                    <input type="hidden" name="isNewAddress" value="true">
-                <% } %>
-                <div class="main-form__group">
-                    <label class="main-form__label" for="acceptance">Saglasnost:</label>
-                    <p>
-                        Prihvatate <a class="main__link" href="/uslovi-koriscenja">Uslove Korišćenja</a> i <a class="main__link" href="/politika-privatnosti">Politiku Privatnosti</a>
-                        <input class="main-form__input" id="acceptance" name="acceptance" type="checkbox" required>
-                    </p>
-                </div>
-                <input name="honeypot" type="hidden">
-                <input class="main-form__input" type="hidden" name="CSRFToken" value="<%= csrfToken %>" required>
-                <button class="btn width-100" type="submit">Poručite</button>
-            </form>
+<section class="main__container">
+  <h1 class="main__title"><%= pageTitle %></h1>
+  <!-- Responsive kontejner: na mobilu kolona, na desktopu red -->
+  <div class="column-row__container">
+    <!-- Lijeva kolona: Checkout forma -->
+    <div class="left__container-50">
+      <form class="main-form width-100" action="/prodavnica/porucivanje" method="post">
+        <% if(errorMessage) { %>
+          <div class="user-message--error"><%= errorMessage %></div>
+        <% } %>
+        <div class="main-form__group">
+          <label class="main-form__label" for="firstNameInput">Ime:</label>
+          <input id="firstNameInput" name="firstName" class="main-form__input" type="text" value="<% if (userInfo && userInfo.Ime) { %><%= userInfo.Ime %><% } %>" required>
         </div>
-        <div class="flex flex-column width-50">
-            <% if (!userInfo) { %>
-                <h3>Imate Kupon?</h3>
-                <p>Da biste upotrebili kupon morate se prijaviti!</p>
-                <p>Kliknite na link ispod.</p>
-                <a class="main__link" href="/prijava?redirectTo=/prodavnica/porudzbina">Prijavite Se</a>
-            <% } else { %>
-                <form class="main-form">
-                    <div class="flex-row">
-                        <label class="main-form__label" for="couponInput">Kupon:</label>
-                        <input class="main-form__input" type="text" name="coupon" id="couponInput" placeholder="Unesite Kupon">
-                        <input name="honeypot" type="hidden">
-                        <input class="main-form__input" type="hidden" name="CSRFToken" value="<%= csrfToken %>" required>
-                        <button id="activateCouponBtn" class="btn" type="button">Aktivirajte Kupon</button>
-                    </div>
-                </form>
-                <div id="couponFeedback"></div>
-            <% } %>
-            <%- include('../include/table.ejs', {
-                items: cart,
-                showId: false,
-                caption: "Artikli",
-                hasActions: false,
-                hasFooter: false,
-                totals: true,
-                actions: []
-            }) %>
-            <div>
-                <% let total = 0;
-                    cart.forEach(i => {
-                        total += i.Cena ? i.Cena.value : i.price
-                    });
-                %>
-                <h3>Poštarina: <%= shipping %> RSD</h3>
-                <h3 id="totalPrice">Ukupna Suma: <%= Number(total) + Number(shipping) %> RSD</h3>
+        <div class="main-form__group">
+          <label class="main-form__label" for="lastNameInput">Prezime:</label>
+          <input id="lastNameInput" name="lastName" class="main-form__input" type="text" value="<% if (userInfo && userInfo.Prezime) { %><%= userInfo.Prezime %><% } %>" required>
+        </div>
+        <div class="main-form__group">
+          <label class="main-form__label" for="emailInput">Email:</label>
+          <input id="emailInput" name="email" class="main-form__input" type="email" value="<% if (userInfo && userInfo.Email) { %><%= userInfo.Email %><% } %>" required>
+        </div>
+        <div class="main-form__group">
+          <label class="main-form__label" for="telephoneInput">Broj Telefona:</label>
+          <% if (userInfo && userInfo.Telefoni) { %>
+            <select class="main-form__select" name="telephone" id="telephoneInput">
+              <% userInfo.Telefoni.forEach(tel => { %>
+                <option value="<%= tel.Broj %>"><%= tel.Broj %></option>
+              <% }) %>
+            </select>
+            <button id="addNewTelephoneBtn" class="btn-secondary" type="button">Novi Broj</button>
+            <div id="newNumber"></div>
+          <% } else { %>
+            <input id="telephoneInput" name="newTelephone" class="main-form__input" type="text">
+            <input type="hidden" name="isNewTelephone" value="true">
+          <% } %>
+        </div>
+        <% if (userInfo && userInfo.Adrese) { %>
+          <div class="main-form__group">
+            <label class="main-form__label" for="addressInput">Adrese:</label>
+            <select class="main-form__select" name="address" id="addressInput">
+              <% userInfo.Adrese.forEach(add => { %>
+                <option value="<%= add.Adresa.Grad %>,<%= add.Adresa.Ulica %>,<%= add.Adresa.Broj %>,<%= add.Adresa['Poštanski Broj'] %>">
+                  <%= add.Adresa.Grad %>, <%= add.Adresa.Ulica %>, <%= add.Adresa.Broj %>, <%= add.Adresa["Poštanski Broj"] %>
+                </option>
+              <% }) %>
+            </select>
+            <button id="addNewAddressBtn" class="btn-secondary" type="button">Nova Adresa</button>
+            <div id="newAddress"></div>
+          </div>
+        <% } else { %>
+          <div class="grid grid-2 width-100">
+            <div class="main-form__group">
+              <label class="main-form__label" for="cityInput">Grad:</label>
+              <input id="cityInput" name="newCity" class="main-form__input" type="text" required>
             </div>
+            <div class="main-form__group">
+              <label class="main-form__label" for="streetInput">Ulica:</label>
+              <input id="streetInput" name="newStreet" class="main-form__input" type="text" required>
+            </div>
+            <div class="main-form__group">
+              <label class="main-form__label" for="numberInput">Broj Ulice:</label>
+              <input id="numberInput" name="newAddressNumber" class="main-form__input" type="text" required>
+            </div>
+            <div class="main-form__group">
+              <label class="main-form__label" for="postalCodeInput">Poštanski Broj:</label>
+              <input id="postalCodeInput" name="newPostalCode" class="main-form__input" type="text">
+            </div>
+          </div>
+          <input type="hidden" name="isNewAddress" value="true">
+        <% } %>
+        <div class="main-form__group">
+          <label class="main-form__label" for="acceptance">Saglasnost:</label>
+          <div class="flex flex-row flex-wrap">
+            Prihvatate <a class="main__link" href="/uslovi-koriscenja">Uslove Korišćenja</a> i <a class="main__link" href="/politika-privatnosti">Politiku Privatnosti</a>
+            <input id="acceptance" name="acceptance" type="checkbox" required>
+          </div>
         </div>
+        <input name="honeypot" type="hidden">
+        <input class="main-form__input" type="hidden" name="CSRFToken" value="<%= csrfToken %>" required>
+        <button class="btn-primary" type="submit">Poručite</button>
+      </form>
     </div>
+    <!-- Desna kolona: Kupon i pregled korpe -->
+    <div class="right__container-50">
+      <% if (!userInfo) { %>
+        <h3>Imate Kupon?</h3>
+        <p>Da biste upotrebili kupon morate se prijaviti!</p>
+        <p>Kliknite na link ispod.</p>
+        <a class="main__link" href="/prijava?redirectTo=/prodavnica/porudzbina">Prijavite Se</a>
+      <% } else { %>
+        <form class="main-form">
+          <div>
+            <label class="main-form__label" for="couponInput">Kupon:</label>
+            <input class="main-form__input" type="text" name="coupon" id="couponInput" placeholder="Unesite Kupon">
+            <input name="honeypot" type="hidden">
+            <input class="main-form__input" type="hidden" name="CSRFToken" value="<%= csrfToken %>" required>
+            <button id="activateCouponBtn" class="btn-secondary" type="button">Aktivirajte Kupon</button>
+          </div>
+        </form>
+        <div id="couponFeedback"></div>
+      <% } %>
+      <br>
+      <%- include('../include/table.ejs', {
+          items: cart,
+          showId: false,
+          caption: "Artikli",
+          hasActions: false,
+          hasFooter: false,
+          totals: true,
+          actions: []
+      }) %>
+      <div>
+        <% let total = 0;
+           cart.forEach(i => {
+             total += i.Cena ? i.Cena.value : i.price;
+           });
+        %>
+        <h3>Poštarina: <%= shipping %> RSD</h3>
+        <h3 id="totalPrice">Ukupna Suma: <%= Number(total) + Number(shipping) %> RSD</h3>
+      </div>
+    </div>
+  </div>
 </section>
 
 <% if (userInfo) { %>
-    <script src="/js/checkoutUser.js"></script>
-    <script src="/js/couponValidation.js"></script>
+  <script src="/js/checkoutUser.js"></script>
+  <script src="/js/couponValidation.js"></script>
 <% } %>
 
 <%- include('../include/end.ejs') %>

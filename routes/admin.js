@@ -1,8 +1,8 @@
 import { Router } from "express";
-import { body, param, query, validationResult } from 'express-validator';
+import { body } from 'express-validator';
+
 import isAuth from '../middleware/isAuth.js';
 import isAdmin from '../middleware/isAdmin.js';
-const router = Router();
 
 import AdminController from '../controller/adminController.js';
 import ContactController from '../controller/contactController.js';
@@ -13,6 +13,8 @@ import HistoryController from '../controller/historyController.js';
 import OrderController from '../controller/orderController.js';
 import UserController from '../controller/userController.js';
 import ItemController from '../controller/itemController.js';
+
+const router = Router();
 
 router.get("/dashboard", isAuth, isAdmin, AdminController.getDashboardPage);
 
@@ -50,15 +52,16 @@ router.get("/istorija", isAuth, isAdmin, HistoryController.getHistoryPage);
 
 router.get("/istroja-detalji/:historyId", isAuth, isAdmin, HistoryController.getHistoryDetailsPage);
 
-router.get("/forum", isAuth, isAdmin, ForumController.getAdminForumPage);
+router.get("/objave", isAuth, isAdmin, ForumController.getAdminForumPage);
 
-router.get("/objava/:postId", isAuth, isAdmin, ForumController.getAdminPostPage);
+router.get("/objava-detalji/:postId", isAuth, isAdmin, ForumController.getAdminForumPostDetailsPage);
 
-router.get("/dodajte-objavu", isAuth, isAdmin, ForumController.getAddPostPage);
+router.get("/dodajte-objavu", isAuth, isAdmin, ForumController.getAddForumPostPage);
 
 router.get('/porudzbine', isAuth, isAdmin, OrderController.getOrdersPage);
 
 router.get('/porudzbina-detalji/:orderId', isAuth, isAdmin, OrderController.getOrderDetailsPage);
+
 
 // POST
 router.post("/artikal-dodavanje", [
@@ -464,6 +467,16 @@ router.post('/kupon-dodavanje',[
 
 router.post('/porudzbine/pretraga', [], isAuth, isAdmin, OrderController.postOrderSearch);
 
+router.post('/korisnici/pretraga', [], isAuth, isAdmin, UserController.postSearchUser);
+
+router.post('/kupci/pretraga', [], isAuth, isAdmin, CustomerController.postSearchCustomer);
+
+router.post('/kuponi/pretraga', [], isAuth, isAdmin, CouponController.postSearchCoupon);
+
+router.post('/napravite-objavu', [], isAuth, isAdmin, ForumController.postAddtPost);
+
 router.delete('/izbrisite-kupon', isAuth, isAdmin, CouponController.deleteCouponById);
+
+router.delete('/izbrisite-artikal', isAuth, isAdmin, ItemController.deleteItemById);
 
 export default router;

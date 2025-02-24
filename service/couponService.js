@@ -1,19 +1,56 @@
-import ErrorHelper from "../helper/errorHelper.js";
+import mongoose from "mongoose";
+
 import CouponModel from '../model/coupon.js';
 
+import ErrorHelper from "../helper/errorHelper.js";
+
 class CouponService {
-    static async findCoupons(limit = 10, skip = null) {
-        const coupons = await CouponModel.find()
-            .select("code status price discount startDate endDate")
+    static async findCoupons(search, limit = 10, skip = null) {
+        let filter = {};
+    
+        if (search) {
+            const searchNumber = parseFloat(search); // Pretvaramo ako korisnik unese broj
+            const dateRegex = /^\d{2}\.\d{2}\.\d{4}$/; // Regex za DD.MM.YYYY format
+    
+            filter.$or = [];
+    
+            // Pretraga po ObjectId (pretvaramo string u ObjectId ako je moguće)
+            if (mongoose.Types.ObjectId.isValid(search)) {
+                filter.$or.push({ _id: search });
+            }
+    
+            // Pretraga po kodu kupona (string)
+            filter.$or.push({ code: { $regex: search, $options: "i" } });
+    
+            // Pretraga po statusu (pretpostavljamo da korisnik može uneti deo statusa)
+            filter.$or.push({ status: { $regex: search, $options: "i" } });
+    
+            // Pretraga po popustu (pretvaramo search u broj ako je moguće)
+            if (!isNaN(searchNumber)) {
+                filter.$or.push({ discount: searchNumber });
+            }
+    
+            // Pretraga po datumu (ako korisnik unese u formatu DD.MM.YYYY)
+            if (dateRegex.test(search)) {
+                const [day, month, year] = search.split(".").map(Number);
+                const startDate = new Date(Date.UTC(year, month - 1, day, 0, 0, 0));
+                const endDate = new Date(Date.UTC(year, month - 1, day, 23, 59, 59));
+    
+                filter.$or.push(
+                    { startDate: { $gte: startDate, $lte: endDate } },
+                    { endDate: { $gte: startDate, $lte: endDate } }
+                );
+            }
+        }
+    
+        const coupons = await CouponModel.find(filter)
+            .select("code status discount startDate endDate")
             .limit(limit)
             .lean();
-
-        if (!coupons) {
-            ErrorHelper.throwNotFoundError("Kuponi");
-        }
-
+    
         return this.mapCoupons(coupons);
     }
+    
 
     static async findCouponById(couponId) {
         try {
@@ -36,26 +73,22 @@ class CouponService {
                 .select('_id status discount amount code');
 
             if (!coupon) {
-                console.log("Nema")
                 ErrorHelper.throwNotFoundError("Kupon")
             }
 
             if (!coupon.status.includes("active") && coupon.status.includes("inactive")) {
-                console.log("Neaktivan")
-                return ErrorHelper.throwConflictError("Kupon nije aktivan");
+                ErrorHelper.throwConflictError("Kupon nije aktivan");
             }
 
             if (coupon.status.includes("amoun-sensitive")) {
                 if (coupon.amount < 1) {
-                    console.log("Nema kolicine")
-                    return ErrorHelper.throwConflictError("Kupon je potršen, nema više aktivacija!");
+                    ErrorHelper.throwConflictError("Kupon je potršen, nema više aktivacija!");
                 }
             }
 
             if (coupon.status.includes("time-sensitive")) {
                 if(new Date() > coupon.endDate) {
-                    console.log("Istekao")
-                    return ErrorHelper.throwConflictError("Kupon je istekao!");
+                    ErrorHelper.throwConflictError("Kupon je istekao!");
                 }
             }
 

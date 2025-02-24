@@ -1,0 +1,24 @@
+<link rel="stylesheet" href="/css/circularBadge.css">
+<% 
+  // Parametri:
+  // title (string): naslov bedža (opciono)
+  // text (string): kratak tekst unutar bedža (opciono)
+  // image (string): putanja do slike (opciono)
+%>
+<div class="circular-badge">
+  <% if (image) { %>
+    <div class="badge-image">
+      <img src="<%= image %>" alt="<%= title || 'Badge' %>">
+    </div>
+  <% } %>
+  <% if (title) { %>
+    <div class="badge-title">
+      <%= title %>
+    </div>
+  <% } %>
+  <% if (text) { %>
+    <div class="badge-text">
+      <%= text %>
+    </div>
+  <% } %>
+</div>

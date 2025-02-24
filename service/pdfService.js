@@ -1,4 +1,3 @@
-// pdfService.js
 import PDFDocument from "pdfkit";
 
 export default class PDFService {

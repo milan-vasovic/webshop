@@ -1,59 +1,342 @@
+:root {
+  --image-max-width: 100px;
+  --image-max-height: 100px;
+  --font-size-large: 1.5rem;
+  --font-size-base: 1rem;
+  --padding-normal: 1rem;
+  --padding-small: 0.3rem;
+  --font-weight-bold: 700;
+  --header-footer-height: 7vh;
+}
+
+/* Ako se koristi poseban kontejner */
+.table__container {
+  display: none;
+  justify-content: center;
+}
+
+/* Osnovni stilovi tabele */
 table {
-    width: 100%;
-    border-collapse: collapse;
-    text-align: left;
+  width: 100%;
+  border-collapse: collapse;
 }
 
+/* Caption – koristi accent boju */
 caption {
-    font-size: var(--font-size-large);
-    font-weight: var(--font-weight-bold);
-    text-align: center;
-    background-color: var(--neutral-color-light);
-    color: var(--primary-text-color);
-    padding: var(--padding-normal);
+  margin-top: 0.5rem;
+  font-size: var(--font-size-large);
+  font-weight: var(--font-weight-bold);
+  text-align: center;
+  background-color: var(--primary-color);
+  color: var(--white-color);
+  padding: var(--padding-normal);
 }
 
+/* Stil zaglavlja i ćelija */
 table th,
 table td {
-    border: 1px solid var(--border-color);
-    padding: var(--padding-small);
+  border: 1px solid var(--border-color);
+  padding: var(--padding-small);
 }
 
 table th {
-    background-color: var(--neutral-color);
-    font-weight: var(--font-weight-bold);
-    text-align: center;
+  background-color: var(--neutral-color);
+  font-weight: var(--font-weight-bold);
+  text-align: center;
 }
 
+/* Akcijske ćelije */
 .table__action {
-    text-align: center;
+  text-align: center;
 }
 
+/* Naizmjenična pozadina redova */
 table tr:nth-child(even) {
-    background-color: var(--neutral-color-light);
+  background-color: var(--neutral-color-light);
 }
 
+/* Hover efekat za redove */
 table tr:hover {
-    background-color: var(--hover-color);
+  background-color: var(--hover-color);
 }
 
+/* Stil za slike unutar tabele – centrirane i iste veličine */
 .table__image {
-    max-width: var(--image-max-width, 100px); /* Default width if not defined in :root */
-    max-height: var(--image-max-height, 100px); /* Default height if not defined in :root */
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: var(--image-max-width);
+  height: var(--image-max-height);
+  object-fit: cover;
 }
 
-.table__action-btn {
-    display: inline-block;
-    padding: var(--padding-small);
-    border-radius: var(--border-radius-small);
-    margin-right: var(--margin-small);
-    background-color: var(--primary-color);
-    color: var(--white-color);
-    text-decoration: none;
-    text-align: center;
+/* Stil za dugmiće unutar tabele – jednoličan izgled */
+
+
+/* Mobilne stilove – transformacija tabele u fleks format */
+@media (max-width: 768px) {
+  /* Tabela kao fleks kontejner */
+  table {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  /* Ako se koristi caption, možete ga ostaviti na svom mjestu ili postaviti order ako želite */
+  caption {
+      order: -2;
+  }
+  /* Premještamo tfoot na vrh */
+  tfoot {
+      order: -1;
+  }
+
+  tFoot tr {
+    margin: 0.2rem;
+  }
+  /* Zadržavamo defaultni order za thead i tbody */
+  thead {
+      order: 0;
+  }
+  tbody {
+      order: 1;
+  }
+
+  /* Sticky zaglavlje tabele */
+  thead {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    position: sticky;
+    top: var(--header-footer-height);
+    border-left: 1px solid var(--border-color);
+    border-right: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  thead tr {
+    display: inherit;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--secondary-color);
+  }
+
+  /* Telo tabele kao kolona */
+  tbody {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    border-top: 1px solid var(--border-color);
+  }
+
+  tbody tr:not(:first-child) {
+    margin-top: 1rem;
+  }
+
+  /* Ćelije se prikazuju kao blokovi s labelama */
+  td {
+    display: block;
+    width: 100%;
+    font-weight: bold;
+  }
+
+  /* Ako ćelija sadrži sliku */
+  td > img {
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+  }
+
+  /* Akcijske ćelije u redu */
+  .table__action {
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    align-items: center;
+  }
+
+  /* Numerički tipovi – poravnanje lijevo */
+  .dt-type-numeric {
+    text-align: left !important;
+  }
+
+  /* Pseudo-elementi: dodavanje labela prije sadržaja ćelije */
+  td:before {
+    font-weight: normal;
+  }
+
+  /* Primjeri za najčešće kolone – prilagodi prema svojim podacima */
+/* Labeliranje ćelija u mobilnom prikazu preko pseudo-elementa ::before */
+tbody td[data-label*="ID"]:before {
+  content: "ID: ";
+}
+tbody td[data-label*="Email"]:before {
+  content: "Email: ";
+}
+tbody td[data-label*="Ime"]:before {
+  content: "Ime: ";
+}
+tbody td[data-label*="Prezime"]:before {
+  content: "Prezime: ";
+}
+tbody td[data-label*="Brojevi Telefona"]:before,
+tbody td[data-label*="Broj Telefona"]:before {
+  content: "Brojevi Telefona: ";
+}
+tbody td[data-label*="Adrese"]:before {
+  content: "Adrese: ";
+}
+tbody td[data-label*="Status"]:before {
+  content: "Status: ";
+}
+tbody td[data-label*="Uloga"]:before {
+  content: "Uloga: ";
+}
+tbody td[data-label*="Partner"]:before {
+  content: "Partner: ";
+}
+tbody td[data-label*="Porudžbine"]:before {
+  content: "Porudžbine: ";
 }
 
-.table__action-btn:hover {
-    background-color: var(--accent-color);
-    color: var(--white-color);
+tbody td[data-label*="Tip"]:before {
+  content: "Tip: ";
+}
+tbody td[data-label*="Kupac"]:before {
+  content: "Kupac: ";
+}
+tbody td[data-label*="Ukupna Cena"]:before {
+  content: "Ukupna Cena: ";
+}
+
+tbody td[data-label*="Cena"]:before {
+  content: "Cena: ";
+}
+tbody td[data-label*="Cena"]:after {
+  content: " RSD";
+}
+tbody td[data-label*="Ukupna Cena"]:after {
+  content: " RSD";
+}
+tbody td[data-label*="Boja"]:before {
+  content: "Boja: ";
+}
+tbody td[data-label*="Poštarina"]:before {
+  content: "Poštarina: ";
+}
+tbody td[data-label*="Kupon"]:before {
+  content: "Kupon: ";
+}
+tbody td[data-label*="Kod"]:before {
+  content: "Kod: ";
+}
+tbody td[data-label*="Popust"]:before {
+  content: "Popust: ";
+}
+tbody td[data-label*="Artikli"]:before {
+  content: "Artikli: ";
+}
+tbody td[data-label*="Telefon"]:before {
+  content: "Telefon: ";
+}
+tbody td[data-label*="Adresa"]:before {
+  content: "Adresa: ";
+}
+tbody td[data-label*="Grad"]:before {
+  content: "Grad: ";
+}
+tbody td[data-label*="Ulica"]:before {
+  content: "Ulica: ";
+}
+tbody td[data-label*="Broj"]:before {
+  content: "Broj: ";
+}
+tbody td[data-label*="Poštanski Broj"]:before {
+  content: "Poštanski Broj: ";
+}
+
+tbody td[data-label*="Naziv"]:before {
+  content: "Naziv: ";
+}
+tbody td[data-label*="Opis"]:before {
+  content: "Opis: ";
+}
+tbody td[data-label*="Akcijska Cena"]:before {
+  content: "Akcijska Cena: ";
+}
+tbody td[data-label*="Kategorije"]:before {
+  content: "Kategorije: ";
+}
+tbody td[data-label*="Tagovi"]:before {
+  content: "Tagovi: ";
+}
+tbody td[data-label*="Kratak Opis"]:before {
+  content: "Kratak Opis: ";
+}
+tbody td[data-label*="Ključne Reči"]:before {
+  content: "Ključne Reči: ";
+}
+tbody td[data-label*="Slika"]:before {
+  content: "Slika: ";
+}
+tbody td[data-label*="Video"]:before {
+  content: "Video: ";
+}
+tbody td[data-label*="Backorder"]:before {
+  content: "Backorder: ";
+}
+tbody td[data-label*="Varijacije"]:before {
+  content: "Varijacije: ";
+}
+tbody td[data-label*="UpSell Artikli"]:before {
+  content: "UpSell Artikli: ";
+}
+tbody td[data-label*="CrossSell Artikli"]:before {
+  content: "CrossSell Artikli: ";
+}
+
+tbody td[data-label*="Autor"]:before {
+  content: "Autor: ";
+}
+tbody td[data-label*="Datum"]:before {
+  content: "Datum: ";
+}
+
+tbody td[data-label*="SKU"]:before {
+  content: "SKU: ";
+}
+
+tbody td[data-label*="Broj Upotreba"]:before {
+  content: "Broj Upotreba: ";
+}
+tbody td[data-label*="Količina"]:before {
+  content: "Količina: ";
+}
+tbody td[data-label*="Datum Početka"]:before {
+  content: "Datum Početka: ";
+}
+tbody td[data-label*="Datum Završetka"]:before {
+  content: "Datum Završetka: ";
+}
+
+tbody td[data-label*="Naslov"]:before {
+  content: "Naslov: ";
+}
+tbody td[data-label*="Artikal"]:before {
+  content: "Artikal: ";
+}
+tbody td[data-label*="Poruka"]:before {
+  content: "Poruka: ";
+}
+tbody td[data-label*="Količina"]:before {
+  content: "Količina: ";
+}
+
+tbody td[data-label*="Veličina"]:before {
+  content: "Veličina: ";
+}
+
 }

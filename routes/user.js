@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { body, param, query, validationResult } from 'express-validator';
+import { body, param, query, validationResult } from 'express-validator'; // Needs to be finished
 
 const router = Router();
 

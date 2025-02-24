@@ -1,10 +1,25 @@
-import ErrorHelper from "../helper/errorHelper.js";
+
+import mongoose from "mongoose";
+
 import UserModel from "../model/user.js";
+
 import CryptoService from "./cryptoService.js";
 import EmailService from "./emailService.js";
 
+import ErrorHelper from "../helper/errorHelper.js";
+
 class UserService {
-   static async checkUserInfo(email, password) {
+    /**
+    * Checks the user's information for validity.
+    * 
+    * @param {Object} userInfo - The user information to check.
+    * @param {string} userInfo.email - The user's email address.
+    * @param {string} userInfo.password - The user's password.
+    * @param {string} [userInfo.firstName] - The user's first name (optional).
+    * @param {string} [userInfo.lastName] - The user's last name (optional).
+    * @returns {Promise<Object>} - A promise that resolves to an object containing the validation results.
+    */
+    static async checkUserInfo(email) {
         const userExist = await UserModel.findOne({email: email}).select("_id password");
 
         if (!userExist){
@@ -14,25 +29,159 @@ class UserService {
         return userExist;
    }
 
-   static async findUsers(userId, limit=10,skip=null) {
+    /**
+    * Validates a user and sends a password reset token.
+    * 
+    * @param {string} email - The email of the user to validate.
+    * @returns {Promise<void>}
+    */
+    static async validateUserAndSendResetToken(email) {
+        const session = await mongoose.startSession();
+
         try {
-            const users = await UserModel.find({ _id: { $ne: userId } })
-                .select("email firstName status role partner")
+            session.startTransaction();
+
+            const user = await UserModel.findOne({ email })
+                .select("firstName email resetToken resetTokenExpiration")
+                .session(session);
+
+            if (!user) {
+                await session.commitTransaction();
+                return { status: false, msg: "Neam Korisnika sa tom email adresuom!" };
+            }
+
+            if (user.resetToken && user.resetTokenExpiration > Date.now()) {
+                const isSent = await EmailService.sendResetTokenToUser(user);
+
+                if (!isSent) {
+                    await session.abortTransaction();
+                    ErrorHelper.throwEmailError();
+                }
+    
+                await session.commitTransaction();
+                return { status: true, msg: "Token već postoji, email ponovo poslat." };
+            }
+
+            const token = await CryptoService.createResetToken();
+
+            user.resetToken = token;
+            user.resetTokenExpiration = Date.now() + 3600000;
+
+            await user.save({ session });
+
+            const isSent = await EmailService.sendResetTokenToUser(user);
+            if (!isSent) {
+                await session.abortTransaction();
+                ErrorHelper.throwEmailError();
+            }
+
+            await session.commitTransaction();
+            return { status: true };
+        } catch (error) {
+            if (session.inTransaction()) {
+                await session.abortTransaction();
+            }
+            ErrorHelper.throwServerError(error);
+        } finally {
+            session.endSession();
+        }
+    }
+
+    /**
+    * Validates a password reset token.
+    * 
+    * @param {string} token - The password reset token to validate.
+    * @returns {Promise<Object>} - A promise that resolves to the user associated with the token.
+    */
+   static async validateResetToken(token) {
+        try {
+            const user = await UserModel.findOne({ resetToken: token, resetTokenExpiration: { $gt: Date.now() }}).select("_id");
+            
+            if (!user) {
+                ErrorHelper.throwNotFoundError("Korisnik");
+            }
+
+            return user;
+        } catch (error) {
+            ErrorHelper.throwServerError(error);
+        }
+   };
+
+   static async updateUserPassword(userId, newPassword, passwordToken) {
+        try {
+            const user = await UserModel.findOne({
+                resetToken: passwordToken,
+                resetTokenExpiration: { $gt: Date.now() },
+                _id: userId,
+            })
+            .select("email password resetToken resetTokenExpiration");
+            
+            if (!user) {
+                ErrorHelper.throwNotFoundError("Korisnik");
+            }
+
+            const securePassword = await CryptoService.hashPassword(newPassword);
+            user.password = securePassword;
+            user.resetToken = undefined;
+            user.resetTokenExpiration = undefined;
+
+            await user.save();
+
+            return user.email;
+
+        } catch (error) {
+            ErrorHelper.throwServerError(error);
+        }
+    }
+
+    /**
+    * Finds users based on a search query.
+    * 
+    * @param {string} [search] - The search query to filter users by (optional).
+    * @returns {Promise<Array>} - A promise that resolves to an array of users.
+    */
+   static async findUsers(userId, search, limit = 10, skip = null) {
+        try {
+            let filter = { _id: { $ne: userId } };
+
+            if (search) {
+                const searchConditions = [
+                    { $expr: { $regexMatch: { input: { $toString: "$_id" }, regex: search, options: "i" } } },
+                    { email: { $regex: search, $options: "i" } },
+                    { firstName: { $regex: search, $options: "i" } },
+                    { status: { $regex: search, $options: "i" } },
+                    { role: { $regex: search, $options: "i" } },
+                ];
+
+                if (searchConditions.length > 0) {
+                    filter = {
+                        $and: [
+                            { _id: { $ne: userId } },
+                            { $or: searchConditions }
+                        ]
+                    };
+                }
+            }
+
+            const users = await UserModel.find(filter)
+                .select("email firstName status role partner.isPartner")
                 .limit(limit)
                 .skip(skip)
                 .lean();
 
-            if (!users) {
-                ErrorHelper.throwNotFoundError("Korisnici");   
-            }
-
             return this.mapUsers(users);
 
         } catch (error) {
-            ErrorHelper.throwServerError("error")
+            ErrorHelper.throwServerError("Greška pri pretrazi korisnika");
         }
-   }
+    }
 
+    /**
+    * Finds a user by their ID.
+    * 
+    * @param {string} userId - The ID of the user to find.
+    * @returns {Promise<Object>} - A promise that resolves to the user details.
+    */
    static async findUserById(userId){
         const user = await UserModel.findById(userId).select("-password -__v")
             .populate({
@@ -48,6 +197,12 @@ class UserService {
         return this.mapUserDetails(user);
    }
 
+    /**
+    * Finds a user for session management.
+    * 
+    * @param {string} userId - The ID of the user to find.
+    * @returns {Promise<Object>} - A promise that resolves to the user details for session management.
+    */
    static async findUserForSession(userId) {
         const user = await UserModel.findById(userId).select("firstName cart role status");
 
@@ -58,7 +213,17 @@ class UserService {
         return user;
     }
 
-    static async createNewUser(email, password, firstname, lastname) {
+    /**
+    * Register a new user.
+    * 
+    * @param {Object} userData - The data of the user to create.
+    * @param {string} userData.email - The email of the user.
+    * @param {string} userData.password - The password of the user.
+    * @param {string} userData.firstName - The first name of the user.
+    * @param {string} userData.lastName - The last name of the user.
+    * @returns {Promise<Object>} - A promise that resolves to the created user.
+    */
+    static async registerNewUser(email, password, firstname, lastname) {
         const securePassword = await CryptoService.hashPassword(password);
         const secureLastName = await CryptoService.encryptData(lastname);
 
@@ -82,6 +247,13 @@ class UserService {
         return newUser.save();
     }
 
+    /**
+    * Adds a phone number to a user.
+    * 
+    * @param {string} userId - The ID of the user to add the phone number to.
+    * @param {string} phoneNumber - The phone number to add.
+    * @returns {Promise<Object>} - A promise that resolves to the updated user.
+    */
     static async addPhoneNumberToUser(phoneNumber, userId) {
         try {
             const user = await UserModel.findById(userId).select("telephoneNumbers");
@@ -108,6 +280,17 @@ class UserService {
         }
     }  
 
+    /**
+    * Adds an address to a user.
+    * 
+    * @param {string} userId - The ID of the user to add the address to.
+    * @param {Object} address - The address to add.
+    * @param {string} address.city - The city of the address.
+    * @param {string} address.street - The street of the address.
+    * @param {string} address.number - The number of the address.
+    * @param {string} address.postalCode - The postal code of the address.
+    * @returns {Promise<Object>} - A promise that resolves to the updated user.
+    */
     static async addAddressToUser(city, street, number, postalCode, userId) {
         try {
             // Pronalaženje korisnika
@@ -117,7 +300,6 @@ class UserService {
                 ErrorHelper.throwNotFoundError("Korisnik");
             }
     
-            // Provera da li adresa već postoji
             const alreadyExist = user.addresses.some(addr => 
                 addr.city === city && 
                 addr.postalCode === postalCode && 
@@ -129,11 +311,9 @@ class UserService {
                 ErrorHelper.throwConflictError("Ova adresa već postoji u sistemu.");
             }
     
-            // Enkripcija ulice i broja
             const encryptedStreet = CryptoService.encryptData(street);
             const encryptedNumber = CryptoService.encryptData(number);
     
-            // Dodavanje nove adrese u listu korisnika
             user.addresses.push({
                 city: city,
                 street: encryptedStreet,
@@ -148,6 +328,12 @@ class UserService {
         }
     }    
 
+    /**
+    * Finds the cart of a user.
+    * 
+    * @param {string} userId - The ID of the user to find the cart for.
+    * @returns {Promise<Object>} - A promise that resolves to the user's cart.
+    */
     static async findUserCart(userId) {
         try {
             const user = await UserModel.findById(userId).select('cart').populate('cart.itemId',"title featureImage");
@@ -157,7 +343,7 @@ class UserService {
             }
 
             const result = user.cart.map((item) => ({
-                ID : { value: item.itemId },
+                ID : { value: item.itemId._id },
                 Slika: {
                     value: item.itemId.featureImage.img
                 },
@@ -176,6 +362,12 @@ class UserService {
         }
     }
 
+    /**
+    * Finds user information by their ID.
+    * 
+    * @param {string} userId - The ID of the user to find.
+    * @returns {Promise<Object>} - A promise that resolves to the user information.
+    */
     static async findUserInfoById(userId) {
         try {
             const user = await UserModel.findById(userId)
@@ -214,6 +406,13 @@ class UserService {
         }
     }
 
+    /**
+    * Deletes a phone number from a user.
+    * 
+    * @param {string} userId - The ID of the user to delete the phone number from.
+    * @param {string} phoneNumber - The phone number to delete.
+    * @returns {Promise<Object>} - A promise that resolves to the updated user.
+    */
     static async deletePhoneNumberFromUser(numberId, userId) {
         try {
             const user = await UserModel.findById(userId).select("telephoneNumbers");
@@ -238,6 +437,17 @@ class UserService {
         }
     }
 
+    /**
+    * Deletes an address from a user.
+    * 
+    * @param {string} userId - The ID of the user to delete the address from.
+    * @param {Object} address - The address to delete.
+    * @param {string} address.city - The city of the address.
+    * @param {string} address.street - The street of the address.
+    * @param {string} address.number - The number of the address.
+    * @param {string} address.postalCode - The postal code of the address.
+    * @returns {Promise<Object>} - A promise that resolves to the updated user.
+    */
     static async deleteAddressFromUser(addressId, userId) {
         try {
             const user = await UserModel.findById(userId).select("addresses");
@@ -262,6 +472,16 @@ class UserService {
         }
     }
     
+    /**
+    * Adds an item to a user's cart.
+    * 
+    * @param {string} userId - The ID of the user to add the item to.
+    * @param {Object} item - The item to add to the cart.
+    * @param {string} item.itemId - The ID of the item.
+    * @param {string} item.variationId - The ID of the variation of the item.
+    * @param {number} item.quantity - The quantity of the item.
+    * @returns {Promise<Object>} - A promise that resolves to the updated user cart.
+    */
     static async addItemToUserCart(userId, item) {
         try {
             const user = await UserModel.findById(userId).select('cart');
@@ -278,6 +498,13 @@ class UserService {
         }
     }
 
+    /**
+    * Updates a user's cart with the session cart.
+    * 
+    * @param {string} userId - The ID of the user to update the cart for.
+    * @param {Array<Object>} sessionCart - The session cart to update the user's cart with.
+    * @returns {Promise<Object>} - A promise that resolves to the updated user cart.
+    */
     static async updateCartWithSessionCart(userId, sessionCart) {
         try {
             const user = await UserModel.findById(userId)
@@ -297,15 +524,22 @@ class UserService {
         }
     }
 
+    /**
+    * Removes an item from a user's cart.
+    * 
+    * @param {string} userId - The ID of the user to remove the item from.
+    * @param {string} itemId - The ID of the item to remove.
+    * @param {string} [variationId] - The ID of the variation of the item to remove (optional).
+    * @returns {Promise<Object>} - A promise that resolves to the updated user cart.
+    */
     static async removeItemFromCart(userId, cartItemId) {
         try {
             const user = await UserModel.findById(userId).select('cart');
-
             if (!user) {
                 ErrorHelper.throwNotFoundError("Korisnik");
             }
 
-            const index = user.cart.findIndex(item => item._id.toString() === cartItemId.toString());
+            const index = user.cart.findIndex(item => item.itemId.toString() === cartItemId.toString());
 
             if (index === -1) {
                 ErrorHelper.throwNotFoundError("Element u Korpi");
@@ -318,6 +552,42 @@ class UserService {
         }
     }
 
+    /**
+    * Uklanja artikal iz svih korisničkih korpi.
+    * @param {string} itemId - ID artikla koji se uklanja
+    * @param {Object} session - Mongoose transakcija
+    * @returns {Promise<void>}
+    */
+    static async removeItemFromCarts(itemId, session) {
+        await UserModel.updateMany(
+            { "cart.itemId": itemId },
+            { $pull: { cart: { itemId: itemId } } },
+            { session }
+        );
+    }
+
+    /**
+     * Uklanja artikal iz svih ponuda partnera.
+     * @param {string} itemId - ID artikla koji se uklanja
+     * @param {Object} session - Mongoose transakcija
+     * @returns {Promise<void>}
+     */
+    static async removeItemFromPartnerOffers(itemId, session) { 
+        await UserModel.updateMany(
+            { "partner.offers.itemId": itemId },
+            { $pull: { "partner.offers": { itemId: itemId } } },
+            { session }
+        );
+    }
+
+    /**
+    * Updates a user's information after an order is placed.
+    * 
+    * @param {string} userId - The ID of the user to update.
+    * @param {Object} orderData - The data of the order placed.
+    * @param {Object} session - The mongoose session object.
+    * @returns {Promise<Object>} - A promise that resolves to the updated user.
+    */
     static async updateUserAfterOrder(userId, order, session, newTelephone = null, newAddress = null) {
         try {
             const user = await UserModel.findById(userId)
@@ -328,12 +598,10 @@ class UserService {
             }
 
             if (newTelephone) {
-                console.log(newTelephone)
                 user.telephoneNumbers.push({number: CryptoService.encryptData(newTelephone)});
             }
 
             if (newAddress) {
-                console.log(newAddress)
                 user.addresses.push({
                     city: newAddress.Adresa.Grad,
                     street: CryptoService.encryptData(newAddress.Adresa.Ulica),
@@ -353,6 +621,12 @@ class UserService {
         }
     }
 
+    /**
+    * Maps user details to a specific format.
+    * 
+    * @param {Object} user - The user object to map.
+    * @returns {Object} - The mapped user details.
+    */
     static mapUserDetails(user) {
         user.lastName = CryptoService.decryptData(user.lastName);
         if (Array.isArray(user.telephoneNumbers) && user.telephoneNumbers.length > 0) {

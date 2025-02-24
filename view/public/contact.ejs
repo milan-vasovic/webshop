@@ -1,54 +1,67 @@
 <%- include('../include/head.ejs') %>
 <link rel="stylesheet" href="/css/form.css">
+<link rel="stylesheet" href="/css/contact.css">
 <%- include('../include/navigation.ejs') %>
+
 <section class="flex flex-column main__container">
     <h1 class="main__title"><%= pageTitle %></h1>
     <div class="width-100">
         <h3>Za sve informacije, pitanja i nedoumice</h3>
-        <p>Slobodno nas kontaktirjate, postavite pitanja, potrudićemo se da vam odgovorimo u najkraćem mogućem roku.</p>
+        <p>Slobodno nas kontaktirajte, postavite pitanja, potrudićemo se da vam odgovorimo u najkraćem mogućem roku.</p>
         <p>Možete nas dobiti putem forme ili telefona:</p>
         <h4>+381 65 977 4000</h4>
-        <div class="flex flex-row">
-            <form class="main-form width-50" action="/kontaktiranje" method="post">
+        <!-- Container za formu i mapu -->
+        <div class="contact__content">
+            <!-- Kontakt forma -->
+            <form class="main-form contact__form" action="/kontaktiranje" method="post">
                 <div class="main-form__group">
-                    <label class="" for="nameInput">Ime:</label>
+                    <label for="nameInput">Ime:</label>
                     <input class="main-form__input" id="nameInput" name="name" type="text" required>
                 </div>
                 <div class="main-form__group">
-                    <label class="" for="emailInput">Email:</label>
+                    <label for="emailInput">Email:</label>
                     <input class="main-form__input" id="emailInput" type="email" name="email" required>
                 </div>
                 <div class="main-form__group">
-                    <label class="" for="titleInput">Naslov:</label>
+                    <label for="titleInput">Naslov:</label>
                     <select class="main-form__select" name="title" id="titleInput">
-                        <option value="Informacije" defalut>Informacije</option>
+                        <option value="Informacije" selected>Informacije</option>
                         <option value="Pitanje">Pitanje</option>
                         <option value="Partnerstvo">Partnerstvo</option>
                         <option value="Nalog">Nalog</option>
                     </select>
                 </div>
                 <div class="main-form__group">
-                    <label class="" for="emailInput">Telefon: (opcionalno)</label>
-                    <input class="main-form__input" id="phoneInput" type="tel" name="phone" required>
+                    <label for="phoneInput">Telefon: (opcionalno)</label>
+                    <input class="main-form__input" id="phoneInput" type="tel" name="phone">
                 </div>
                 <div class="main-form__group">
-                    <label class="" for="msgInput">Poruka:</label>
-                    <textarea class="main-form__textarea" id="msgInput" name="msg" type="text" required></textarea>
+                    <label for="msgInput">Poruka:</label>
+                    <textarea class="main-form__textarea" id="msgInput" name="msg" required></textarea>
+                </div>
+                <div class="main-form__group">
+                    <label class="main-form__label" for="acceptance">Saglasnost:</label>
+                    <p>
+                        Prihvatate <a class="main__link" href="/uslovi-koriscenja">Uslove Korišćenja</a> i <a class="main__link" href="/politika-privatnosti">Politiku Privatnosti</a>
+                    </p>
+                    <input class="main-form__input" id="acceptance" name="acceptance" type="checkbox" <% if (existingData) { %>value='<%= existingData.acceptance %>'<% } %>>
                 </div>
                 <input class="main-form__input" type="hidden" name="CSRFToken" value="<%= csrfToken %>" required>
                 <input name="honeypot" type="hidden">
-                <button class="btn" type="submit">Pošaljite</button>
+                <button class="btn-primary" type="submit">Pošaljite</button>
                 <% if (errorMessage) { %>
                     <p><%= errorMessage %></p>
                 <% } %>
             </form>
-            <div>
-                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2808.0233263590544!2d19.805638776650355!3d45.26753924653822!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x475b11a58a5c961f%3A0x88089247cd6b3a07!2sBo%C5%A1ka%20Vrebalova%2026%2C%20Novi%20Sad!5e0!3m2!1sen!2srs!4v1738934562872!5m2!1sen!2srs" width="600" 
-                height="450" 
-                style="border:0;" 
-                allowfullscreen="" 
-                loading="lazy"
-                referrerpolicy="no-referrer-when-downgrade"></iframe>
+            <!-- Google mapa -->
+            <div class="contact__map">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2808.0233263590544!2d19.805638776650355!3d45.26753924653822!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x475b11a58a5c961f%3A0x88089247cd6b3a07!2sBo%C5%A1ka%20Vrebalova%2026%2C%20Novi%20Sad!5e0!3m2!1sen!2srs!4v1738934562872!5m2!1sen!2srs" 
+                        width="100%" 
+                        height="450" 
+                        style="border:0;" 
+                        allowfullscreen="" 
+                        loading="lazy"
+                        referrerpolicy="no-referrer-when-downgrade"></iframe>
             </div>
         </div>
     </div>

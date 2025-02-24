@@ -1,7 +1,7 @@
 <%- include('../include/head.ejs') %>
 <link rel="stylesheet" href="/css/form.css">
 <%- include('../include/navigation.ejs') %>
-<section class="flex flex-column main__container">
+<section class="main__container">
     <div class="main-form__container">
         <h1 class="main-form__title"><%= pageTitle %></h1>
         <form class="main-form width-100" action="/registracija" method="post">
@@ -34,7 +34,7 @@
             </div>
             <input class="main-form__input" type="hidden" name="CSRFToken" value="<%= csrfToken %>">
             <input name="honeypot" type="hidden">
-            <button class="btn" type="submit">Registrujte Se</button>
+            <button class="btn-primary" type="submit">Registrujte Se</button>
             <% if (errorMessage) { %>
                 <div class="user-message--error"><%= errorMessage %></div>
             <% } %>

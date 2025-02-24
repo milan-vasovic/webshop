@@ -1,0 +1,44 @@
+<link rel="stylesheet" href="/css/testimonialCard.css">
+
+<% 
+  /*
+    Parametri koje komponenta prima:
+    - image (string): putanja do slike/avatara (npr. "/images/user1.jpg")
+    - name (string): ime osobe
+    - rating (number): broj zvezdica (1-5)
+    - text (string): glavni komentar/testimonial
+  */
+%>
+
+<div class="testimonial-card">
+  <!-- Leva strana: slika i ime -->
+  <div class="testimonial-left">
+    <% if (image) { %>
+      <div class="testimonial-image">
+        <img src="<%= image %>" alt="<%= name || 'User' %>">
+      </div>
+    <% } %>
+    <% if (name) { %>
+      <div class="testimonial-name">
+        <%= name %>
+      </div>
+    <% } %>
+  </div>
+
+  <!-- Desna strana: zvezdice i tekst -->
+  <div class="testimonial-right">
+    <div class="testimonial-stars">
+      <% 
+        const maxStars = 5;
+        let validRating = rating && rating > 0 ? rating : 0;
+        if (validRating > maxStars) { validRating = maxStars; }
+      %>
+      <% for (let i = 1; i <= maxStars; i++) { %>
+        <span class="<%= i <= validRating ? 'star filled' : 'star' %>">★</span>
+      <% } %>
+    </div>
+    <div class="testimonial-text">
+      <%= text %>
+    </div>
+  </div>
+</div>

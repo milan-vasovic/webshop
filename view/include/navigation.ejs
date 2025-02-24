@@ -1,149 +1,176 @@
-<!-- Creat navigation that is mobile responsive and have checks for isAuth and isAdmin -->
+<!-- Navigation -->
 </head>
 <body>
-    <div class="backdrop"></div>
-    <header class="main-header">
-        <button class="btn" id="side-menu-toggle">Meni</button>
-        <nav class="main-header__nav">
-            <ul class="main-header__item-list">
-                <li class="main-header__item">
-                    <a class="<%= path === '/' ? 'active' : '' %>" href="/">Početna</a>
-                </li>
-                <li class="main-header__item">
-                    <a class="<%= path === '/prodavnica' ? 'active' : '' %>" href="/prodavnica">Prodavnica</a>
-                </li>
-                <li class="main-header__item">
-                    <a class="<%= path === '/partnerstvo' ? 'active' : '' %>" href="/partnerstvo">Partnerstvo</a>
-                </li>
-                <li class="main-header__item">
-                    <a class="<%= path === '/kontakt' ? 'active' : '' %>" href="/kontakt">Kontakt</a>
-                </li>
+  <div class="backdrop"></div>
+  <header class="main-header">
+    <!-- Dugme za otvaranje mobilnog menija -->
+    <button class="btn-primary" id="side-menu-toggle">Meni</button>
 
-                <% if (isAuthenticated) { %>
-                    <li class="main-header__item">
-                        <a class="<%= path === '/moj-profil' ? 'active' : '' %>" href="/moj-profil">Moj Profil</a>
-                    </li>
-                    <% if (role === "partner") { %>
-                        <li class="main-header__item">
-                            <a class="<%= path === '/admin/doajte-artikal' ? 'active' : '' %>" href="/admin/dodajte-artikal">Partner Profil</a>
-                        </li>
-                    <% } %>
-                    <% if (role === "admin") { %>
-                        <li class="main-header__item">
-                            <a class="<%= path === '/admin/artikli' ? 'active' : '' %>" href="/admin/artikli">Admin Artikli</a>
-                        </li>
-                        <li class="main-header__item">
-                            <a class="<%= path === '/admin/doajte-artikal' ? 'active' : '' %>" href="/admin/dodajte-artikal">Dodajte Artikal</a>
-                        </li>
-                        <li class="main-header__item">
-                            <a class="<%= path === '/admin/korisnici' ? 'active' : '' %>" href="/admin/korisnici">Admin Korisnici</a>
-                        </li>
-                        <li class="main-header__item">
-                            <a class="<%= path === '/admin/kuponi' ? 'active' : '' %>" href="/admin/kuponi">Admin Kuponi</a>
-                        </li>
-                        <li class="main-header__item">
-                            <a class="<%= path === '/admin/doajte-kupon' ? 'active' : '' %>" href="/admin/dodajte-kupon">Dodajte Kupon</a>
-                        </li>
-                        <li class="main-header__item">
-                            <a class="<%= path === '/admin/porudzbine' ? 'active' : '' %>" href="/admin/porudzbine">Porudžbine</a>
-                        </li>
-                    <% } %>
-                <% } %>
-            </ul>
-            <ul class="main-header__item-list">
-                <li class="main-header__item">
-                    <a class="<%= path === '/prodavnica/korpa' ? 'active' : '' %>" href="/prodavnica/korpa">Korpa</a>
-                </li>
-                <% if (!isAuthenticated) { %>
-                    <li class="main-header__item">
-                        <a class="<%= path === '/prijava' ? 'active' : '' %>" href="/prijava">Prijava</a>
-                    </li>
-                    <li class="main-header__item">
-                        <a class="<%= path === '/registracija' ? 'active' : '' %>" href="/registracija">Registracija</a>
-                    </li>
-                <% } else { %>
-                    <li class="main-header__item">
-                        <form action="/odjava" method="POST">
-                            <input name="honeypot" type="hidden">
-                            <input type="hidden" name="CSRFToken" value="<%= csrfToken %>">
-                            <button class="btn" type="submit">Odjava</button>
-                        </form>
-                    </li>
-                <% } %>
-            </ul>
-        </nav>
-        <nav class="mobile-nav">
-            <ul class="mobile-nav__item-list">
-                <% if (!isAuthenticated) { %>
-                    <li class="mobile-nav__item">
-                        <a class="<%= path === '/prijava' ? 'active' : '' %>" href="/prijava">Prijava</a>
-                    </li>
-                    <li class="mobile-nav__item">
-                        <a class="<%= path === '/registracija' ? 'active' : '' %>" href="/registracija">Registracija</a>
-                    </li>
-                <% } else { %>
-                    <li class="mobile-nav__item">
-                        <form action="/odjava" method="POST">
-                            <input name="honeypot" type="hidden">
-                            <input type="hidden" name="CSRFToken" value="<%= csrfToken %>">
-                            <button class="btn" type="submit">Odjava</button>
-                        </form>
-                    </li>
-                <% } %>
-                <hr>
-                <li class="mobile-nav__item">
-                    <a class="<%= path === '/' ? 'active' : '' %>" href="/">Početna</a>
-                </li>
-                <li class="mobile-nav__item">
-                    <a class="<%= path === '/prodavnica' ? 'active' : '' %>" href="/prodavnica">Prodavnica</a>
-                </li>
-                <li class="mobile-nav__item">
-                    <a class="<%= path === '/partnerstvo' ? 'active' : '' %>" href="/partnerstvo">Partnerstvo</a>
-                </li>
-                <li class="mobile-nav__item">
-                    <a class="<%= path === '/kontakt' ? 'active' : '' %>" href="/kontakt">Kontakt</a>
-                </li>
-                <% if (isAuthenticated) { %>
-                    <li class="mobile-nav__item">
-                        <a class="<%= path === '/moj-profil' ? 'active' : '' %>" href="/moj-profil">Moj Profil</a>
-                    </li>
-                    <% if (role === "partner") { %>
-                        <li class="mobile-nav__item">
-                            <a class="<%= path === '/partner-profil' ? 'active' : '' %>" href="/partner-profil">Partner Profil</a>
-                        </li>
-                    <% } %>
-                    <% if (role === "admin") { %>
-                        <li class="mobile-nav__item">
-                            <a class="<%= path === '/admin/artikli' ? 'active' : '' %>" href="/admin/artikli">Admin Artikli</a>
-                        </li>
-                        <li class="mobile-nav__item">
-                            <a class="<%= path === '/admin/dodajte-artikal' ? 'active' : '' %>" href="/admin/dodajte-artikal">Dodajte Artikal</a>
-                        </li>
-                        <li class="mobile-nav__item">
-                            <a class="<%= path === '/admin/korisnici' ? 'active' : '' %>" href="/admin/korisnici">Admin Korisnici</a>
-                        </li>
-                        <li class="mobile-nav__item">
-                            <a class="<%= path === '/admin/kuponi' ? 'active' : '' %>" href="/admin/kuponi">Admin Kuponi</a>
-                        </li>
-                        <li class="mobile-nav__item">
-                            <a class="<%= path === '/admin/dodajte-kupon' ? 'active' : '' %>" href="/admin/dodajte-kupon">Dodajte Kupon</a>
-                        </li>
-                        <li class="mobile-nav__item">
-                            <a class="<%= path === '/admin/porudzbine' ? 'active' : '' %>" href="/admin/porudzbine">Porudžbine</a>
-                        </li>
-                    <% } %>
-                <% } %>
-                <hr>
-                <li class="mobile-nav__item">
-                    <a class="<%= path === '/uslovi-koriscenja' ? 'active' : '' %>" href="/uslovi-koriscenja">Uslovi Korišćenja</a>
-                </li>
-                <li class="mobile-nav__item">
-                    <a class="<%= path === '/politika-privatnosti' ? 'active' : '' %>" href="/politika-privatnosti">Politika Privatnosti</a>
-                </li>
-                <li class="mobile-nav__item">
-                    <a class="<%= path === '/o-nama' ? 'active' : '' %>" href="/o-nama">O Nama</a>
-                </li>             
-                <hr>
-            </ul>
-        </nav>
-    </header>
+    <!-- Desktop navigacija -->
+    <nav class="main-header__nav">
+      <ul class="main-header__item-list">
+        <li class="main-header__item">
+          <a class="<%= path === '/' ? 'active' : '' %>" href="/">Početna</a>
+        </li>
+        <li class="main-header__item">
+          <a class="<%= path === '/prodavnica' ? 'active' : '' %>" href="/prodavnica">Prodavnica</a>
+        </li>
+        <li class="main-header__item">
+          <a class="<%= path === '/forum' ? 'active' : '' %>" href="/forum">Forum</a>
+        </li>
+        <li class="main-header__item">
+          <a class="<%= path === '/partnerstvo' ? 'active' : '' %>" href="/partnerstvo">Partnerstvo</a>
+        </li>
+        <li class="main-header__item">
+          <a class="<%= path === '/kontakt' ? 'active' : '' %>" href="/kontakt">Kontakt</a>
+        </li>
+        <% if (isAuthenticated) { %>
+          <li class="main-header__item">
+            <a class="<%= path === '/moj-profil' ? 'active' : '' %>" href="/moj-profil">Moj Profil</a>
+          </li>
+          <% if (role === "partner") { %>
+            <li class="main-header__item">
+              <a class="<%= path === '/partner-profil' ? 'active' : '' %>" href="/partner-profil">Partner Profil</a>
+            </li>
+          <% } %>
+          <% if (role === "admin") { %>
+            <li class="main-header__item">
+              <a class="<%= path === '/admin/artikli' ? 'active' : '' %>" href="/admin/artikli">Artikli</a>
+            </li>
+            <li class="main-header__item">
+              <a class="<%= path === '/admin/dodajte-artikal' ? 'active' : '' %>" href="/admin/dodajte-artikal">Dodajte Artikal</a>
+            </li>
+            <li class="main-header__item">
+              <a class="<%= path === '/admin/korisnici' ? 'active' : '' %>" href="/admin/korisnici">Korisnici</a>
+            </li>
+            <li class="main-header__item">
+              <a class="<%= path === '/admin/kupci' ? 'active' : '' %>" href="/admin/kupci">Kupci</a>
+            </li>
+            <li class="main-header__item">
+              <a class="<%= path === '/admin/kuponi' ? 'active' : '' %>" href="/admin/kuponi">Kuponi</a>
+            </li>
+            <li class="main-header__item">
+              <a class="<%= path === '/admin/dodajte-kupon' ? 'active' : '' %>" href="/admin/dodajte-kupon">Dodajte Kupon</a>
+            </li>
+            <li class="main-header__item">
+              <a class="<%= path === '/admin/porudzbine' ? 'active' : '' %>" href="/admin/porudzbine">Porudžbine</a>
+            </li>
+            <li class="main-header__item">
+              <a class="<%= path === '/admin/objave' ? 'active' : '' %>" href="/admin/objave">Objave</a>
+            </li>
+            <li class="main-header__item">
+              <a class="<%= path === '/admin/dodajte-objavu' ? 'active' : '' %>" href="/admin/dodajte-objavu">Dodajte Objavu</a>
+            </li>
+            <li class="main-header__item">
+              <a class="<%= path === '/admin/kontakti' ? 'active' : '' %>" href="/admin/kontakti">Kontakti</a>
+            </li>
+          <% } %>
+        <% } %>
+      </ul>
+      <ul class="main-header__item-list">
+        <li class="main-header__item">
+          <a class="<%= path === '/prodavnica/korpa' ? 'active' : '' %>" href="/prodavnica/korpa">Korpa</a>
+        </li>
+        <% if (!isAuthenticated) { %>
+          <li class="main-header__item">
+            <a class="<%= path === '/prijava' ? 'active' : '' %>" href="/prijava">Prijava</a>
+          </li>
+          <li class="main-header__item">
+            <a class="<%= path === '/registracija' ? 'active' : '' %>" href="/registracija">Registracija</a>
+          </li>
+        <% } else { %>
+          <li class="main-header__item">
+            <form action="/odjava" method="POST">
+              <input name="honeypot" type="hidden">
+              <input type="hidden" name="CSRFToken" value="<%= csrfToken %>">
+              <button class="btn-primary" type="submit">Odjava</button>
+            </form>
+          </li>
+        <% } %>
+      </ul>
+    </nav>
+
+    <!-- Mobilna navigacija -->
+    <nav class="mobile-nav">
+      <ul class="mobile-nav__item-list">
+        <% if (!isAuthenticated) { %>
+          <li class="mobile-nav__item">
+            <a class="<%= path === '/prijava' ? 'active' : '' %>" href="/prijava">Prijava</a>
+          </li>
+          <li class="mobile-nav__item">
+            <a class="<%= path === '/registracija' ? 'active' : '' %>" href="/registracija">Registracija</a>
+          </li>
+        <% } else { %>
+          <li class="mobile-nav__item">
+            <form action="/odjava" method="POST">
+              <input name="honeypot" type="hidden">
+              <input type="hidden" name="CSRFToken" value="<%= csrfToken %>">
+              <button class="btn-primary" type="submit">Odjava</button>
+            </form>
+          </li>
+        <% } %>
+        <hr>
+        <li class="mobile-nav__item">
+          <a class="<%= path === '/' ? 'active' : '' %>" href="/">Početna</a>
+        </li>
+        <li class="mobile-nav__item">
+          <a class="<%= path === '/prodavnica' ? 'active' : '' %>" href="/prodavnica">Prodavnica</a>
+        </li>
+        <li class="mobile-nav__item">
+          <a class="<%= path === '/forum' ? 'active' : '' %>" href="/forum">Forum</a>
+        </li>
+        <li class="mobile-nav__item">
+          <a class="<%= path === '/partnerstvo' ? 'active' : '' %>" href="/partnerstvo">Partnerstvo</a>
+        </li>
+        <li class="mobile-nav__item">
+          <a class="<%= path === '/kontakt' ? 'active' : '' %>" href="/kontakt">Kontakt</a>
+        </li>
+        <li class="mobile-nav__item">
+          <a class="<%= path === '/o-nama' ? 'active' : '' %>" href="/o-nama">O Nama</a>
+        </li>
+        <% if (isAuthenticated) { %>
+          <li class="mobile-nav__item">
+            <a class="<%= path === '/moj-profil' ? 'active' : '' %>" href="/moj-profil">Moj Profil</a>
+          </li>
+          <% if (role === "partner") { %>
+            <li class="mobile-nav__item">
+              <a class="<%= path === '/partner-profil' ? 'active' : '' %>" href="/partner-profil">Partner Profil</a>
+            </li>
+          <% } %>
+          <% if (role === "admin") { %>
+            <li class="mobile-nav__item">
+              <a class="<%= path === '/admin/artikli' ? 'active' : '' %>" href="/admin/artikli">Artikli</a>
+            </li>
+            <li class="mobile-nav__item">
+              <a class="<%= path === '/admin/dodajte-artikal' ? 'active' : '' %>" href="/admin/dodajte-artikal">Dodajte Artikal</a>
+            </li>
+            <li class="mobile-nav__item">
+              <a class="<%= path === '/admin/korisnici' ? 'active' : '' %>" href="/admin/korisnici">Korisnici</a>
+            </li>
+            <li class="mobile-nav__item">
+              <a class="<%= path === '/admin/kupci' ? 'active' : '' %>" href="/admin/kupci">Kupci</a>
+            </li>
+            <li class="mobile-nav__item">
+              <a class="<%= path === '/admin/kuponi' ? 'active' : '' %>" href="/admin/kuponi">Kuponi</a>
+            </li>
+            <li class="mobile-nav__item">
+              <a class="<%= path === '/admin/dodajte-kupon' ? 'active' : '' %>" href="/admin/dodajte-kupon">Dodajte Kupon</a>
+            </li>
+            <li class="mobile-nav__item">
+              <a class="<%= path === '/admin/porudzbine' ? 'active' : '' %>" href="/admin/porudzbine">Porudžbine</a>
+            </li>
+            <li class="mobile-nav__item">
+              <a class="<%= path === '/admin/objave' ? 'active' : '' %>" href="/admin/objave">Objave</a>
+            </li>
+            <li class="mobile-nav__item">
+              <a class="<%= path === '/admin/dodajte-objavu' ? 'active' : '' %>" href="/admin/objave">Dodajte Objavu</a>
+            </li>
+            <li class="mobile-nav__item">
+              <a class="<%= path === '/admin/kontakti' ? 'active' : '' %>" href="/admin/kontakti">Kontakti</a>
+            </li>
+          <% } %>
+        <% } %>
+        <hr>
+      </ul>
+    </nav>
+  </header>
