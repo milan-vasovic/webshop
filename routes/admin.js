@@ -475,6 +475,8 @@ router.post('/kuponi/pretraga', [], isAuth, isAdmin, CouponController.postSearch
 
 router.post('/napravite-objavu', [], isAuth, isAdmin, ForumController.postAddtPost);
 
+router.post("/izmenite-porudzbinu", [], isAuth, isAdmin, OrderController.postEditOrderStatus)
+
 router.delete('/izbrisite-kupon', isAuth, isAdmin, CouponController.deleteCouponById);
 
 router.delete('/izbrisite-artikal', isAuth, isAdmin, ItemController.deleteItemById);

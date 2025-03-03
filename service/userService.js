@@ -7,6 +7,8 @@ import CryptoService from "./cryptoService.js";
 import EmailService from "./emailService.js";
 
 import ErrorHelper from "../helper/errorHelper.js";
+import CustomerService from "./customerService.js";
+import OredrService from "./orderService.js";
 
 class UserService {
     /**
@@ -223,9 +225,72 @@ class UserService {
     * @param {string} userData.lastName - The last name of the user.
     * @returns {Promise<Object>} - A promise that resolves to the created user.
     */
-    static async registerNewUser(email, password, firstname, lastname) {
+    static async registerNewUser(email, password, firstname, lastname, telephone = null, address = null, session = null) {
+        if (session) {
+            const customerExist = await CustomerService.checkCustomerByEamil(email, session);
+
+            if (customerExist) {
+                const securePassword = await CryptoService.hashPassword(password);
+                const secureLastName = await CryptoService.encryptData(lastname);
+        
+                const secureTelephone = {
+                    number: telephone ? await CryptoService.encryptData(telephone) : ""
+                }
+        
+                const secureAddress = {
+                    city: address ? address.Adresa.Grad : "",
+                    street: address ? await CryptoService.encryptData(address.Adresa.Ulica) : "",
+                    number: address ? await CryptoService.encryptData(address.Adresa.Broj) : "",
+                    postalCode: address ? address.Adresa["Poštanski Broj"] : ""
+                }
+
+                customerExist.telephoneNumber.push({number: secureTelephone})
+                customerExist.address.push(secureAddress)
+                const newUser = new UserModel({
+                    email: email,
+                    password: securePassword,
+                    firstName: firstname,
+                    lastName: secureLastName,
+                    role: 'user',
+                    status: ['active'],
+                    telephoneNumbers: customerExist.telephoneNumbers,
+                    addresses: customerExist.address,
+                    orders: customerExist.orders,
+                    cart: [],
+                    partner: {
+                        history: [],
+                        offers: []
+                    }
+                })
+
+                await newUser.save({ session });
+                if (newUser.orders && newUser.orders.length > 0) {
+                    await Promise.all(
+                      newUser.orders.map(orderId =>
+                        OredrService.updateOrderBuyerRef(orderId, newUser._id, session)
+                    )
+                )}
+
+                await CustomerService.deleteCustomerById(customerExist._id, session);
+
+                return newUser;
+            }
+        }
+        
+
         const securePassword = await CryptoService.hashPassword(password);
         const secureLastName = await CryptoService.encryptData(lastname);
+
+        const secureTelephone = {
+            number: telephone ? await CryptoService.encryptData(telephone) : ""
+        }
+
+        const secureAddress = {
+            city: address ? address.Adresa.Grad : "",
+            street: address ? await CryptoService.encryptData(address.Adresa.Ulica) : "",
+            number: address ? await CryptoService.encryptData(address.Adresa.Broj) : "",
+            postalCode: address ? address.Adresa["Poštanski Broj"] : ""
+        }
 
         const newUser = new UserModel({
             email: email,
@@ -234,8 +299,8 @@ class UserService {
             lastName: secureLastName,
             role: 'user',
             status: ['active'],
-            telephoneNumbers: [],
-            addresses: [],
+            telephoneNumbers: telephone ? [secureTelephone] : [],
+            addresses: address ? [secureAddress] : [],
             orders: [],
             cart: [],
             partner: {
@@ -244,7 +309,7 @@ class UserService {
             }
         })
 
-        return newUser.save();
+        return await newUser.save(session ? { session } : undefined);
     }
 
     /**
@@ -406,6 +471,36 @@ class UserService {
         }
     }
 
+    static async findUserEmailById(userId) {
+        try {
+            const user = UserModel.findById(userId)
+                .select("email firstName");
+
+            if (!user) {
+                ErrorHelper.throwNotFoundError("Korisnik");
+            }
+
+            return user;
+        } catch (error) {
+            ErrorHelper.throwServerError(error);
+        }
+    }
+
+    static async findUserByEmail(email) {
+        try {
+            const user = UserModel.findOne({email: email})
+                .select("_id email firstName");
+
+            if (!user) {
+                ErrorHelper.throwNotFoundError("Korisnik");
+            }
+
+            return user;
+        } catch (error) {
+            ErrorHelper.throwServerError(error);
+        }
+    }
+    
     /**
     * Deletes a phone number from a user.
     * 
@@ -591,24 +686,39 @@ class UserService {
     static async updateUserAfterOrder(userId, order, session, newTelephone = null, newAddress = null) {
         try {
             const user = await UserModel.findById(userId)
-                .select('firstName cart orders email telephoneNumbers addresses');
+                .select('firstName cart orders email telephoneNumbers addresses')
+                .session(session);
 
             if (!user) {
                 ErrorHelper.throwNotFoundError("Korisnik");
             }
 
             if (newTelephone) {
-                user.telephoneNumbers.push({number: CryptoService.encryptData(newTelephone)});
-            }
-
-            if (newAddress) {
-                user.addresses.push({
+                const encryptedTelephone = await CryptoService.encryptData(newTelephone);
+                const existsTel = user.telephoneNumbers.some(t => t.number === encryptedTelephone);
+                if (!existsTel) {
+                  user.telephoneNumbers.push({ number: encryptedTelephone });
+                }
+              }
+          
+              if (newAddress) {
+                const encryptedStreet = await CryptoService.encryptData(newAddress.Adresa.Ulica);
+                const encryptedNumber = await CryptoService.encryptData(newAddress.Adresa.Broj);
+                const existsAddress = user.addresses.some(a =>
+                  a.city === newAddress.Adresa.Grad &&
+                  a.street === encryptedStreet &&
+                  a.number === encryptedNumber &&
+                  a.postalCode === newAddress.Adresa["Poštanski Broj"]
+                );
+                if (!existsAddress) {
+                  user.addresses.push({
                     city: newAddress.Adresa.Grad,
-                    street: CryptoService.encryptData(newAddress.Adresa.Ulica),
-                    number: CryptoService.encryptData(newAddress.Adresa.Broj),
+                    street: encryptedStreet,
+                    number: encryptedNumber,
                     postalCode: newAddress.Adresa["Poštanski Broj"]
-                });
-            }
+                  });
+                }
+              }
 
             user.cart = [];
             user.orders.push(order._id);

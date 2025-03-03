@@ -4,6 +4,7 @@ import sanitize from "mongo-sanitize";
 import ItemModel from "../model/item.js";
 
 import ErrorHelper from "../helper/errorHelper.js";
+import EmailService from "./emailService.js";
 
 class ItemService {
   /**
@@ -361,7 +362,7 @@ class ItemService {
   static async findItemDetailsByIdOrName(id, itemName = null) {
     if (itemName) {
       const item = await ItemModel.findOne({ title: itemName }).select(
-        "title keyWords shortDescription price actionPrice description categories tags featureImage video status backorder variations upSellItems crossSellItems"
+        "title keyWords shortDescription price actionPrice description categories tags featureImage video status backorder variations upSellItems crossSellItems wishlist"
       );
 
       if (!item) {
@@ -512,6 +513,68 @@ class ItemService {
     }
   }
 
+  static async findUsersFromItemWishlist(itemId) {
+    try {
+      const item = await ItemModel.findById(itemId)
+        .select("name whislist")
+        .populate('wishlist.userId', "firstName email");
+
+      if (!item) {
+        ErrorHelper.throwNotFoundError("Artikal");
+      }
+
+
+      return item;
+    } catch (error) {
+      ErrorHelper.throwServerError(error);
+    }
+  }
+  
+  static async addUserToItemWishlist(userId, itemId) {
+    try {
+      const item = await ItemModel.findById(itemId)
+        .select("title wishlist");
+
+      if (!item) {
+        ErrorHelper.throwNotFoundError("Artikal");
+      }
+
+      const hasUser = item.wishlist.some(wish => wish.userId.toString() === userId.toString());
+    
+      if (!hasUser) {
+        item.wishlist.push({userId: userId});
+        return await item.save();
+      }
+
+      return item;
+
+    } catch (error) {
+      ErrorHelper.throwServerError(error);
+    }
+  }
+
+  static async removeUserFromItemWishlist(userId, itemId) {
+    try {
+      const item = await ItemModel.findById(itemId)
+        .select("title wishlist");
+
+      if (!item) {
+        ErrorHelper.throwNotFoundError("Artikal");
+      }
+      
+      const initialLength = item.wishlist.length;
+      item.wishlist = item.wishlist.filter(wish => wish.userId.toString() !== userId.toString());
+      
+      if (item.wishlist.length !== initialLength) {
+        await item.save();
+      }
+      
+      return item;
+    } catch (error) {
+      ErrorHelper.throwServerError(error);
+    }
+  }
+  
   /**
    * Creates a new item.
    *
@@ -687,7 +750,7 @@ class ItemService {
             color: variation.color,
             amount: Number(variation.amount) || (existingVar ? existingVar.amount : 0),
             image: {
-              img: file ? file.path : (existingVar && existingVar.image && existingVar.image.img) || "",
+              img: file ? file.originalname : (existingVar && existingVar.image && existingVar.image.img) || "",
               imgDesc: variation.imgDesc || (existingVar && existingVar.image && existingVar.image.imgDesc) || ""
             }
           };
@@ -701,7 +764,7 @@ class ItemService {
       } else {
         body.variations = existingItem.variations;
       }
-      
+      existingItem.variations = body.variations;
 
       // Ažuriraj ostale podatke
       existingItem.title = body.title || existingItem.title;
@@ -712,7 +775,18 @@ class ItemService {
       existingItem.keyWords = body.keyWords || existingItem.keyWords;
       existingItem.categories = body.categories || existingItem.categories;
       existingItem.tags = body.tags || existingItem.tags;
+
+      // Pretvaranje statusa u niz (ako već nije niz)
+      const newStatus = Array.isArray(body.status) ? body.status : [body.status];
+      const existingStatus = Array.isArray(existingItem.status) ? existingItem.status : [existingItem.status];
+
+      // Provera da li je "action" dodat u novim statusima, a prethodno nije bio prisutan
+      if (newStatus.includes("action") && !existingStatus.includes("action")) {
+        await EmailService.notifyUsersFromItemWishlist(existingItem._id);
+      }
+
       existingItem.status = body.status || existingItem.status;
+
       existingItem.price = body.price || existingItem.price;
       existingItem.actionPrice = body.actionPrice || existingItem.actionPrice;
       existingItem.upSellItems = body.upSellItems || existingItem.upSellItems;
@@ -723,6 +797,22 @@ class ItemService {
 
       const updatedItem = await existingItem.save();
       return updatedItem;
+    } catch (error) {
+      ErrorHelper.throwServerError(error);
+    }
+  }
+
+  static async findUsersFromWishlist(itemId) {
+    try {
+      const item = await ItemModel.findById(itemId)
+        .select("title wishlist")
+        .populate("wishlist.userId", "firstName email");
+
+      if (!item) {
+        ErrorHelper.throwNotFoundError("Artikal");
+      }
+
+      return item;
     } catch (error) {
       ErrorHelper.throwServerError(error);
     }
@@ -802,11 +892,69 @@ class ItemService {
 
       if (variationIndex > -1) {
         item.variations[variationIndex].amount -= amount;
+
+        if (0 < item.variations[variationIndex].amount <= 3) {
+          EmailService.sendItemLowInStock(item._id, item.variations[variationIndex]._id);
+        } else if (item.variations[variationIndex].amount <= 0) {
+          EmailService.sendItemOutOfStock(item.variations[variationIndex]._id);
+        }
+        
       } else {
         ErrorHelper.throwNotFoundError("Varijacija nije pronađena");
       }
 
       return await item.save({ session });
+    } catch (error) {
+      ErrorHelper.throwServerError(error);
+    }
+  }
+
+  static async changeItemSoldCount(itemId, amount, session) {
+    try {
+      const updatedItem = await ItemModel.findByIdAndUpdate(
+        itemId,
+        { $inc: { soldCount: amount } },
+        { new: true, session }
+      );
+      return updatedItem;
+    } catch (error) {
+      ErrorHelper.throwServerError(error);
+    }
+  }
+  
+  static async changeItemReturnedCount(itemId, amount, session) {
+    try {
+      const updatedItem = await ItemModel.findByIdAndUpdate(
+        itemId,
+        { $inc: { returnedCount: amount } },
+        { new: true, session }
+      );
+      return updatedItem;
+    } catch (error) {
+      ErrorHelper.throwServerError(error);
+    }
+  }
+
+  static async changeVariationAmount(itemId, size, color, amount, session) {
+    try {
+      const item = await ItemModel.findById(itemId)
+        .select("variations");
+
+      if (!item) {
+        ErrorHelper.throwNotFoundError("Artikal");
+      }
+
+      const variation = item.variations.find(v => v.size === size && v.color === color);
+      if (!variation) {
+        ErrorHelper.throwNotFoundError("Varijacija");
+      }
+
+      // Povećaj (ili smanji, ako je negativan) amount varijacije
+      variation.amount = (variation.amount || 0) + Number(amount);
+
+      // Sačuvaj artikal unutar sesije
+      await item.save({ session });
+      return item;
     } catch (error) {
       ErrorHelper.throwServerError(error);
     }
@@ -968,6 +1116,7 @@ class ItemService {
         "Kratak Opis": { value: crosssell.shortDescription },
         Slika: { value: crosssell.featureImage },
       })),
+      "Lista Želja": item.wishlist
     };
   }
 

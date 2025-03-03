@@ -46,9 +46,9 @@ app.use(
       contentSecurityPolicy: {
           directives: {
               "default-src": ["'self'"],
-              "script-src": ["'self'"], 
+              "script-src": ["'self'", "https://www.instagram.com/"], 
               "style-src": ["'self'", "'unsafe-inline'"],
-              frameSrc: ["'self'", "https://www.google.com", "https://maps.google.com"],
+              frameSrc: ["'self'", "https://www.google.com", "https://maps.google.com", "https://www.instagram.com/"],
           },
       },
   })

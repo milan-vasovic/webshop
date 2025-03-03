@@ -147,6 +147,19 @@ function postSearchUser(req, res, next) {
     }
 }
 
+async function cancelOrder(req, res, next) {
+    try {
+        const userId = req.session.user._id;
+        const orderId = sanitize(req.body.orderId);
+
+        const order = await OrderService.cancelOrder(orderId, userId);
+
+        return res.redirect('/korisnik/porudzbina-detalji/'+orderId);
+    } catch (error) {
+        next(error);
+    }
+}
+
 async function deleteNumber(req, res, next) {
     try {
         const numberId = req.body.itemId;
@@ -185,6 +198,7 @@ export default {
     getMyShopPage,
     getUserOrderDetails,
     postAddNumber,
+    cancelOrder,
     deleteNumber,
     postAddAddress,
     postSearchUser,

@@ -76,12 +76,25 @@
           <input type="hidden" name="isNewAddress" value="true">
         <% } %>
         <div class="main-form__group">
+          <label class="main-form__label" for="noteInp">Napomena:</label>
+          <textarea class="main-form__textarea" name="note" id="noteInp"></textarea>
+        </div>
+        <div class="main-form__group">
           <label class="main-form__label" for="acceptance">Saglasnost:</label>
           <div class="flex flex-row flex-wrap">
             Prihvatate <a class="main__link" href="/uslovi-koriscenja">Uslove Korišćenja</a> i <a class="main__link" href="/politika-privatnosti">Politiku Privatnosti</a>
             <input id="acceptance" name="acceptance" type="checkbox" required>
           </div>
         </div>
+        <% if (!isAuthenticated) { %>
+          <div class="main-form__group">
+            <label class="main-form__label" for="createAccount">Napravite nalog:</label>
+            <div class="flex flex-row flex-wrap">
+              Prihvatate da Vam se nalog automatski napravi.
+              <input id="createAccount" name="createAccount" type="checkbox">
+            </div>
+          </div>
+        <% } %>
         <input name="honeypot" type="hidden">
         <input class="main-form__input" type="hidden" name="CSRFToken" value="<%= csrfToken %>" required>
         <button class="btn-primary" type="submit">Poručite</button>

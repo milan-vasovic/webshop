@@ -4,6 +4,8 @@ import { body, param, query, validationResult } from 'express-validator'; // Nee
 const router = Router();
 
 import UserController from '../controller/userController.js';
+import ItemController from '../controller/itemController.js';
+
 import isAuth from '../middleware/isAuth.js';
 
 router.get("/moj-profil", isAuth, UserController.getMyProfilePage);
@@ -19,6 +21,12 @@ router.post('/korisnik/dodajte-broj', [
 router.post('/korisnik/dodajte-adresu', [
 
 ], isAuth, UserController.postAddAddress);
+
+router.post('/korisnik/dodavanje-u-listu-zelja', ItemController.postAddUserToItemWishlist)
+
+router.post('/korisnik/izbacivanje-iz-liste-zelja', ItemController.postRemoveUserToItemWishlist)
+
+router.post('/korisnik/otkazivanje-porudzbine', isAuth, UserController.cancelOrder)
 
 router.delete('/korisnik/izbrisite-broj', isAuth, UserController.deleteNumber);
 

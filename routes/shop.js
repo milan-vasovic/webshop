@@ -32,111 +32,121 @@ router.post('/korpa-dodavanje', ShopController.postAddItemToCart);
 router.post("/provera-kupona", ShopController.postCouponValidation);
 
 router.post("/porucivanje", [
+    // First Name: required, trimmed, letters only
     body('firstName')
-    .trim()
-    .notEmpty().withMessage('Ime je obavezno.')
-    .matches(/^[\p{L}\s-]+$/u).withMessage('Ime može sadržavati samo slova.'),
-
-    // Prezime: obavezno, trim-ovano
+      .trim()
+      .notEmpty().withMessage('First name is required.')
+      .matches(/^[\p{L}\s-]+$/u).withMessage('First name can only contain letters.'),
+  
+    // Last Name: required, trimmed, letters only
     body('lastName')
-    .trim()
-    .notEmpty().withMessage('Prezime je obavezno.')
-    .matches(/^[\p{L}\s-]+$/u).withMessage('Prezime može sadržavati samo slova.'),
-
-    // Email: obavezan i validan
+      .trim()
+      .notEmpty().withMessage('Last name is required.')
+      .matches(/^[\p{L}\s-]+$/u).withMessage('Last name can only contain letters.'),
+  
+    // Email: required and must be valid
     body('email')
-    .trim()
-    .notEmpty().withMessage('Email je obavezan.')
-    .isEmail().withMessage('Email mora biti validan.'),
-
-    // Broj telefona: ako se koristi postojeći broj, očekuje se da polje bude popunjeno i da sadrži validan broj
+      .trim()
+      .notEmpty().withMessage('Email is required.')
+      .isEmail().withMessage('Email must be valid.'),
+  
+    // Telephone: if not using a new telephone, the field must be filled and valid
     body('telephone')
-    .if((value, { req }) => !req.body.isNewTelephone)
-    .trim()
-    .notEmpty().withMessage('Broj telefona je obavezan.')
-    .isMobilePhone('any').withMessage('Broj telefona mora biti validan.'),
-
-    // Novi broj telefona: ako postoji flag isNewTelephone, onda je polje newTelephone obavezno i mora biti validno
+      .if((value, { req }) => !req.body.isNewTelephone)
+      .trim()
+      .notEmpty().withMessage('Telephone number is required.')
+      .isMobilePhone('any').withMessage('Telephone number must be valid.'),
+  
+    // New Telephone: if the flag isNewTelephone is set, then newTelephone is required and must be valid
     body('newTelephone')
-    .if((value, { req }) => req.body.isNewTelephone)
-    .trim()
-    .notEmpty().withMessage('Novi broj telefona je obavezan.')
-    .isMobilePhone('any').withMessage('Novi broj telefona mora biti validan.'),
-
-    // Ako korisnik ima unapred definisane adrese (odabir iz selecta) – polje address se ne validira dodatno,
-    // ali ako korisnik nije prijavljen (ili želi da unese novu adresu) onda očekujemo unos podataka:
+      .if((value, { req }) => req.body.isNewTelephone)
+      .trim()
+      .notEmpty().withMessage('New telephone number is required.')
+      .isMobilePhone('any').withMessage('New telephone number must be valid.'),
+  
+    // Address: optional if a predefined address is selected
     body('address')
-    .optional({ checkFalsy: true })
-    .trim(),
-
-    // Dinamički unos nove adrese: ako postoji flag isNewAddress, tada su newCity, newStreet i newAddressNumber obavezni.
+      .optional({ checkFalsy: true })
+      .trim(),
+  
+    // New Address: if flag isNewAddress is set, then newCity, newStreet, and newAddressNumber are required
     body('newCity')
-    .if((value, { req }) => req.body.isNewAddress)
-    .trim()
-    .notEmpty().withMessage('Grad je obavezan.'),
+      .if((value, { req }) => req.body.isNewAddress)
+      .trim()
+      .notEmpty().withMessage('City is required.'),
     body('newStreet')
-    .if((value, { req }) => req.body.isNewAddress)
-    .trim()
-    .notEmpty().withMessage('Ulica je obavezna.'),
+      .if((value, { req }) => req.body.isNewAddress)
+      .trim()
+      .notEmpty().withMessage('Street is required.'),
     body('newAddressNumber')
-    .if((value, { req }) => req.body.isNewAddress)
-    .trim()
-    .notEmpty().withMessage('Broj ulice je obavezan.'),
+      .if((value, { req }) => req.body.isNewAddress)
+      .trim()
+      .notEmpty().withMessage('House number is required.'),
     body('newPostalCode')
-    .if((value, { req }) => req.body.isNewAddress)
-    .optional({ checkFalsy: true })
-    .trim()
-    .isPostalCode('any').withMessage('Poštanski broj mora biti validan.'),
-
-    // Ako korisnik nije prijavljen (nema adrese u sistemu) – validiraju se polja za unos adrese iz forme (npr. city, street, number)
+      .if((value, { req }) => req.body.isNewAddress)
+      .optional({ checkFalsy: true })
+      .trim()
+      .isPostalCode('any').withMessage('Postal code must be valid.'),
+  
+    // If no predefined address is used, validate the address fields from the form
     body('newCity')
-    .if((value, { req }) => !req.body.address)
-    .trim()
-    .notEmpty().withMessage('Grad je obavezan.'),
+      .if((value, { req }) => !req.body.address)
+      .trim()
+      .notEmpty().withMessage('City is required.'),
     body('newStreet')
-    .if((value, { req }) => !req.body.address)
-    .trim()
-    .notEmpty().withMessage('Ulica je obavezna.'),
+      .if((value, { req }) => !req.body.address)
+      .trim()
+      .notEmpty().withMessage('Street is required.'),
     body('newAddressNumber')
-    .if((value, { req }) => !req.body.address)
-    .trim()
-    .notEmpty().withMessage('Broj ulice je obavezan.'),
+      .if((value, { req }) => !req.body.address)
+      .trim()
+      .notEmpty().withMessage('House number is required.'),
     body('newPostalCode')
-    .if((value, { req }) => !req.body.address)
-    .optional({ checkFalsy: true })
-    .trim()
-    .isPostalCode('any').withMessage('Poštanski broj mora biti validan.'),
-
-    // Saglasnost: mora biti prihvaćena (ako checkbox nije čekiran, vrednost će biti undefined)
+      .if((value, { req }) => !req.body.address)
+      .optional({ checkFalsy: true })
+      .trim()
+      .isPostalCode('any').withMessage('Postal code must be valid.'),
+  
+    // Acceptance: must be checked (if checkbox is not checked, the value is undefined)
     body('acceptance')
-    .custom((value) => {
-    if (!value) {
-        throw new Error('Morate prihvatiti uslove korišćenja i politiku privatnosti.');
-    }
-    return true;
-    }),
+      .custom((value) => {
+        if (!value) {
+          throw new Error('You must accept the Terms of Use and Privacy Policy.');
+        }
+        return true;
+      }),
+  
+    body('createAccount')
+      .optional({ checkFalsy: true })
+      .custom(value => true),
 
+    // CouponId: optional, but if provided, must have at least 3 characters and only valid characters
     body('couponId')
-    .optional({ checkFalsy: true })
-    .trim()
-    .isLength({ min: 3 }).withMessage('Kupon mora imati najmanje 3 karaktera.')
-    .matches(/^[\p{L}\d\s-]+$/u)
-    .withMessage('Kupon sadrži nevažeće karaktere.'),
-
-    // Honeypot: mora biti prazno
+      .optional({ checkFalsy: true })
+      .trim()
+      .isLength({ min: 3 }).withMessage('Coupon code must have at least 3 characters.')
+      .matches(/^[\p{L}\d\s-]+$/u).withMessage('Coupon code contains invalid characters.'),
+  
+    // Note: optional field, trim any whitespace
+    body('note')
+      .optional({ checkFalsy: true })
+      .trim(),
+  
+    // Honeypot: must be empty
     body('honeypot')
-    .custom((value) => {
-    if (value && value.trim() !== '') {
-        throw new Error('Nevalidan zahtev.');
-    }
-    return true;
-    }),
-
-    // CSRFToken: mora biti prisutan
+      .custom((value) => {
+        if (value && value.trim() !== '') {
+          throw new Error('Invalid request.');
+        }
+        return true;
+      }),
+  
+    // CSRFToken: must be present
     body('CSRFToken')
-    .trim()
-    .notEmpty().withMessage('CSRF token je obavezan.')
-], ShopController.postOrder);
+      .trim()
+      .notEmpty().withMessage('CSRF token is required.')
+  ], ShopController.postOrder);
+  
 
 router.delete('/korpa-izbacivanje', ShopController.postRemoveItemFromCart);
 

@@ -222,15 +222,11 @@ const itemSchema = new Schema({
         min: 0
     },
 
-    wishList: [{
+    wishlist: [{
         userId: {
             type: Schema.Types.ObjectId,
             requried: true,
             ref: "User"
-        },
-        email: {
-            type: String,
-            required: true
         }
     }]
 })

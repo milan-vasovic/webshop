@@ -112,12 +112,20 @@ async function getItemByName(req, res, next) {
 
         const item = await ShopService.findItemByName(itemName);
 
+        const userId = req.session.user?._id;
+
+        let isWishlisted = false;
+        if (userId) {
+            isWishlisted = item["Lista Želja"].some(wish => wish.userId.toString() === userId.toString());
+        }
+
         return res.render('shop/item', {
             path: '/item',
             pageTitle: item.Naziv.value,
             pageDescription: item["Kratak Opis"].value,
             pageKeyWords: item["Ključne Reči"].value,
-            item: item
+            item: item,
+            isWishlisted
         })
     } catch (error) {
         next(error)
@@ -317,7 +325,8 @@ async function postOrder(req, res, next) {
         const hasNewTelephone = sanitize(req.body.isNewTelephone);
         const hasNewAddress = sanitize(req.body.isNewAddress);
         const couponId = sanitize(req.body.couponId);
-
+        const note = sanitizeHtml(req.body.note) || "";
+        const createNewAccount = sanitize(req.body.createAccount) || false;
         // Determine which phone number to use
         let telephone = hasNewTelephone ? sanitize(req.body.newTelephone) : sanitize(req.body.telephone);
 
@@ -427,6 +436,7 @@ async function postOrder(req, res, next) {
                 address,
                 cart,
                 totalPrice,
+                note,
                 session,
                 { couponId: coupon?._id, code: coupon?.code, discount: coupon?.discount },
             )
@@ -440,28 +450,74 @@ async function postOrder(req, res, next) {
                 await UserService.updateUserAfterOrder(userId, newOrder, session, newTelephoneUser, newAddressUser);
             }
         } else {
-            // Create new customer and process guest order
-            const customer = await CustomerService.createNewCustomer(firstName, lastName, email, telephone, address, session);
-            const buyer = { type: 'Customer', ref: customer._id, firstName: firstName, lastName: lastName };
+            if (createNewAccount) {
+                const hasUserExist = await UserService.findUserByEmail(email);
 
-            // Create order for guest user
-            const newOrder = await OrderService.createNewOrder(
-                buyer,
-                telephone,
-                address,
-                cart,
-                totalPrice,
-                session,
-            )
+                if (hasUserExist) {
+                    const newOrder = await OrderService.createNewOrder(
+                        { type: 'User', ref: hasUserExist._id, firstName: firstName, lastName: lastName },
+                        telephone,
+                        address,
+                        cart,
+                        totalPrice,
+                        note,
+                        session,
+                        { couponId: coupon?._id, code: coupon?.code, discount: coupon?.discount },
+                    )
+        
+                    if (newOrder) {
+                        // Update user data after order
+                        await UserService.updateUserAfterOrder(hasUserExist._id, newOrder, session, telephone, address);
+                        req.session.cart = [];
+                    }
+                } else {
+                    let newTelephoneUser, newAddressUser;
+                    if (hasNewTelephone) newTelephoneUser = telephone;
+                    if (hasNewAddress) newAddressUser = address;
+                    const newUser = await UserService.registerNewUser(email,"PodrazumevanaSifra123!", firstName, lastName, newTelephoneUser, newAddressUser, session);
+                    if (newUser) {
+                        const newOrder = await OrderService.createNewOrder(
+                            { type: 'User', ref: newUser._id, firstName: firstName, lastName: lastName },
+                            telephone,
+                            address,
+                            cart,
+                            totalPrice,
+                            note,
+                            session,
+                            { couponId: coupon?._id, code: coupon?.code, discount: coupon?.discount },
+                        )
+                
+                        if (newOrder) {
+                            // Update user data after order
+                            await UserService.updateUserAfterOrder(newUser._id, newOrder, session);
+                        }
+                    }
+                }
+            } else {
+                // Create new customer and process guest order
+                const customer = await CustomerService.createNewCustomer(firstName, lastName, email, telephone, address, session);
+                const buyer = { type: 'Customer', ref: customer._id, firstName: firstName, lastName: lastName };
 
-            // Link order to customer
-            await CustomerService.updateCustomerOrders(customer._id, newOrder._id, session);
+                // Create order for guest user
+                const newOrder = await OrderService.createNewOrder(
+                    buyer,
+                    telephone,
+                    address,
+                    cart,
+                    totalPrice,
+                    note,
+                    session,
+                )
 
-            // Clear guest cart
-            req.session.cart = [];
+                // Link order to customer
+                await CustomerService.updateCustomerOrders(customer._id, newOrder._id, session);
 
-            // Send order confirmation email (not critical for success)
-            EmailService.sendOrderInfo(customer.firstName, customer.email, newOrder);
+                // Clear guest cart
+                req.session.cart = [];
+
+                // Send order confirmation email (not critical for success)
+                EmailService.sendOrderInfo(customer.firstName, customer.email, newOrder);
+            }
         }
 
         // Commit transaction and finalize order

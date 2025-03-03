@@ -1,0 +1,19 @@
+# Omogućava svim pretraživačima da indeksiraju sve osim /admin, /korisnik
+
+User-agent: *
+Allow: /
+Allow: /proandji
+Allow: /auth
+Allow: /prodavnica
+Allow: /forum
+Allow: /kontakt
+Allow: /uslovi-koriscenja
+Allow: /politika-privatnosti
+Allow: /o-nama
+
+# Blokiraj pristup određenim delovima sajta
+Disallow: /admin
+Disallow: /korinsik
+
+# Link ka sitemap-u
+Sitemap: https://tophelanke.com/sitemap.xml

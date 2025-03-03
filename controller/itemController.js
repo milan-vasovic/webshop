@@ -347,7 +347,7 @@ async function postEditItem(req, res, next) {
             })
         );
     }
-    
+
     // Pozovi updateItem funkciju iz servisa – sve logičke provere i mapiranje obavi se tamo
     const updatedItem = await ItemService.updateItem(itemId, body, files);
     if (!updatedItem) {
@@ -373,6 +373,32 @@ async function postSearchItems(req, res, next) {
   } catch (error) {
     next(error);
   }
+}
+
+async function postAddUserToItemWishlist(req, res, next) {
+    try {
+        const userId = req.session.user._id;
+        const itemId = req.body.itemId;
+
+        const item = await ItemService.addUserToItemWishlist(userId, itemId);
+
+        return res.redirect("/prodavnica/artikal/" + item.title);
+    } catch (error) {
+        next(error);
+    }
+}
+
+async function postRemoveUserToItemWishlist(req, res, next) {
+    try {
+        const userId = req.session.user._id;
+        const itemId = req.body.itemId;
+
+        const item = await ItemService.removeUserFromItemWishlist(userId, itemId);
+
+        return res.redirect("/prodavnica/artikal/" + item.title);
+    } catch (error) {
+        next(error);
+    }
 }
 
 /**
@@ -417,6 +443,8 @@ export default {
   getAllCrosSellItems,
   getAllUpSellItems,
   postEditItem,
+  postAddUserToItemWishlist,
+  postRemoveUserToItemWishlist,
   postSearchItems,
   deleteItemById,
 };

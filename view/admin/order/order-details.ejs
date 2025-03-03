@@ -1,10 +1,39 @@
 <%- include('../../include/head.ejs') %>
 <link rel="stylesheet" href="/css/table.css">
+<link rel="stylesheet" href="/css/form.css">
+
 <%- include('../../include/navigation.ejs') %>
 <section class="main__container">
     <h1 class="main__title"><%= pageTitle %></h1>
     <div class="column-row__container">
         <div class="left__container-20">
+            <% if (order.Status.value !== 'failed' && order.Status.value !== 'cancelled') { %>
+                <div>
+                    <button id="toggleBtn" class="btn-secondary">Upravljanje</button>
+                    <form style="display: none;" id="statusForm" action="/admin/izmenite-porudzbinu" method="post">
+                        <div class="main-form__group">
+                            <label class="main-form__label" for="statusSelect">Status:</label>
+                            <select class="main-form__select" name="status" id="statusSelect">
+                                <option value="processing">Processing</option>
+                                <% if (order.Status.value === 'processing') { %>
+                                    <option value="cancelled">Cancelled</option>
+                                <% } %>
+                                <option value="pending-payment">Pending Payment</option>
+                                <option value="refund-period">Refund Period</option>
+                                <option value="fulfilled">Fulfilled</option>
+                                <option value="sent-exchange">Sent Exchange</option>
+                                <option value="exchanged">Exchanged</option>
+                                <option value="returned">Returned</option>
+                                <option value="failed">Failed</option>
+                            </select>
+                        </div>
+                        <input type="hidden" name="orderId" value="<%= order.ID.value %>" required>
+                        <input name="honeypot" type="hidden">
+                        <input type="hidden" name="CSRFToken" value="<%= csrfToken %>" required>
+                        <button type="submit" class="btn-primary">Izmenite</button>
+                    </form>
+                </div>
+            <% } %>
             <h2>Broj Porudžbine: <%= order.ID.value %></h2>
             <h3>Datum: <%= order.Datum.value %></h3>
             <h3>Status: <%= order.Status.value %></h3>
@@ -31,4 +60,5 @@
         </div>
     </div>
 </section>
+<script src="/js/orderForm.js"></script>
 <%- include('../../include/end.ejs') %>

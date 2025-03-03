@@ -5,6 +5,16 @@
     <h1 class="main__title"><%= pageTitle %></h1>
     <div class="flex flex-row justify-between width-100">
         <div class="width-20">
+            <% if (order.Status.value === 'processing') { %>
+                <div>
+                    <form action="/korisnik/otkazivanje-porudzbine" method="post">
+                        <input type="hidden" name="orderId" value="<%= order.ID.value %>" required>
+                        <input name="honeypot" type="hidden">
+                        <input type="hidden" name="CSRFToken" value="<%= csrfToken %>" required>
+                        <button type="submit" class="btn-primary">Otkažite</button>
+                    </form>
+                </div>
+            <% } %>
             <h2>Broj Porudžbine: <%= order.ID.value %></h2>
             <h3>Datum: <%= order.Datum.value %></h3>
             <h3>Status: <%= order.Status.value %></h3>

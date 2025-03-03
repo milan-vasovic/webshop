@@ -86,6 +86,11 @@ const orderSchema = new Schema({
             type: String
         },
     }],
+    
+    note: {
+        type: String
+    },
+
     shipping: {
         type: Number,
         required: true,

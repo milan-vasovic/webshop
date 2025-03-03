@@ -60,7 +60,16 @@
           <input name="honeypot" type="hidden">
         </form>
       </div>
-
+      <% if (isAuthenticated) { %>
+        <div>
+          <form action="/korisnik/<% if (!isWishlisted) { %>dodavanje-u-listu-zelja<% } else { %>izbacivanje-iz-liste-zelja<% } %>" method="post">
+            <input class="main-form__input" id="itemId" type="hidden" name="itemId" value="<%= item.ID.value %>">
+            <input name="honeypot" type="hidden">
+            <input class="main-form__input" type="hidden" name="CSRFToken" value="<%= csrfToken %>" required>
+            <button type="submit" class="btn-primary"><% if (!isWishlisted) { %>Ubacite u Listu Želja &#9829;<% } else { %>Izbacite iz Liste Želja &#9825;<% } %></button>
+          </form>
+        </div>
+      <% } %>
       <div>
         <% if (item["CrossSell Artikli"].length > 0) { %>
           <h2>Idealni Artikli uz Ovaj:</h2>

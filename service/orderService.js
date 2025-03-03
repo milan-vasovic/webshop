@@ -4,6 +4,9 @@ import CryptoService from "./cryptoService.js";
 import ItemService from "./itemService.js";
 
 import ErrorHelper from "../helper/errorHelper.js";
+import EmailService from "./emailService.js";
+import UserService from "./userService.js";
+import CustomerService from "./customerService.js";
 
 class OredrService {
   /**
@@ -24,6 +27,7 @@ class OredrService {
     address,
     items,
     totalPrice,
+    note,
     session,
     coupon = undefined
   ) {
@@ -64,6 +68,7 @@ class OredrService {
         address: newAddress,
         shipping: newShipping,
         totalPrice: newTotalPrice,
+        note: note,
         coupon: coupon,
       });
 
@@ -216,69 +221,130 @@ class OredrService {
     }
   }
 
-  static async updateOrderById(orderId, status) {
+  static async updateOrderStatus(orderId, status, session, exchangedOrderId=null) {
     try {
-      const order = await OrderModel.findOneAndUpdate(
-        { _id: orderId },
-        { status },
-        { new: true }
-      );
+      const order = await OrderModel.findById(orderId);
 
       if (!order) {
         ErrorHelper.throwNotFoundError("Porudžbina");
       }
 
-      return order;
+      let userInfo;
+      if (order.buyer.type === "User") {
+        userInfo = await UserService.findUserEmailById(order.buyer.ref);
+      } else {
+        userInfo = await CustomerService.findCustomerEmailById(order.buyer.ref);
+      }
+
+      switch (status) {
+        case 'pending-payment':
+          // Need to sent email to user that will inform them that order is sent
+          order.refundDate = undefined;
+
+          await EmailService.notifyUserThatOrderIsSent(order.buyer.firstName, userInfo.email, order._id);
+          break;
+        case 'sent-exchange':
+          if (exchangedOrderId) {
+            // Need to sent email to user that will inform them that order is sent
+            order.exchangedOrderId = exchangedOrderId;
+          }
+          order.refundDate = undefined;
+          break;
+
+        case 'refund-period':
+          const today = new Date();
+          const futureDate = new Date();
+          futureDate.setDate(today.getDate() + 7);
+          order.refundDate = futureDate;
+          case 'fulfilled':
+            order.refundDate = undefined;
+            
+            await Promise.all(
+              order.items.map(async (item) => {
+                await ItemService.changeItemSoldCount(item.itemId, item.amount, session);
+              })
+            );
+            break;
+        case 'returned':
+          // add item variation amount number to cooresponding item variation
+          order.refundDate = undefined;
+
+          // Increment amount of returnedCount in item
+          await Promise.all(
+            order.items.map(async (item) => {
+              await ItemService.changeItemReturnedCount(item.itemId, item.amount, session);
+              await ItemService.changeVariationAmount(item.itemId, item.size, item.color, item.amount, session);
+            })
+          );
+
+          await EmailService.notifyUserThatOrderIsReturned(order.buyer.firstName, userInfo.email, order._id);
+
+          break;
+        case 'cancelled':
+          order.refundDate = undefined;
+
+          // add item variation amount number to cooresponding item variation
+          await Promise.all(
+            order.items.map(async (orderItem) => {
+              await ItemService.changeVariationAmount(orderItem.itemId, orderItem.size, orderItem.color, orderItem.amount, session);
+            })
+          )
+
+          await EmailService.notifyUserThatOrderIsCancelled(order.buyer.firstName, userInfo.email, order._id);
+
+          break;
+        case 'failed':
+          // add item variation amount number to cooresponding item variation
+          await Promise.all(
+            order.items.map(async (orderItem) => {
+              await ItemService.changeVariationAmount(orderItem.itemId, orderItem.size, orderItem.color, orderItem.amount, session);
+            })
+          )
+
+          order.refundDate = undefined;
+          break;
+        default:
+          order.refundDate = undefined;
+          break;
+      }
+
+      order.status = status;
+
+      return await order.save();
     } catch (error) {
       ErrorHelper.throwServerError(error);
     }
   }
 
-  static async sendOrderById(orderId, session) {
+  static async updateOrderBuyerRef(orderId, userId, session) {
     try {
-      
+      const order = await OrderModel.findById(orderId)
+        .select('buyer');
+
+      order.buyer.ref = userId;
+      return await order.save({ session });
     } catch (error) {
-      
+      ErrorHelper.throwServerError(error);
     }
   }
 
-  static async realizeOrderById(orderId, session) {
+  static async cancelOrder(orderId, userId) {
     try {
-      
-    } catch (error) {
-      
-    }
-  }
+      const order = await OrderModel.findOneAndUpdate(
+        { _id: orderId, "buyer.ref": userId },
+        { $set: { status: "cancelled" } },
+        { new: true }
+      );
 
-  static async failOrderById(orderId, session) {
-    try {
-      
-    } catch (error) {
-      
-    }
-  }
+      if (!order) {
+        ErrorHelper.throwNotFoundError("Porudzbina");
+      }
+      const userInfo = await UserService.findUserEmailById(userId);
 
-  static async cancelOrderById(orderId, session) {
-    try {
-      
+      EmailService.notifyUserThatOrderIsCancelled(userInfo.firstName, userInfo.email, order._id );
+      return order;
     } catch (error) {
-      
-    }
-  }
-
-  static async returnOrderById(orderId, session) {
-    try {
-      
-    } catch (error) {
-      
-    }
-  }
-  
-  static async exchangeOrderById(orderId, newItemsId, session) {
-    try {
-      
-    } catch (error) {
-      
+      ErrorHelper.throwServerError(error);
     }
   }
 
