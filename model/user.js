@@ -31,7 +31,15 @@ const userSchema = new Schema({
     resetTokenExpiration: {
         type: Date,
     },
-    
+
+    confirmToken: {
+        type: String,
+    },
+
+    confirmTokenExpiration: {
+        type: Date,
+    },
+
     firstName: {
         type: String,
         required: true
@@ -182,6 +190,11 @@ const userSchema = new Schema({
         default: true,
     },
 
+    confirmed: {
+        type: Boolean,
+        default: false,
+    },
+    
     lastLogin: {
         type: Date
     }

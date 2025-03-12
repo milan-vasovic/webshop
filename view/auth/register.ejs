@@ -30,7 +30,7 @@
                 <p>
                     Prihvatate <a class="main__link" href="/uslovi-koriscenja">Uslove Korišćenja</a> i <a class="main__link" href="/politika-privatnosti">Politiku Privatnosti</a>
                 </p>
-                <input class="main-form__input" id="acceptance" name="acceptance" type="checkbox" <% if (existingData) { %>value='<%= existingData.acceptance %>'<% } %>>
+                <input class="main-form__input" id="acceptance" name="acceptance" type="checkbox" required>
             </div>
             <input class="main-form__input" type="hidden" name="CSRFToken" value="<%= csrfToken %>">
             <input name="honeypot" type="hidden">

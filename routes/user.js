@@ -26,7 +26,7 @@ router.post('/korisnik/dodavanje-u-listu-zelja', ItemController.postAddUserToIte
 
 router.post('/korisnik/izbacivanje-iz-liste-zelja', ItemController.postRemoveUserToItemWishlist)
 
-router.post('/korisnik/otkazivanje-porudzbine', isAuth, UserController.cancelOrder)
+router.post('/korisnik/otkazivanje-porudzbine', isAuth, UserController.postCancelOrder)
 
 router.delete('/korisnik/izbrisite-broj', isAuth, UserController.deleteNumber);
 

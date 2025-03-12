@@ -12,7 +12,11 @@ router.get("/registracija", AuthController.getRegistrationPage);
 
 router.get("/zatrazite-novu-sifru", AuthController.getNewPasswordPage);
 
+router.get("/zatrazite-aktivaciju", AuthController.getActivationAccount);
+
 router.get("/napravite-novu-sifru/:token", AuthController.getSetNewPasswordPage);
+
+router.get('/auth/confirm', authController.getConfirmAccountPage);
 
 router.post('/prijava', [
     body("email")
@@ -75,6 +79,12 @@ router.post("/zatrazite-novu-sifru", [
     .notEmpty()
     .withMessage("Email adresa je obavezna."),
 ], AuthController.postRequestNewPassword);
+
+router.post("/zatrazite-aktivaciju", [
+    body("email")
+    .notEmpty()
+    .withMessage("Email adresa je obavezna."),
+], AuthController.postRequestActivation);
 
 router.post("/napravite-novu-sifru", [ 
     body("password")

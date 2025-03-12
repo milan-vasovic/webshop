@@ -8,7 +8,7 @@ import EmailService from "./emailService.js";
 
 import ErrorHelper from "../helper/errorHelper.js";
 import CustomerService from "./customerService.js";
-import OredrService from "./orderService.js";
+import OrderService from "./orderService.js";
 
 class UserService {
     /**
@@ -21,14 +21,27 @@ class UserService {
     * @param {string} [userInfo.lastName] - The user's last name (optional).
     * @returns {Promise<Object>} - A promise that resolves to an object containing the validation results.
     */
-    static async checkUserInfo(email) {
-        const userExist = await UserModel.findOne({email: email}).select("_id password");
+    static async validateUserInfo(email, password) {
+        const userExist = await UserModel.findOne({email: email}).select("_id password confirmed");
 
-        if (!userExist){
-            return false;
+        if (!userExist ){
+            return {success: false, message: "Nalog nije pronađen!"}
         }
 
-        return userExist;
+        const checkPassword = await CryptoService.compareUserPasswords(password, userExist.password);
+
+        if (!checkPassword) {
+            return { success: false, message: "Neispravni podaci!", show: false}
+        }
+
+        if (!userExist.confirmed) {
+            return { success: false, message: "Vaš nalog nije aktiviran!", show: true};
+        }
+
+        return {
+            success: true,
+            _id: userExist._id
+        };
    }
 
     /**
@@ -64,7 +77,7 @@ class UserService {
                 return { status: true, msg: "Token već postoji, email ponovo poslat." };
             }
 
-            const token = await CryptoService.createResetToken();
+            const token = await CryptoService.createToken();
 
             user.resetToken = token;
             user.resetTokenExpiration = Date.now() + 3600000;
@@ -108,6 +121,66 @@ class UserService {
             ErrorHelper.throwServerError(error);
         }
    };
+
+   static async validateUserAndSendConfirmationAcount(email) {
+    try {
+        const user = await UserModel.findOne({ email: email}).select("confirmToken confirmTokenExpiration");
+
+        if (!user) {
+            ErrorHelper.throwNotFoundError("Korisnik");
+        }
+
+        const confirmToken = await CryptoService.createToken();
+        const confirmTokenExpiration = Date.now() +  2 * 24 * 60 * 60 * 1000;
+
+        user.confirmToken = confirmToken;
+        user.confirmTokenExpiration = confirmTokenExpiration;
+
+        const emailSent = await EmailService.sendConfirmAccount(email, confirmToken);
+        if (!emailSent) {
+            console.log("❌ Neuspešno slanje emaila, registracija otkazana.");
+            return { success: false, message: "Neuspešno slanje emaila, zahtev za aktivaciju otkazan."}
+        }
+    
+        await user.save();
+
+        return { success: true, message: "Uspešno ste zatražili aktivaciju!"}
+    } catch (error) {
+        ErrorHelper.throwServerError(error);
+    }
+   }
+
+   static async confirmAccount(token) {
+    try {
+        if (!token) {
+            ErrorHelper.throwNotFoundError("Nedostaje token za potvrdu naloga.");
+        }
+
+        // Pronađi korisnika sa ovim tokenom
+        const user = await UserModel.findOne({ confirmToken: token }).select("status confirmToken confirmTokenExpiration confirmed");
+
+        if (!user) {
+            ErrorHelper.throwNotFoundError("Nevažeći token ili korisnik ne postoji.");
+        }
+
+        // Proveri da li je token istekao
+        if (Date.now() > user.confirmTokenExpiration) {
+            ErrorHelper.throwConflictError("Token za potvrdu je istekao. Zahtevajte novi email za potvrdu.");
+        }
+
+        // Ažuriraj status korisnika na 'active' i ukloni token
+        user.status = ["active"];
+        user.confirmToken = undefined;
+        user.confirmTokenExpiration = undefined;
+        user.confirmed = true;
+
+        await user.save();
+
+        return { success: true, message: "Vaš nalog je uspešno potvrđen!" };
+    } catch (error) {
+        ErrorHelper.throwServerError(error);
+    }
+   }
 
    static async updateUserPassword(userId, newPassword, passwordToken) {
         try {
@@ -206,7 +279,7 @@ class UserService {
     * @returns {Promise<Object>} - A promise that resolves to the user details for session management.
     */
    static async findUserForSession(userId) {
-        const user = await UserModel.findById(userId).select("firstName cart role status");
+        const user = await UserModel.findById(userId).select("firstName cart role status confirmed");
 
         if (!user) {
             return false;
@@ -227,8 +300,8 @@ class UserService {
     */
     static async registerNewUser(email, password, firstname, lastname, telephone = null, address = null, session = null) {
         if (session) {
-            const customerExist = await CustomerService.checkCustomerByEamil(email, session);
-
+            const customerExist = await CustomerService.validateCustomerByEmail(email, session);
+    
             if (customerExist) {
                 const securePassword = await CryptoService.hashPassword(password);
                 const secureLastName = await CryptoService.encryptData(lastname);
@@ -238,67 +311,82 @@ class UserService {
                 }
         
                 const secureAddress = {
-                    city: address ? address.Adresa.Grad : "",
-                    street: address ? await CryptoService.encryptData(address.Adresa.Ulica) : "",
-                    number: address ? await CryptoService.encryptData(address.Adresa.Broj) : "",
-                    postalCode: address ? address.Adresa["Poštanski Broj"] : ""
+                    city: address.Adresa ? address.Adresa.Grad : address.city,
+                    street: address.Adresa ? await CryptoService.encryptData(address.Adresa.Ulica) : address.street,
+                    number: address.Adresa ? await CryptoService.encryptData(address.Adresa.Broj) : address.number,
+                    postalCode: address.Adresa ? address.Adresa["Poštanski Broj"] : address.postalCode
                 }
-
-                customerExist.telephoneNumber.push({number: secureTelephone})
-                customerExist.address.push(secureAddress)
+    
+                customerExist.telephoneNumber.push({number: secureTelephone});
+                customerExist.address.push(secureAddress);
+    
+                const confirmToken = await CryptoService.createToken();
+                const confirmTokenExpiration = Date.now() +  2 * 24 * 60 * 60 * 1000;
+    
                 const newUser = new UserModel({
                     email: email,
                     password: securePassword,
                     firstName: firstname,
                     lastName: secureLastName,
                     role: 'user',
-                    status: ['active'],
-                    telephoneNumbers: customerExist.telephoneNumbers,
+                    status: ['pending'],
+                    telephoneNumbers: customerExist.telephoneNumber,
                     addresses: customerExist.address,
                     orders: customerExist.orders,
                     cart: [],
                     partner: {
                         history: [],
                         offers: []
-                    }
-                })
-
+                    },
+                    confirmToken: confirmToken,
+                    confirmTokenExpiration: confirmTokenExpiration
+                });
+    
+                const emailSent = await EmailService.sendConfirmAccount(email, confirmToken);
+                if (!emailSent) {
+                    console.log("❌ Neuspešno slanje emaila, registracija otkazana.");
+                    await session.abortTransaction();
+                    return null; 
+                }
+    
                 await newUser.save({ session });
+    
                 if (newUser.orders && newUser.orders.length > 0) {
                     await Promise.all(
                       newUser.orders.map(orderId =>
-                        OredrService.updateOrderBuyerRef(orderId, newUser._id, session)
-                    )
-                )}
-
+                        OrderService.updateOrderBuyerRef(orderId, newUser._id, session)
+                    ));
+                }
+    
                 await CustomerService.deleteCustomerById(customerExist._id, session);
-
                 return newUser;
             }
         }
-        
-
+    
         const securePassword = await CryptoService.hashPassword(password);
         const secureLastName = await CryptoService.encryptData(lastname);
-
+    
         const secureTelephone = {
             number: telephone ? await CryptoService.encryptData(telephone) : ""
         }
-
+    
         const secureAddress = {
             city: address ? address.Adresa.Grad : "",
             street: address ? await CryptoService.encryptData(address.Adresa.Ulica) : "",
             number: address ? await CryptoService.encryptData(address.Adresa.Broj) : "",
             postalCode: address ? address.Adresa["Poštanski Broj"] : ""
         }
-
+    
+        const confirmToken = await CryptoService.createToken();
+        const confirmTokenExpiration = Date.now() +  2 * 24 * 60 * 60 * 1000;
+    
         const newUser = new UserModel({
             email: email,
             password: securePassword,
             firstName: firstname,
             lastName: secureLastName,
             role: 'user',
-            status: ['active'],
+            status: ['pending'],
             telephoneNumbers: telephone ? [secureTelephone] : [],
             addresses: address ? [secureAddress] : [],
             orders: [],
@@ -306,9 +394,17 @@ class UserService {
             partner: {
                 history: [],
                 offers: []
-            }
-        })
-
+            },
+            confirmToken: confirmToken,
+            confirmTokenExpiration: confirmTokenExpiration
+        });
+    
+        const emailSent = await EmailService.sendConfirmAccount(email, confirmToken);
+        if (!emailSent) {
+            console.log("❌ Neuspešno slanje emaila, registracija otkazana.");
+            return null; 
+        }
+    
         return await newUser.save(session ? { session } : undefined);
     }
 
@@ -646,6 +742,21 @@ class UserService {
             ErrorHelper.throwServerError(error);
         }
     }
+    
+    static async removeItemsFromCart(userId) {
+        try {
+            const user = await UserModel.findById(userId).select('cart');
+            
+            if (!user) {
+                ErrorHelper.throwNotFoundError("Korisnik");
+            }
+
+            user.cart = [];
+            return await user.save();
+        } catch (error) {
+            ErrorHelper.throwServerError(error);
+        }
+    }
 
     /**
     * Uklanja artikal iz svih korisničkih korpi.
@@ -694,28 +805,25 @@ class UserService {
             }
 
             if (newTelephone) {
-                const encryptedTelephone = await CryptoService.encryptData(newTelephone);
-                const existsTel = user.telephoneNumbers.some(t => t.number === encryptedTelephone);
+                const existsTel = user.telephoneNumbers.some(t => t.number === newTelephone);
                 if (!existsTel) {
-                  user.telephoneNumbers.push({ number: encryptedTelephone });
+                  user.telephoneNumbers.push({ number: newTelephone });
                 }
               }
           
               if (newAddress) {
-                const encryptedStreet = await CryptoService.encryptData(newAddress.Adresa.Ulica);
-                const encryptedNumber = await CryptoService.encryptData(newAddress.Adresa.Broj);
                 const existsAddress = user.addresses.some(a =>
-                  a.city === newAddress.Adresa.Grad &&
-                  a.street === encryptedStreet &&
-                  a.number === encryptedNumber &&
-                  a.postalCode === newAddress.Adresa["Poštanski Broj"]
+                  a.city === newAddress.city &&
+                  a.street === newAddress.street &&
+                  a.number === newAddress.number &&
+                  a.postalCode === newAddress.postalCode
                 );
                 if (!existsAddress) {
                   user.addresses.push({
-                    city: newAddress.Adresa.Grad,
-                    street: encryptedStreet,
-                    number: encryptedNumber,
-                    postalCode: newAddress.Adresa["Poštanski Broj"]
+                    city: newAddress.city,
+                    street: newAddress.street,
+                    number: newAddress.number,
+                    postalCode: newAddress.postalCode
                   });
                 }
               }

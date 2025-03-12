@@ -155,7 +155,7 @@ async function getCartPage(req, res, next) {
 
 
         return res.render('shop/cart', {
-            path: "/korpa",
+            path: "/prodavnica/korpa",
             pageTitle: "Vaša Korpa",
             pageDescription: "Svi Vaši izabrani artikli na jednom mestu, prikaz vaše krope!",
             pageKeyWords: "Korpa, Vaši Atikli",
@@ -209,6 +209,30 @@ async function getCheckOutPage(req, res, next) {
             shipping: process.env.SHIPPING_PRICE
         })
 
+    } catch (error) {
+        next(error);
+    }
+}
+
+async function getConfirmOrder(req, res, next) {
+    try {
+        const { token } = req.query;
+
+        let existingData = req.existingData;
+
+        if (!existingData) {
+            existingData = ""
+        }
+
+        return res.render("shop/order-confirm", {
+            path: "/prodavnica/potvrdite-porudzbinu",
+            pageTitle: "Potvrdite Porudžbinu",
+            pageDescription: "Potvrđivanje Porudžbine",
+            pageKeyWords: "",
+            existingData: existingData,
+            errorMessage: "",
+            token: token
+        });
     } catch (error) {
         next(error);
     }
@@ -291,7 +315,25 @@ async function postRemoveItemFromCart(req, res, next) {
 
         const userId = req.session.user._id;
 
-        const isRemoved = await UserService.removeItemFromCart(userId, cartItemId);
+        await UserService.removeItemFromCart(userId, cartItemId);
+
+        res.redirect('/prodavnica/korpa');
+    } catch (error) {
+        next(error);
+    }
+}
+
+async function postRemoveItemsFromCart(req, res, next) {
+    try {
+        if(!req.session.user) {
+            req.session.cart = [];
+
+            return res.redirect('/prodavnica/korpa');
+        }
+
+        const userId = req.session.user._id;
+
+        await UserService.removeItemsFromCart(userId);
 
         res.redirect('/prodavnica/korpa');
     } catch (error) {
@@ -311,10 +353,11 @@ async function postCouponValidation(req, res, next) {
     }
 }
 
-async function postOrder(req, res, next) {
+async function postTemporaryOrder(req, res, next) {
     // Start a new MongoDB session for transaction handling
     const session = await mongoose.startSession();
     try {
+        let message;
         session.startTransaction();
         const userId = req.session.user?._id; // Retrieve user ID if logged in
 
@@ -427,11 +470,12 @@ async function postOrder(req, res, next) {
             }
         }
 
+        let newTemporaryOrder;
         // Process order creation
         if (userId) {
-            // Create order for registered user
-            const newOrder = await OrderService.createNewOrder(
-                { type: 'User', ref: userId, firstName: firstName, lastName: lastName },
+            newTemporaryOrder = await OrderService.createNewTemporaryOrder(
+                { type: 'User', firstName: firstName, lastName: lastName },
+                email,
                 telephone,
                 address,
                 cart,
@@ -439,85 +483,37 @@ async function postOrder(req, res, next) {
                 note,
                 session,
                 { couponId: coupon?._id, code: coupon?.code, discount: coupon?.discount },
+                hasNewTelephone,
+                hasNewAddress
+
             )
 
-            if (newOrder) {
-                let newTelephoneUser, newAddressUser;
-                if (hasNewTelephone) newTelephoneUser = telephone;
-                if (hasNewAddress) newAddressUser = address;
-
-                // Update user data after order
-                await UserService.updateUserAfterOrder(userId, newOrder, session, newTelephoneUser, newAddressUser);
-            }
+            message = "Hvala Vam, uspešno ste napravili porudžbinu, proverite vaš email i POTVRDITE istu. Sve inforamcije možete pronaći prijavom na vaš nalog vezano za porudžbinu!"
         } else {
-            if (createNewAccount) {
-                const hasUserExist = await UserService.findUserByEmail(email);
+            newTemporaryOrder = await OrderService.createNewTemporaryOrder(
+                { type: 'Customer', firstName: firstName, lastName: lastName },
+                email,
+                telephone,
+                address,
+                cart,
+                totalPrice,
+                note,
+                session,
+                { couponId: coupon?._id, code: coupon?.code, discount: coupon?.discount },
+                createNewAccount,
+                hasNewTelephone,
+                hasNewAddress
+            )
 
-                if (hasUserExist) {
-                    const newOrder = await OrderService.createNewOrder(
-                        { type: 'User', ref: hasUserExist._id, firstName: firstName, lastName: lastName },
-                        telephone,
-                        address,
-                        cart,
-                        totalPrice,
-                        note,
-                        session,
-                        { couponId: coupon?._id, code: coupon?.code, discount: coupon?.discount },
-                    )
-        
-                    if (newOrder) {
-                        // Update user data after order
-                        await UserService.updateUserAfterOrder(hasUserExist._id, newOrder, session, telephone, address);
-                        req.session.cart = [];
-                    }
-                } else {
-                    let newTelephoneUser, newAddressUser;
-                    if (hasNewTelephone) newTelephoneUser = telephone;
-                    if (hasNewAddress) newAddressUser = address;
-                    const newUser = await UserService.registerNewUser(email,"PodrazumevanaSifra123!", firstName, lastName, newTelephoneUser, newAddressUser, session);
-                    if (newUser) {
-                        const newOrder = await OrderService.createNewOrder(
-                            { type: 'User', ref: newUser._id, firstName: firstName, lastName: lastName },
-                            telephone,
-                            address,
-                            cart,
-                            totalPrice,
-                            note,
-                            session,
-                            { couponId: coupon?._id, code: coupon?.code, discount: coupon?.discount },
-                        )
-                
-                        if (newOrder) {
-                            // Update user data after order
-                            await UserService.updateUserAfterOrder(newUser._id, newOrder, session);
-                        }
-                    }
-                }
-            } else {
-                // Create new customer and process guest order
-                const customer = await CustomerService.createNewCustomer(firstName, lastName, email, telephone, address, session);
-                const buyer = { type: 'Customer', ref: customer._id, firstName: firstName, lastName: lastName };
+            message = "Hvala Vam, uspešno ste napravili porudžbinu, proverite vaš email i POTVRDITE istu! Ako želite više inforamcija i benefite, registrujte se na našu aplikaciju!"
+        }
 
-                // Create order for guest user
-                const newOrder = await OrderService.createNewOrder(
-                    buyer,
-                    telephone,
-                    address,
-                    cart,
-                    totalPrice,
-                    note,
-                    session,
-                )
+        // Send order confirmation email (not critical for success)
+        const isSent = await EmailService.sendOrderConfirmation(newTemporaryOrder.buyer.firstName, newTemporaryOrder.email, newTemporaryOrder.verificationToken);
 
-                // Link order to customer
-                await CustomerService.updateCustomerOrders(customer._id, newOrder._id, session);
-
-                // Clear guest cart
-                req.session.cart = [];
-
-                // Send order confirmation email (not critical for success)
-                EmailService.sendOrderInfo(customer.firstName, customer.email, newOrder);
-            }
+        if (!isSent) {
+            const error = new Error("Email potvrde nije poslat!");
+            next(error);
         }
 
         // Commit transaction and finalize order
@@ -527,9 +523,172 @@ async function postOrder(req, res, next) {
             pageTitle: "Uspešno Poručivanje",
             pageDescription: "Stranica koja informiše korisnika o uspešnom poručivanju",
             pageKeyWords: "Uspeh, Uspešno, Poručivanje",
-            message: "Hvala Vam, uspešno ste napravili porudžbinu, proverite vaš email!"
+            message: message
         })
     } catch (error) {
+        console.log(error);
+         // Rollback transaction on error
+         await session.abortTransaction();
+         next(error);
+    } finally {
+        // Ensure the session is always closed
+        session.endSession();
+    }
+}
+
+async function postConfirmOrder(req, res, next) {
+    // Start a new MongoDB session for transaction handling
+    const session = await mongoose.startSession();
+    try {
+        session.startTransaction();
+        let message;
+        const { token } = req.body;
+        const userId = req.session.user?._id; // Retrieve user ID if logged in
+
+        const tempOrder = await OrderService.validateTemporaryOrder(token);
+
+        let coupon;
+        if (tempOrder.coupon) {
+            coupon = tempOrder.coupon
+        }
+
+        // This is if user is loogedin
+        if (userId) {
+            // Create order for registered user
+            const newOrder = await OrderService.createNewOrder(
+                { type: 'User', ref: userId, firstName: tempOrder.buyer.firstName, lastName: tempOrder.buyer.lastName },
+                tempOrder.telephone,
+                tempOrder.address,
+                tempOrder.items,
+                tempOrder.totalPrice,
+                tempOrder.note,
+                session,
+                coupon,
+            )
+
+            if (newOrder) {
+                let newTelephoneUser, newAddressUser;
+                if (tempOrder.hasNewTelephone) newTelephoneUser = tempOrder.telephone;
+                if (tempOrder.hasNewAddress) newAddressUser = tempOrder.address;
+
+                // Update user data after order
+                await UserService.updateUserAfterOrder(userId, newOrder, session, newTelephoneUser, newAddressUser);
+            }
+
+            message = "Hvala Vam, uspešno ste napravili porudžbinu, proverite vaš email i potvrdite istu. Sve inforamcije možete pronaći prijavom na vaš nalog vezano za porudžbinu!"
+        } else {
+            // When there isn't loogedin user, its guest
+            if (tempOrder.createNewAccount) {
+                // When guest wants to creat account
+                const hasUserExist = await UserService.findUserByEmail(tempOrder.email);
+                if (hasUserExist) {
+                    // When guest already have account as user, creating order for him
+                    const newOrder = await OrderService.createNewOrder(
+                        { type: 'User', ref: hasUserExist._id, firstName: tempOrder.buyer.firstName, lastName: tempOrder.buyer.lastName },
+                        tempOrder.telephone,
+                        tempOrder.address,
+                        tempOrder.items,
+                        tempOrder.totalPrice,
+                        tempOrder.note,
+                        session,
+                        { couponId: tempOrder.coupon?._id, code: tempOrder.coupon?.code, discount: tempOrder.coupon?.discount },
+                    )
+        
+                    if (newOrder) {
+                        // Update user data after order
+                        await UserService.updateUserAfterOrder(hasUserExist._id, newOrder, session, tempOrder.telephone, tempOrder.address);
+                        req.session.cart = [];
+                    }
+                    message = "Hvala Vam, uspešno ste napravili porudžbinu. Sve informacije možete videti na vašem nalogu!"
+                } else {
+                    // Guest doesnt have account in the system
+                    let newTelephoneUser, newAddressUser;
+                    if (tempOrder.hasNewTelephone) newTelephoneUser = tempOrder.telephone;
+                    if (tempOrder.hasNewAddress) newAddressUser = tempOrder.address;
+                    const newUser = await UserService.registerNewUser(tempOrder.email,"PodrazumevanaSifra123!", tempOrder.buyer.firstName, tempOrder.buyer.lastName, newTelephoneUser, newAddressUser, session);
+                    if (newUser) {
+                        const newOrder = await OrderService.createNewOrder(
+                            { type: 'User', ref: newUser._id, firstName: tempOrder.buyer.firstName, lastName: tempOrder.buyer.lastName },
+                            tempOrder.telephone,
+                            tempOrder.address,
+                            tempOrder.items,
+                            tempOrder.totalPrice,
+                            tempOrder.note,
+                            session,
+                            { couponId: tempOrder.coupon?._id, code: tempOrder.coupon?.code, discount: tempOrder.coupon?.discount },
+                        )
+                
+                        if (newOrder) {
+                            // Update user data after order
+                            await UserService.updateUserAfterOrder(newUser._id, newOrder, session);
+                        }
+                    }
+                    message = "Hvala Vam, uspešno ste napravili porudžbinu, proverite vaš email! Uspešno ste se registrovali, da bi ste se prijavili idite na zaboravili ste lozinku za odgovarajući email i zatražite novu, pratite uputstva iz emaila i postavite novu lozinku!"
+                }
+            } else {
+                // Check does guest already have account with us, if yes creat order for him, otherwise creat new customer and order for him
+                const hasUserExist = await UserService.findUserByEmail(tempOrder.email);
+                if (hasUserExist) {
+                    const newOrder = await OrderService.createNewOrder(
+                        { type: 'User', ref: hasUserExist._id, firstName: tempOrder.buyer.firstName, lastName: tempOrder.buyer.lastName },
+                        tempOrder.telephone,
+                        tempOrder.address,
+                        tempOrder.items,
+                        tempOrder.totalPrice,
+                        tempOrder.note,
+                        session,
+                        { couponId: tempOrder.coupon?._id, code: tempOrder.coupon?.code, discount: tempOrder.coupon?.discount },
+                    )
+        
+                    if (newOrder) {
+                        // Update user data after order
+                        await UserService.updateUserAfterOrder(hasUserExist._id, newOrder, session, tempOrder.telephone, tempOrder.address);
+                        req.session.cart = [];
+                    }
+                    message = "Hvala Vam, uspešno ste napravili porudžbinu. Sve informacije možete videti na vašem nalogu!"
+                } else {
+                    // Create new customer and process guest order
+                    const customer = await CustomerService.registerNewCustomer(tempOrder.buyer.firstName, tempOrder.buyer.lastName, tempOrder.email, tempOrder.telephone, tempOrder.address, session);
+                    const buyer = { type: 'Customer', ref: customer._id, firstName: tempOrder.buyer.firstName, lastName: tempOrder.buyer.lastName };
+
+                    // Create order for guest user
+                    const newOrder = await OrderService.createNewOrder(
+                        buyer,
+                        tempOrder.telephone,
+                        tempOrder.address,
+                        tempOrder.items,
+                        tempOrder.totalPrice,
+                        tempOrder.note,
+                        session,
+                    )
+
+                    // Link order to customer
+                    await CustomerService.updateCustomerOrders(customer._id, newOrder._id, session);
+
+                    // Clear guest cart
+                    req.session.cart = [];
+
+                    // Send order confirmation email (not critical for success)
+                    EmailService.sendOrderInfo(customer.firstName, customer.email, newOrder);
+
+                    message = "Hvala Vam, uspešno ste napravili porudžbinu, proverite vaš email! Ako želite više inforamcija i benefite, registrujte se na našu aplikaciju!"
+                }
+            }
+        }
+
+        await OrderService.deleteTemporaryOrderById(tempOrder._id, session);
+
+        // Commit transaction and finalize order
+        await session.commitTransaction();
+        return res.render("email/success", {
+            path: "/uspesno-poruceno",
+            pageTitle: "Uspešno Poručivanje",
+            pageDescription: "Stranica koja informiše korisnika o uspešnom poručivanju",
+            pageKeyWords: "Uspeh, Uspešno, Poručivanje",
+            message: message
+        })
+    } catch (error) {
+        console.log(error);
         // Rollback transaction on error
         await session.abortTransaction();
         next(error);
@@ -549,10 +708,13 @@ export default {
     getCartPage,
     getCheckOutPage,
     getItemByName,
+    getConfirmOrder,
     postShopSearch,
     postAddItemToCart,
     postAddItemToBackorder,
     postRemoveItemFromCart,
+    postRemoveItemsFromCart,
     postCouponValidation,
-    postOrder
+    postTemporaryOrder,
+    postConfirmOrder
 }

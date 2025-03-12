@@ -48,7 +48,7 @@ class CryptoService {
      * 
      * @returns {Promise<string>} - A promise that resolves to the generated reset token.
      */
-    async createResetToken() {
+    async createToken() {
         try {
             return crypto.randomBytes(32).toString("hex");
         } catch (error) {

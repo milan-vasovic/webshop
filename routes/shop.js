@@ -23,6 +23,8 @@ router.get('/korpa', ShopController.getCartPage);
 
 router.get('/porudzbina', ShopController.getCheckOutPage);
 
+router.get('/potvrdite-porudzbinu', ShopController.getConfirmOrder)
+
 router.post("/pretraga", ShopController.postShopSearch);
 
 router.post('/backorder-dodavanje', ShopController.postAddItemToBackorder);
@@ -145,8 +147,12 @@ router.post("/porucivanje", [
     body('CSRFToken')
       .trim()
       .notEmpty().withMessage('CSRF token is required.')
-  ], ShopController.postOrder);
+  ], ShopController.postTemporaryOrder);
   
+
+router.post('/potvrdite-porudzbinu', ShopController.postConfirmOrder);
+
+router.post("/korpa-praznjenje", ShopController.postRemoveItemsFromCart);
 
 router.delete('/korpa-izbacivanje', ShopController.postRemoveItemFromCart);
 

@@ -86,7 +86,7 @@ class CustomerService {
     }
   }
 
-  static async checkCustomerByEamil(email, session) {
+  static async validateCustomerByEmail(email, session) {
     try {
       const customer = await CustomerModel.findOne({email: email})
         .select("telephoneNumber address orders")
@@ -111,7 +111,7 @@ class CustomerService {
    * @param {Array<Object>} [customerData.address] - The addresses of the customer (optional).
    * @returns {Promise<Object>} - A promise that resolves to the created customer.
    */
-  static async createNewCustomer(
+  static async registerNewCustomer(
     firstName,
     lastName,
     email,
@@ -122,14 +122,14 @@ class CustomerService {
     try {
       const encryptedLastName = CryptoService.encryptData(lastName);
       const encryptedTelephone = CryptoService.encryptData(telephone);
-      const encryptedStreet = CryptoService.encryptData(address.Adresa.Ulica);
-      const encryptedNumber = CryptoService.encryptData(address.Adresa.Broj);
+      const encryptedStreet = CryptoService.encryptData(address.street);
+      const encryptedNumber = CryptoService.encryptData(address.number);
 
       const newAddress = {
-        city: address.Adresa.Grad,
+        city: address.city,
         street: encryptedStreet,
         number: encryptedNumber,
-        postalCode: address.Adresa["Poštanski Broj"],
+        postalCode: address.postalCode,
       };
 
       let existingCustomer = await CustomerModel.findOne({

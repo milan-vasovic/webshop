@@ -51,7 +51,6 @@ class CouponService {
         return this.mapCoupons(coupons);
     }
     
-
     static async findCouponById(couponId) {
         try {
             const coupon = await CouponModel.findById(couponId);

@@ -1,4 +1,5 @@
 import OrderModel from "../model/order.js";
+import TemporaryOrderModel from "../model/temporaryOrder.js";
 
 import CryptoService from "./cryptoService.js";
 import ItemService from "./itemService.js";
@@ -8,7 +9,7 @@ import EmailService from "./emailService.js";
 import UserService from "./userService.js";
 import CustomerService from "./customerService.js";
 
-class OredrService {
+class OrderService {
   /**
    * Creates a new order.
    *
@@ -32,6 +33,67 @@ class OredrService {
     coupon = undefined
   ) {
     try {
+      const newShipping = process.env.SHIPPING_PRICE;
+
+      const newTotalPrice =
+        (Number(totalPrice) + Number(newShipping)) *
+        (Number(coupon?.discount || 100) / 100);
+
+      const newOrder = new OrderModel({
+        buyer: {
+          type: buyer.type,
+          ref: buyer.ref,
+          firstName: buyer.firstName,
+          lastName: buyer.lastName,
+        },
+        telephone: telephone,
+        items: items,
+        address: address,
+        shipping: newShipping,
+        totalPrice: newTotalPrice,
+        note: note,
+        coupon: coupon,
+      });
+
+      await newOrder.save({ session });
+
+      await Promise.all(
+        items.map((item) =>
+          ItemService.updateItemAmountById(
+            item.itemId,
+            item.amount,
+            item.variationId,
+            session
+          )
+        )
+      );
+
+      return newOrder;
+    } catch (error) {
+      ErrorHelper.throwServerError(error);
+    }
+  }
+
+  static async createNewTemporaryOrder(
+    buyer,
+    email,
+    telephone,
+    address,
+    items,
+    totalPrice,
+    note,
+    session = undefined,
+    coupon = undefined,
+    createNewAccount = false,
+    hasNewTelephone = false,
+    hasNewAddress = false
+  ) {
+    try {
+      let newAccount = false;
+      if (createNewAccount === "on") {
+        newAccount = true;
+      }
+
       const newItems = items.map((item) => ({
         itemId: item.ID.value,
         variationId: item["Variacija ID"].value,
@@ -56,36 +118,54 @@ class OredrService {
         (Number(totalPrice) + Number(newShipping)) *
         (Number(coupon?.discount || 100) / 100);
 
-      const newOrder = new OrderModel({
+      const verificationToken = await CryptoService.createToken();
+      const tokenExpiration = Date.now() + 2 * 24 * 60 * 60 * 1000;
+
+      const newOrder = new TemporaryOrderModel({
         buyer: {
           type: buyer.type,
-          ref: buyer.ref,
           firstName: buyer.firstName,
           lastName: CryptoService.encryptData(buyer.lastName),
         },
+        email: email,
         telephone: CryptoService.encryptData(telephone),
         items: newItems,
         address: newAddress,
         shipping: newShipping,
         totalPrice: newTotalPrice,
-        note: note,
+        note: CryptoService.encryptData(note),
         coupon: coupon,
+        verificationToken: verificationToken,
+        tokenExpiration: tokenExpiration,
+        createNewAccount: newAccount,
+        hasNewTelephone: hasNewTelephone,
+        hasNewAddress: hasNewAddress,
       });
 
-      await newOrder.save({ session });
+      return await newOrder.save({ session });
+    } catch (error) {
+      ErrorHelper.throwServerError(error);
+    }
+  }
 
-      await Promise.all(
-        newItems.map((item) =>
-          ItemService.updateItemAmountById(
-            item.itemId,
-            item.amount,
-            item.variationId,
-            session
-          )
-        )
-      );
+  static async validateTemporaryOrder(token) {
+    try {
+      const tempOrder = await TemporaryOrderModel.findOne({
+        verificationToken: token,
+      });
 
-      return newOrder;
+      if (!tempOrder) {
+        return {
+          success: false,
+          message: "Nije moguće validirati porudžbinu!",
+        };
+      }
+
+      if (Date.now() > tempOrder.tokenExpiration) {
+        return { success: false, message: "Porudybina je istekla!" };
+      }
+
+      return tempOrder;
     } catch (error) {
       ErrorHelper.throwServerError(error);
     }
@@ -221,7 +301,12 @@ class OredrService {
     }
   }
 
-  static async updateOrderStatus(orderId, status, session, exchangedOrderId=null) {
+  static async updateOrderStatus(
+    orderId,
+    status,
+    session,
+    exchangedOrderId = null
+  ) {
     try {
       const order = await OrderModel.findById(orderId);
 
@@ -237,13 +322,17 @@ class OredrService {
       }
 
       switch (status) {
-        case 'pending-payment':
+        case "pending-payment":
           // Need to sent email to user that will inform them that order is sent
           order.refundDate = undefined;
 
-          await EmailService.notifyUserThatOrderIsSent(order.buyer.firstName, userInfo.email, order._id);
+          await EmailService.notifyUserThatOrderIsSent(
+            order.buyer.firstName,
+            userInfo.email,
+            order._id
+          );
           break;
-        case 'sent-exchange':
+        case "sent-exchange":
           if (exchangedOrderId) {
             // Need to sent email to user that will inform them that order is sent
             order.exchangedOrderId = exchangedOrderId;
@@ -251,55 +340,89 @@ class OredrService {
           order.refundDate = undefined;
           break;
 
-        case 'refund-period':
+        case "refund-period":
           const today = new Date();
           const futureDate = new Date();
           futureDate.setDate(today.getDate() + 7);
           order.refundDate = futureDate;
-          case 'fulfilled':
-            order.refundDate = undefined;
-            
-            await Promise.all(
-              order.items.map(async (item) => {
-                await ItemService.changeItemSoldCount(item.itemId, item.amount, session);
-              })
-            );
-            break;
-        case 'returned':
+        case "fulfilled":
+          order.refundDate = undefined;
+
+          await Promise.all(
+            order.items.map(async (item) => {
+              await ItemService.changeItemSoldCount(
+                item.itemId,
+                item.amount,
+                session
+              );
+            })
+          );
+          break;
+        case "returned":
           // add item variation amount number to cooresponding item variation
           order.refundDate = undefined;
 
           // Increment amount of returnedCount in item
           await Promise.all(
             order.items.map(async (item) => {
-              await ItemService.changeItemReturnedCount(item.itemId, item.amount, session);
-              await ItemService.changeVariationAmount(item.itemId, item.size, item.color, item.amount, session);
+              await ItemService.changeItemReturnedCount(
+                item.itemId,
+                item.amount,
+                session
+              );
+              await ItemService.changeVariationAmount(
+                item.itemId,
+                item.size,
+                item.color,
+                item.amount,
+                session
+              );
             })
           );
 
-          await EmailService.notifyUserThatOrderIsReturned(order.buyer.firstName, userInfo.email, order._id);
+          await EmailService.notifyUserThatOrderIsReturned(
+            order.buyer.firstName,
+            userInfo.email,
+            order._id
+          );
 
           break;
-        case 'cancelled':
+        case "cancelled":
           order.refundDate = undefined;
 
           // add item variation amount number to cooresponding item variation
           await Promise.all(
             order.items.map(async (orderItem) => {
-              await ItemService.changeVariationAmount(orderItem.itemId, orderItem.size, orderItem.color, orderItem.amount, session);
+              await ItemService.changeVariationAmount(
+                orderItem.itemId,
+                orderItem.size,
+                orderItem.color,
+                orderItem.amount,
+                session
+              );
             })
-          )
+          );
 
-          await EmailService.notifyUserThatOrderIsCancelled(order.buyer.firstName, userInfo.email, order._id);
+          await EmailService.notifyUserThatOrderIsCancelled(
+            order.buyer.firstName,
+            userInfo.email,
+            order._id
+          );
 
           break;
-        case 'failed':
+        case "failed":
           // add item variation amount number to cooresponding item variation
           await Promise.all(
             order.items.map(async (orderItem) => {
-              await ItemService.changeVariationAmount(orderItem.itemId, orderItem.size, orderItem.color, orderItem.amount, session);
+              await ItemService.changeVariationAmount(
+                orderItem.itemId,
+                orderItem.size,
+                orderItem.color,
+                orderItem.amount,
+                session
+              );
             })
-          )
+          );
 
           order.refundDate = undefined;
           break;
@@ -318,8 +441,7 @@ class OredrService {
 
   static async updateOrderBuyerRef(orderId, userId, session) {
     try {
-      const order = await OrderModel.findById(orderId)
-        .select('buyer');
+      const order = await OrderModel.findById(orderId).select("buyer");
 
       order.buyer.ref = userId;
       return await order.save({ session });
@@ -341,7 +463,22 @@ class OredrService {
       }
       const userInfo = await UserService.findUserEmailById(userId);
 
-      EmailService.notifyUserThatOrderIsCancelled(userInfo.firstName, userInfo.email, order._id );
+      EmailService.notifyUserThatOrderIsCancelled(
+        userInfo.firstName,
+        userInfo.email,
+        order._id
+      );
+      return order;
+    } catch (error) {
+      ErrorHelper.throwServerError(error);
+    }
+  }
+
+  static async deleteTemporaryOrderById(id, session) {
+    try {
+      const order = await TemporaryOrderModel.deleteOne({
+        _id: id,
+      }).session(session);
       return order;
     } catch (error) {
       ErrorHelper.throwServerError(error);
@@ -396,6 +533,7 @@ class OredrService {
       },
       "Ukupna Cena": { value: `${order.totalPrice} RSD` },
       Artikli: order.items.map((item) => ({
+        Slika: { value: item.image },
         Naziv: item.title,
         Velicina: item.size,
         Količina: item.amount,
@@ -409,9 +547,10 @@ class OredrService {
         Broj: { value: CryptoService.decryptData(order.address.number) },
         "Poštanski Broj": { value: order.address.postalCode },
       },
+      Napomena: { value: CryptoService.decryptData(order.note) || "Nema" },
       Status: { value: order.status },
     };
   }
 }
 
-export default OredrService;
+export default OrderService;

@@ -16,6 +16,26 @@ let transporter = nodemailer.createTransport({
     },
 });
 
+const styles = {
+    bodyFontFamily: "'Verdana', Helvetica, Arial, sans-serif",
+    bodyBackground: "#f4f4f4",
+    containerBackground: "#ffffff",
+    containerPadding: "20px",
+    containerBorderRadius: "8px",
+    containerBoxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+    headingColor: "#01b3e9",
+    headingMarginBottom: "20px",
+    textColor: "#333333",
+    textFontSize: "16px",
+    textMarginBottom: "30px",
+    buttonPadding: "12px 24px",
+    buttonBackground: "#01b3e9",
+    buttonTextColor: "#fff",
+    buttonBorderRadius: "4px",
+    buttonFontSize: "16px",
+    buttonTransition: "background-color 0.3s"
+};
+
 class EmailService {
     static async sendNewContactNotification(name, email,contactId) {
         const mailOptions = {
@@ -24,17 +44,25 @@ class EmailService {
             subject: "Dobliste novi upit!",
             text: "Imate novi upit iz kontakt forme",
             html: `
-                <html lang="en">
+                <html lang="sr">
                 <head>
                     <meta charset="UTF-8">
                     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                    <title>Dobliste novi upit!</title>
+                    <title>Novi upit!</title>
                 </head>
-                <body style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f4f4f4; text-align: center; padding: 20px;">
-                    <div style="margin: 0 auto; background-color: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
-                        <h1 style="color: #ad1b1b; margin-bottom: 20px;">Dobliste novi upit!</h1>
-                        <h2 style="color: #009688; margin-bottom: 10px;">Imate novi upit iz kontakt forme od ${name} na email: ${email}</h2>
-                        <a href="http://localhost:3000/admin/kontakt-detalji/${contactId}" style="display: inline-block; padding: 12px 24px; background-color: #009688; color: #fff; text-decoration: none; border-radius: 4px; font-size: 16px; transition: background-color 0.3s;">Pogledajte</a>
+                <body style="font-family: ${ styles.bodyFontFamily }; background-color: ${  styles.bodyBackground }; text-align: center; padding: 20px;">
+                    <div style="max-width: 600px; margin: 0 auto; background-color: ${  styles.containerBackground }; padding: ${  styles.containerPadding }; border-radius: ${  styles.containerBorderRadius }; box-shadow: ${  styles.containerBoxShadow };">
+                    <h1 style="color: ${  styles.headingColor }; margin-bottom: 20px;">Novi upit!</h1>
+                    <h2 style="color: ${  styles.h2Color }; margin-bottom: ${  styles.h2MarginBottom };">
+                        Imate novi upit od ${  name } (Email: ${  email })
+                    </h2>
+                    <p style="color: ${  styles.textColor }; font-size: ${  styles.textFontSize }; margin-bottom: ${  styles.textMarginBottom };">
+                        Prijavite se u administraciju kako biste pregledali upit.
+                    </p>
+                    <a href="http://localhost:3000/admin/kontakt-detalji/${ contactId }" 
+                        style="display: inline-block; padding: ${  styles.buttonPadding }; background-color: ${  styles.buttonBackground }; color: ${  styles.buttonTextColor }; text-decoration: none; border-radius: ${  styles.buttonBorderRadius }; font-size: ${  styles.buttonFontSize }; transition: ${  styles.buttonTransition };">
+                        Pogledajte upit
+                    </a>
                     </div>
                 </body>
                 </html>
@@ -48,6 +76,103 @@ class EmailService {
         });
     }
 
+    static async sendConfirmAccount(email, token, session = null) {
+        try {
+            const confirmUrl = `http://localhost:3000/auth/confirm?token=${token}`;
+
+            const mailOptions = {
+                from: "Tophelanke <no-reply@tophelanke.com>",
+                to: email,
+                subject: "Potvrdite vašu registraciju",
+                html: `
+                    <html lang="sr">
+                    <head>
+                        <meta charset="UTF-8">
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                        <title>Potvrda registracije</title>
+                    </head>
+                    <body style="font-family: ${styles.bodyFontFamily}; background-color: ${styles.bodyBackground}; text-align: center; padding: 20px;">
+                        <div style="max-width: 600px; margin: 0 auto; background-color: ${styles.containerBackground}; padding: ${styles.containerPadding}; border-radius: ${styles.containerBorderRadius}; box-shadow: ${styles.containerBoxShadow};">
+                            <h1 style="color: ${styles.headingColor}; margin-bottom: ${styles.headingMarginBottom};">Dobrodošli u Tophelanke!</h1>
+                            <p style="color: ${styles.textColor}; font-size: ${styles.textFontSize}; margin-bottom: ${styles.textMarginBottom};">
+                                Kliknite na dugme ispod kako biste potvrdili vašu registraciju.
+                            </p>
+                            <a href="${confirmUrl}" 
+                                style="display: inline-block; padding: ${styles.buttonPadding}; background-color: ${styles.buttonBackground}; color: ${styles.buttonTextColor}; text-decoration: none; border-radius: ${styles.buttonBorderRadius}; font-size: ${styles.buttonFontSize}; transition: ${styles.buttonTransition};">
+                                Potvrdite nalog
+                            </a>
+                            <p style="color: ${styles.textColor}; font-size: ${styles.textFontSize}; margin-top: 20px;">
+                                Ako niste vi inicirali ovu registraciju, možete zanemariti ovaj email.
+                            </p>
+                        </div>
+                    </body>
+                    </html>
+                `,
+            };
+
+            // Pošalji email
+            let info = await transporter.sendMail(mailOptions);
+            if (!info) {
+                console.error("❌ Email nije poslat:");
+                return false;
+            }
+
+            console.log(`✅ Email za potvrdu poslat`);
+            return true; // Ako je email uspešno poslat
+        } catch (error) {
+            console.error("❌ Greška prilikom slanja emaila");
+            return false; // Ako email nije poslat
+        }
+    }
+
+    static async sendOrderConfirmation(name, email, token) {
+        try {
+            const confirmUrl = `http://localhost:3000/prodavnica/potvrdite-porudzbinu?token=${token}`;
+
+            const mailOptions = {
+                from: "Tophelanke <no-reply@tophelanke.com>",
+                to: email,
+                subject: "Potvrdite vašu porudžbinu",
+                html: `
+                    <html lang="sr">
+                    <head>
+                        <meta charset="UTF-8">
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                        <title>Potvrda porudžbine</title>
+                    </head>
+                    <body style="font-family: ${styles.bodyFontFamily}; background-color: ${styles.bodyBackground}; text-align: center; padding: 20px;">
+                        <div style="max-width: 600px; margin: 0 auto; background-color: ${styles.containerBackground}; padding: ${styles.containerPadding}; border-radius: ${styles.containerBorderRadius}; box-shadow: ${styles.containerBoxShadow};">
+                            <h1 style="color: ${styles.headingColor}; margin-bottom: ${styles.headingMarginBottom};">Dobrodošli u Tophelanke!</h1>
+                            <p style="color: ${styles.textColor}; font-size: ${styles.textFontSize}; margin-bottom: ${styles.textMarginBottom};">
+                                Kliknite na dugme ispod kako biste potvrdili vašu porudžbinu.
+                            </p>
+                            <a href="${confirmUrl}" 
+                                style="display: inline-block; padding: ${styles.buttonPadding}; background-color: ${styles.buttonBackground}; color: ${styles.buttonTextColor}; text-decoration: none; border-radius: ${styles.buttonBorderRadius}; font-size: ${styles.buttonFontSize}; transition: ${styles.buttonTransition};">
+                                Potvrdite Porudžbinu
+                            </a>
+                            <p style="color: ${styles.textColor}; font-size: ${styles.textFontSize}; margin-top: 20px;">
+                                Ako niste vi inicirali ovu porudžbinu, možete zanemariti ovaj email.
+                            </p>
+                        </div>
+                    </body>
+                    </html>
+                `,
+            };
+
+            // Pošalji email
+            let info = await transporter.sendMail(mailOptions);
+            if (!info) {
+                console.error("❌ Email nije poslat:");
+                return false;
+            }
+
+            console.log(`✅ Email za potvrdu poslat`);
+            return true; // Ako je email uspešno poslat
+        } catch (error) {
+            console.error("❌ Greška prilikom slanja emaila");
+            return false; // Ako email nije poslat
+        }
+    }
     static async sendOrderInfo(name, email, orderInfo) {
         try {
             const itemsInfo = orderInfo.items.map(item => ({
@@ -106,21 +231,31 @@ class EmailService {
                 subject: `Poštovani/a ${user.firstName}, zatražili ste promenu lozinke`,
                 text: "Ukoliko ste zatražili promenu lozinke, pratite instrukcije unutar ovog email.",
                 html: `<html lang="sr">
-                    <head>
-                        <meta charset="UTF-8">
-                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                        <title>Zatražiliste Restartovanje Šifre</title>
-                    </head>
-                    <body style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f4f4f4; text-align: center; padding: 20px;">
-                        <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
-                            <h1 style="color: #009688; margin-bottom: 20px;">Restartujte Šifru</h1>
-                            <p style="color: #333; font-size: 16px; margin-bottom: 30px;">Pozdrav ${user.firstName},</p>
-                            <p style="color: #333; font-size: 16px; margin-bottom: 30px;">Vi ste zatražili restartovanje šifre. Kliknite na link ispod:</p>
-                            <a href="http://localhost:3000/napravite-novu-sifru/${user.resetToken}" style="display: inline-block; padding: 12px 24px; background-color: #009688; color: #fff; text-decoration: none; border-radius: 4px; font-size: 16px; transition: background-color 0.3s;">Restartovanje Šifre</a>
-                            <p style="color: #333; font-size: 16px; margin-top: 30px;">Ako niste zatražili, ignorišite ovaj email.</p>
-                        </div>
-                    </body>
-                </html>`
+                        <head>
+                            <meta charset="UTF-8">
+                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                            <title>Restartovanje šifre</title>
+                        </head>
+                        <body style="font-family: ${  styles.bodyFontFamily }; background-color: ${  styles.bodyBackground }; text-align: center; padding: 20px;">
+                            <div style="max-width: 600px; margin: 0 auto; background-color: ${  styles.containerBackground }; padding: ${  styles.containerPadding }; border-radius: ${  styles.containerBorderRadius }; box-shadow: ${  styles.containerBoxShadow };">
+                            <h1 style="color: ${  styles.headingColor }; margin-bottom: ${  styles.headingMarginBottom };">Restartujte šifru</h1>
+                            <p style="color: ${  styles.textColor }; font-size: ${  styles.textFontSize }; margin-bottom: ${  styles.textMarginBottom };">
+                                Pozdrav <strong>${  user.firstName }</strong>,
+                            </p>
+                            <p style="color: ${  styles.textColor }; font-size: ${  styles.textFontSize }; margin-bottom: ${  styles.textMarginBottom };">
+                                Zatražili ste restartovanje šifre. Kliknite na link ispod da biste kreirali novu šifru:
+                            </p>
+                            <a href="http://localhost:3000/napravite-novu-sifru/${  user.resetToken }" 
+                                style="display: inline-block; padding: ${  styles.buttonPadding }; background-color: ${  styles.buttonBackground }; color: ${  styles.buttonTextColor }; text-decoration: none; border-radius: ${  styles.buttonBorderRadius }; font-size: ${  styles.buttonFontSize }; transition: ${  styles.buttonTransition };">
+                                Restartujte šifru
+                            </a>
+                            <p style="color: ${  styles.textColor }; font-size: ${  styles.textFontSize }; margin-top: 30px;">
+                                Ako niste zatražili restartovanje šifre, ignorišite ovaj email.
+                            </p>
+                            </div>
+                        </body>
+                        </html>
+                    `
             };
     
             const info = await transporter.sendMail(mailOptions);
@@ -161,20 +296,26 @@ class EmailService {
                             subject: `Poštovani/a ${ name || 'Korisniče/ce'}, Artikal ${item.title} je sada na akciji`,
                             text: "Na našoj aplikaciji trenutno je Vaš željeni artiakl na akciji!",
                             html: `<html lang="sr">
-                                <head>
-                                    <meta charset="UTF-8">
-                                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                                    <title>${item.title} je sada na Akciji!</title>
-                                </head>
-                                <body style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f4f4f4; text-align: center; padding: 20px;">
-                                    <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
-                                        <h1 style="color: #009688; margin-bottom: 20px;">Vaš željeni artikal je na akciji</h1>
-                                        <p style="color: #333; font-size: 16px; margin-bottom: 30px;">Pozdrav ${name},</p>
-                                        <p style="color: #333; font-size: 16px; margin-bottom: 30px;">Klikom na link možete proveriti akciju na željenom artiklu:</p>
-                                        <a href="http://localhost:3000/prodavnica/artikal/${item.title}" style="display: inline-block; padding: 12px 24px; background-color: #009688; color: #fff; text-decoration: none; border-radius: 4px; font-size: 16px; transition: background-color 0.3s;">Pogledajte</a>
-                                    </div>
-                                </body>
-                            </html>`
+                                    <head>
+                                        <meta charset="UTF-8">
+                                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                                        <title>${  item.title } je sada na akciji!</title>
+                                    </head>
+                                    <body style="font-family: ${  styles.bodyFontFamily }; background-color: ${  styles.bodyBackground }; text-align: center; padding: 20px;">
+                                        <div style="max-width: 600px; margin: 0 auto; background-color: ${  styles.containerBackground }; padding: ${  styles.containerPadding }; border-radius: ${  styles.containerBorderRadius }; box-shadow: ${  styles.containerBoxShadow };">
+                                        <h1 style="color: ${  styles.headingColor }; margin-bottom: ${  styles.headingMarginBottom };">Vaš željeni artikal je sada na akciji!</h1>
+                                        <p style="color: ${  styles.textColor }; font-size: ${  styles.textFontSize }; margin-bottom: ${  styles.textMarginBottom };">Pozdrav ${  name },</p>
+                                        <p style="color: ${  styles.textColor }; font-size: ${  styles.textFontSize }; margin-bottom: ${  styles.textMarginBottom };">
+                                            Klikom na link možete proveriti akciju na artiklu <strong>${  item.title }</strong>:
+                                        </p>
+                                        <a href="http://localhost:3000/prodavnica/artikal/${  encodeURIComponent(item.title) }" 
+                                            style="display: inline-block; padding: ${  styles.buttonPadding }; background-color: ${  styles.buttonBackground }; color: ${  styles.buttonTextColor }; text-decoration: none; border-radius: ${  styles.buttonBorderRadius }; font-size: ${  styles.buttonFontSize }; transition: ${  styles.buttonTransition };">
+                                            Pogledajte
+                                        </a>
+                                        </div>
+                                    </body>
+                                    </html>
+                                    `
                         };
                 
                         const info = await transporter.sendMail(mailOptions);
@@ -200,20 +341,26 @@ class EmailService {
             subject: `Poštovani/a ${ name || 'Korisniče/ce'}, Vaša prudžbina: ${orderInfo} je poslata`,
             text: "Na našoj aplikaciji možete pratiti status Vaše porudžbine!",
             html: `<html lang="sr">
-                <head>
-                    <meta charset="UTF-8">
-                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                    <title>Prudžbina: ${orderInfo} je poslata</title>
-                </head>
-                <body style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f4f4f4; text-align: center; padding: 20px;">
-                    <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
-                        <h1 style="color: #009688; margin-bottom: 20px;">Porudžbina je poslata!</h1>
-                        <p style="color: #333; font-size: 16px; margin-bottom: 30px;">Pozdrav ${name},</p>
-                        <p style="color: #333; font-size: 16px; margin-bottom: 30px;">Klikom na link možete proveriti status vaše porudžbine:</p>
-                        <a href="http://localhost:3000/korisnik/porudzbina-detalji/${orderInfo}" style="display: inline-block; padding: 12px 24px; background-color: #009688; color: #fff; text-decoration: none; border-radius: 4px; font-size: 16px; transition: background-color 0.3s;">Pogledajte</a>
-                    </div>
-                </body>
-            </html>`
+                    <head>
+                        <meta charset="UTF-8">
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                        <title>Porudžbina: ${  orderInfo } je poslata</title>
+                    </head>
+                    <body style="font-family: ${  styles.bodyFontFamily }; background-color: ${  styles.bodyBackground }; text-align: center; padding: 20px;">
+                        <div style="max-width: 600px; margin: 0 auto; background-color: ${  styles.containerBackground }; padding: ${  styles.containerPadding }; border-radius: ${  styles.containerBorderRadius }; box-shadow: ${  styles.containerBoxShadow };">
+                        <h1 style="color: ${  styles.headingColor }; margin-bottom: ${  styles.headingMarginBottom };">Porudžbina je poslata!</h1>
+                        <p style="color: ${  styles.textColor }; font-size: ${  styles.textFontSize }; margin-bottom: ${  styles.textMarginBottom };">Pozdrav ${  name },</p>
+                        <p style="color: ${  styles.textColor }; font-size: ${  styles.textFontSize }; margin-bottom: ${  styles.textMarginBottom };">
+                            Klikom na link možete proveriti status vaše porudžbine:
+                        </p>
+                        <a href="http://localhost:3000/korisnik/porudzbina-detalji/${  orderInfo }" 
+                            style="display: inline-block; padding: ${  styles.buttonPadding }; background-color: ${  styles.buttonBackground }; color: ${  styles.buttonTextColor }; text-decoration: none; border-radius: ${  styles.buttonBorderRadius }; font-size: ${  styles.buttonFontSize }; transition: ${  styles.buttonTransition };">
+                            Pogledajte
+                        </a>
+                        </div>
+                    </body>
+                    </html>
+                    `
         };
 
         const info = await transporter.sendMail(mailOptions);
@@ -230,20 +377,28 @@ class EmailService {
             subject: `Poštovani/a ${ name || 'Korisniče/ce'}, Vaša prudžbina: ${orderInfo} je vraćena`,
             text: "Na našoj aplikaciji možete pratiti status Vaše porudžbine!",
             html: `<html lang="sr">
-                <head>
-                    <meta charset="UTF-8">
-                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                    <title>Prudžbina: ${orderInfo} je vraćena</title>
-                </head>
-                <body style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f4f4f4; text-align: center; padding: 20px;">
-                    <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
-                        <h1 style="color: #009688; margin-bottom: 20px;">Porudžbina je Vraćena!</h1>
-                        <p style="color: #333; font-size: 16px; margin-bottom: 30px;">Pozdrav ${name},</p>
-                        <p style="color: #333; font-size: 16px; margin-bottom: 30px;">Klikom na link možete proveriti status vaše porudžbine:</p>
-                        <a href="http://localhost:3000/korisnik/porudzbina-detalji/${orderInfo}" style="display: inline-block; padding: 12px 24px; background-color: #009688; color: #fff; text-decoration: none; border-radius: 4px; font-size: 16px; transition: background-color 0.3s;">Pogledajte</a>
-                    </div>
-                </body>
-            </html>`
+                    <head>
+                        <meta charset="UTF-8">
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                        <title>Porudžbina: ${  orderInfo } je vraćena</title>
+                    </head>
+                    <body style="font-family: ${  styles.bodyFontFamily }; background-color: ${  styles.bodyBackground }; text-align: center; padding: 20px;">
+                        <div style="max-width: 600px; margin: 0 auto; background-color: ${  styles.containerBackground }; padding: ${  styles.containerPadding }; border-radius: ${  styles.containerBorderRadius }; box-shadow: ${  styles.containerBoxShadow };">
+                        <h1 style="color: ${  styles.headingColor }; margin-bottom: ${  styles.headingMarginBottom };">Porudžbina je vraćena!</h1>
+                        <p style="color: ${  styles.textColor }; font-size: ${  styles.textFontSize }; margin-bottom: ${  styles.textMarginBottom };">
+                            Pozdrav ${  name },
+                        </p>
+                        <p style="color: ${  styles.textColor }; font-size: ${  styles.textFontSize }; margin-bottom: ${  styles.textMarginBottom };">
+                            Klikom na link možete proveriti status vaše porudžbine:
+                        </p>
+                        <a href="http://localhost:3000/korisnik/porudzbina-detalji/${  orderInfo }" 
+                            style="display: inline-block; padding: ${  styles.buttonPadding }; background-color: ${  styles.buttonBackground }; color: ${  styles.buttonTextColor }; text-decoration: none; border-radius: ${  styles.buttonBorderRadius }; font-size: ${  styles.buttonFontSize }; transition: ${  styles.buttonTransition };">
+                            Pogledajte
+                        </a>
+                        </div>
+                    </body>
+                    </html>
+                    `
         };
 
         const info = await transporter.sendMail(mailOptions);
@@ -260,20 +415,28 @@ class EmailService {
             subject: `Poštovani/a ${ name || 'Korisniče/ce'}, Vaša prudžbina: ${orderInfo} je otkazana`,
             text: "Na našoj aplikaciji možete pratiti status Vaše porudžbine!",
             html: `<html lang="sr">
-                <head>
-                    <meta charset="UTF-8">
-                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                    <title>Prudžbina: ${orderInfo} je otkazana!</title>
-                </head>
-                <body style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f4f4f4; text-align: center; padding: 20px;">
-                    <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
-                        <h1 style="color: #009688; margin-bottom: 20px;">Porudžbina je Otkazana!</h1>
-                        <p style="color: #333; font-size: 16px; margin-bottom: 30px;">Poštovani/a ${ name || 'Korisniče/ce'}, Vaša prudžbina: ${orderInfo} je otkazana!</p>
-                        <p style="color: #333; font-size: 16px; margin-bottom: 30px;">Klikom na link možete proveriti status vaše porudžbine:</p>
-                        <a href="http://localhost:3000/korisnik/porudzbina-detalji/${orderInfo}" style="display: inline-block; padding: 12px 24px; background-color: #009688; color: #fff; text-decoration: none; border-radius: 4px; font-size: 16px; transition: background-color 0.3s;">Pogledajte</a>
-                    </div>
-                </body>
-            </html>`
+                    <head>
+                        <meta charset="UTF-8">
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                        <title>Porudžbina: ${  orderInfo } je otkazana!</title>
+                    </head>
+                    <body style="font-family: ${  styles.bodyFontFamily }; background-color: ${  styles.bodyBackground }; text-align: center; padding: 20px;">
+                        <div style="max-width: 600px; margin: 0 auto; background-color: ${  styles.containerBackground }; padding: ${  styles.containerPadding }; border-radius: ${  styles.containerBorderRadius }; box-shadow: ${  styles.containerBoxShadow };">
+                        <h1 style="color: ${  styles.headingColor }; margin-bottom: ${  styles.headingMarginBottom };">Porudžbina je otkazana!</h1>
+                        <p style="color: ${  styles.textColor }; font-size: ${  styles.textFontSize }; margin-bottom: ${  styles.textMarginBottom };">
+                            Poštovani/a ${  name || "Korisniče/ce" }, vaša porudžbina: <strong>${  orderInfo }</strong> je otkazana!
+                        </p>
+                        <p style="color: ${  styles.textColor }; font-size: ${  styles.textFontSize }; margin-bottom: ${  styles.textMarginBottom };">
+                            Klikom na link možete proveriti status vaše porudžbine:
+                        </p>
+                        <a href="http://localhost:3000/korisnik/porudzbina-detalji/${  orderInfo }" 
+                            style="display: inline-block; padding: ${  styles.buttonPadding }; background-color: ${  styles.buttonBackground }; color: ${  styles.buttonTextColor }; text-decoration: none; border-radius: ${  styles.buttonBorderRadius }; font-size: ${  styles.buttonFontSize }; transition: ${  styles.buttonTransition };">
+                            Pogledajte
+                        </a>
+                        </div>
+                    </body>
+                    </html>
+                    `
         };
 
         const info = await transporter.sendMail(mailOptions);
@@ -292,19 +455,25 @@ class EmailService {
             subject: `Prudžbina: ${orderInfo} je otkazana`,
             text: `Porudžbina od strane: ${name} na email: ${email} je otkazana!`,
             html: `<html lang="sr">
-                <head>
-                    <meta charset="UTF-8">
-                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                    <title>Prudžbina: ${orderInfo} je otkazana!</title>
-                </head>
-                <body style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f4f4f4; text-align: center; padding: 20px;">
-                    <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
-                        <h1 style="color: #009688; margin-bottom: 20px;">Porudžbina je Otkazana!</h1>
-                        <p style="color: #333; font-size: 16px; margin-bottom: 30px;">Porudžbina od strane: ${name} na email: ${email} je otkazana!</p>
-                        <a href="http://localhost:3000/admin/porudzbina-detalji/${orderInfo}" style="display: inline-block; padding: 12px 24px; background-color: #009688; color: #fff; text-decoration: none; border-radius: 4px; font-size: 16px; transition: background-color 0.3s;">Pogledajte</a>
-                    </div>
-                </body>
-            </html>`
+                    <head>
+                        <meta charset="UTF-8">
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                        <title>Porudžbina: ${  orderInfo } je otkazana!</title>
+                    </head>
+                    <body style="font-family: ${  styles.bodyFontFamily }; background-color: ${  styles.bodyBackground }; text-align: center; padding: 20px;">
+                        <div style="max-width: 600px; margin: 0 auto; background-color: ${  styles.containerBackground }; padding: ${  styles.containerPadding }; border-radius: ${  styles.containerBorderRadius }; box-shadow: ${  styles.containerBoxShadow };">
+                        <h1 style="color: ${  styles.headingColor }; margin-bottom: ${  styles.headingMarginBottom };">Porudžbina je otkazana!</h1>
+                        <p style="color: ${  styles.textColor }; font-size: ${  styles.textFontSize }; margin-bottom: ${  styles.textMarginBottom };">
+                            Porudžbina od strane: <strong>${  name }</strong> na email: <strong>${  email }</strong> je otkazana!
+                        </p>
+                        <a href="http://localhost:3000/admin/porudzbina-detalji/${  orderInfo }" 
+                            style="display: inline-block; padding: ${  styles.buttonPadding }; background-color: ${  styles.buttonBackground }; color: ${  styles.buttonTextColor }; text-decoration: none; border-radius: ${  styles.buttonBorderRadius }; font-size: ${  styles.buttonFontSize }; transition: ${  styles.buttonTransition };">
+                            Pogledajte
+                        </a>
+                        </div>
+                    </body>
+                    </html>
+                    `
         };
 
         const info = await transporter.sendMail(mailOptions);
@@ -328,10 +497,15 @@ class EmailService {
                         <meta name="viewport" content="width=device-width, initial-scale=1.0">
                         <title>Zaliha Artikla se smanjila!</title>
                     </head>
-                    <body style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f4f4f4; text-align: center; padding: 20px;">
-                        <div style="margin: 0 auto; background-color: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
-                            <h1 style="color: #ad1b1b; margin-bottom: 20px;">Količina Artikla ${itemId}, variacije: ${variationId} se smanjila!</h1>
-                            <a href="http://localhost:3000/admin/artikal-detalji/${itemId}" style="display: inline-block; padding: 12px 24px; background-color: #009688; color: #fff; text-decoration: none; border-radius: 4px; font-size: 16px; transition: background-color 0.3s;">Pogledajte</a>
+                    <body style="font-family: ${  styles.bodyFontFamily }; background-color: ${  styles.bodyBackground }; text-align: center; padding: 20px;">
+                        <div style="max-width: 600px; margin: 0 auto; background-color: ${  styles.containerBackground }; padding: ${  styles.containerPadding }; border-radius: ${  styles.containerBorderRadius }; box-shadow: ${  styles.containerBoxShadow };">
+                        <h1 style="color: ${  styles.alertHeadingColor }; margin-bottom: ${  styles.headingMarginBottom };">
+                            Količina artikla ${  itemId }, varijacije: ${  variationId } se smanjila!
+                        </h1>
+                        <a href="http://localhost:3000/admin/artikal-detalji/${  itemId }" 
+                            style="display: inline-block; padding: ${  styles.buttonPadding }; background-color: ${  styles.buttonBackground }; color: ${  styles.buttonTextColor }; text-decoration: none; border-radius: ${  styles.buttonBorderRadius }; font-size: ${  styles.buttonFontSize }; transition: ${  styles.buttonTransition };">
+                            Pogledajte
+                        </a>
                         </div>
                     </body>
                     </html>
@@ -363,10 +537,15 @@ class EmailService {
                         <meta name="viewport" content="width=device-width, initial-scale=1.0">
                         <title>Zaliha Artikla se izpraznila!</title>
                     </head>
-                    <body style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f4f4f4; text-align: center; padding: 20px;">
-                        <div style="margin: 0 auto; background-color: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
-                            <h1 style="color: #ad1b1b; margin-bottom: 20px;">Količina Artikla ${itemId}, variacije: ${variationId} se izpraznila!</h1>
-                            <a href="http://localhost:3000/admin/artikal-detalji/${itemId}" style="display: inline-block; padding: 12px 24px; background-color: #009688; color: #fff; text-decoration: none; border-radius: 4px; font-size: 16px; transition: background-color 0.3s;">Pogledajte</a>
+                    <body style="font-family: ${  styles.bodyFontFamily }; background-color: ${  styles.bodyBackground }; text-align: center; padding: 20px;">
+                        <div style="max-width: 600px; margin: 0 auto; background-color: ${  styles.containerBackground }; padding: ${  styles.containerPadding }; border-radius: ${  styles.containerBorderRadius }; box-shadow: ${  styles.containerBoxShadow };">
+                        <h1 style="color: ${  styles.alertHeadingColor }; margin-bottom: ${  styles.headingMarginBottom };">
+                            Količina artikla ${  itemId }, varijacije: ${  variationId } se izpraznila!
+                        </h1>
+                        <a href="http://localhost:3000/admin/artikal-detalji/${  itemId }" 
+                            style="display: inline-block; padding: ${  styles.buttonPadding }; background-color: ${  styles.buttonBackground }; color: ${  styles.buttonTextColor }; text-decoration: none; border-radius: ${  styles.buttonBorderRadius }; font-size: ${  styles.buttonFontSize }; transition: ${  styles.buttonTransition };">
+                            Pogledajte
+                        </a>
                         </div>
                     </body>
                     </html>

@@ -40,7 +40,8 @@ async function getLoginPage(req, res, next) {
             pageKeyWords: "Prijava, Webshop, Prodavnica, Odeća",
             existingData: null,
             errorMessage: "",
-            redirectTo: redirectUrl
+            redirectTo: redirectUrl,
+            showRequestNewActivation: false
         })
     } catch (error) {
         next(error);
@@ -94,6 +95,45 @@ async function getSetNewPasswordPage(req, res, next) {
     }
 }
 
+async function getConfirmAccountPage(req, res, next) {
+    try {
+        const { token } = req.query;
+
+        const result = await UserService.confirmAccount(token);
+
+        return res.render("email/success", {
+            path: "/auth/confirm",
+            pageTitle: "Nalog potvrđen",
+            pageDescription: "Ptovrda Emaila",
+            pageKeyWords: "",
+            message: result.message
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+async function getActivationAccount(req, res, next) {
+    try {
+        let existingData = req.existingData;
+
+        if (!existingData) {
+            existingData = ""
+        }
+
+        return res.render("auth/get-activation", {
+            path: "/zatrazite-aktivaciju",
+            pageTitle: "Zatražite Aktivaciju Naloga",
+            pageDescription: "Stranica za traženje nove aktivacije",
+            pageKeyWords: "Zatražite Novu Aktivaciju, Nova Aktivacija",
+            existingData: existingData,
+            errorMessage: ""
+        })
+    } catch (error) {
+        next(error);
+    }
+}
+
 /**
  * Handles the login form submission.
  */
@@ -115,13 +155,17 @@ async function postLogin(req, res, next) {
                     email: email
                 },
                 errorMessage: errors.array()[0].msg,
-                redirectTo: redirectUrl
+                redirectTo: redirectUrl,
+                showRequestNewActivation: false
             })
         }
 
-        const userExist = await UserService.checkUserInfo(email);
+        const userExist = await UserService.validateUserInfo(email, password);
 
-        if(!userExist) {
+        if(!userExist.success) {
+            let showRequestNewActivation = false;
+            if (userExist.show) showRequestNewActivation = true;
+
             return res.render("auth/login", {
                 path: "/prijava",
                 pageTitle: "Prijavite Se",
@@ -130,23 +174,8 @@ async function postLogin(req, res, next) {
                 existingData: {
                     email: email
                 },
-                errorMessage: "Nije moguće naći korisnika!",
-                redirectTo: redirectUrl
-            })
-        }
-
-        const checkPassword = await CryptoService.compareUserPasswords(password, userExist.password);
-
-        if (!checkPassword) {
-            return res.render("auth/login", {
-                path: "/prijava",
-                pageTitle: "Prijavite Se",
-                pageDescription: "Prijavite se na našu prodavnicu i olakšano pratite i poručujte",
-                pageKeyWords: "Prijava, Webshop, Prodavnica, Odeća",
-                existingData: {
-                    email: email
-                },
-                errorMessage: "Neispravni podaci!",
+                errorMessage: userExist.message || "Nije moguće naći korisnika!",
+                showRequestNewActivation: showRequestNewActivation,
                 redirectTo: redirectUrl
             })
         }
@@ -202,7 +231,13 @@ async function postRegister(req, res, next) {
         const newUser = await UserService.registerNewUser(email, password, firstname, lastname);
 
         if (newUser) {
-            res.redirect('/prijava');
+            return res.render("email/success", {
+                path: "/uspesna-registracija",
+                pageTitle: "Uspešno Završena Registracija",
+                pageDescription: "Stranica koja informiše korisnika o uspešno zatraženoj registraciji",
+                pageKeyWords: "Uspeh, Uspešno, Registracija Naloga",
+                message: "Uspešno ste završili registraciju Vašeg naloga, pogledajte Vaš email za AKTIVACIJU naloga i dalja uputstva!"
+            });
         }
     } catch (error) {
         next(error)
@@ -254,6 +289,47 @@ async function postRequestNewPassword(req, res, next) {
     }
 }
 
+async function postRequestActivation(req, res, next) {
+    try {
+        const email = sanitize(req.body.email);
+        const errors = validationResult(req);
+
+        if (!errors.isEmpty()) {
+            return res.render("auth/get-activation", {
+                path: "/zatrazite-aktivaciju",
+                pageTitle: "Zatražite Aktivaciju Naloga",
+                pageDescription: "Stranica za traženje nove aktivacije",
+                pageKeyWords: "Zatražite Novu Aktivaciju, Nova Aktivacija",
+                existingData: { email: email },
+                errorMessage: errors.array()[0].msg
+            });
+        }
+
+        const result = await UserService.validateUserAndSendConfirmationAcount(email);
+
+        if (!result.success) {
+            return res.render("auth/get-activation", {
+                path: "/zatrazite-aktivaciju",
+                pageTitle: "Zatražite Aktivaciju Naloga",
+                pageDescription: "Stranica za traženje nove aktivacije",
+                pageKeyWords: "Zatražite Novu Aktivaciju, Nova Aktivacija",
+                existingData: { email: email },
+                errorMessage: result.message || "Došlo je do greške!"
+            });
+        }
+
+        return res.render("email/success", {
+            path: "/uspesno-zatrazena-aktivacija",
+            pageTitle: "Uspešno Zatražena Aktivacija",
+            pageDescription: "Stranica koja informiše korisnika o uspešno zatraženoj aktivaciji",
+            pageKeyWords: "Uspeh, Uspešno, Aktivacija Naloga",
+            message: "Uspešno ste zatražili aktivaciju Vašeg naloga, pogledajte Vaš email za dalja uputstva!"
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
 async function postSetNewPassword(req, res, next) {
     try {
         const newPassword = sanitize(req.body.password);
@@ -291,6 +367,7 @@ async function postSetNewPassword(req, res, next) {
         next(error)
     }
 }
+
 /**
  * Handles the logout action, and destroy user sassion
  */
@@ -309,9 +386,12 @@ export default {
     getLoginPage,
     getNewPasswordPage,
     getSetNewPasswordPage,
+    getConfirmAccountPage,
+    getActivationAccount,
     postRegister,
     postLogin,
     postRequestNewPassword,
+    postRequestActivation,
     postSetNewPassword,
     postLogout
 }

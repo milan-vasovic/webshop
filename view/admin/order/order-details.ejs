@@ -41,6 +41,7 @@
             <h3>Kupac: <a href="/admin/<% if (order.Kupac.Tip.value === 'User') { %>korisnik-detalji<% } else { %>kupac-detalji<% } %>/<%= order.Kupac.ID.value %>" class="main__title"><%= order.Kupac.Ime.value %> <%= order.Kupac.Prezime.value %></a></h3>
             <p>Broj Telefona: <%= order.Telefon.value %></p>
             <p>Adresa: <%= order.Adresa.Grad.value %>, <%= order.Adresa.Ulica.value %>, <%= order.Adresa.Broj.value %>, <%= order.Adresa["Poštanski Broj"].value %></p>
+            <p>Napomena: <%= order.Napomena.value %></p>
             <br><hr><br>
             <h3>Kupon: </h3> 
             <p>Kod: <strong><%= order.Kupon.Kod.value || "nema" %></strong> Popust: <strong><% if (order.Kupon.Popust.value !== 'undefined %') { %><%= order.Kupon.Popust.value %><% } else { %>nema<% } %></strong></p>

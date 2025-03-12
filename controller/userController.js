@@ -147,7 +147,7 @@ function postSearchUser(req, res, next) {
     }
 }
 
-async function cancelOrder(req, res, next) {
+async function postCancelOrder(req, res, next) {
     try {
         const userId = req.session.user._id;
         const orderId = sanitize(req.body.orderId);
@@ -198,7 +198,7 @@ export default {
     getMyShopPage,
     getUserOrderDetails,
     postAddNumber,
-    cancelOrder,
+    postCancelOrder,
     deleteNumber,
     postAddAddress,
     postSearchUser,
