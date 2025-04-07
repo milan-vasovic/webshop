@@ -43,7 +43,7 @@
 
   <!-- Shop Featured sekcija -->
   <div class="shop-featured">
-    <h1 class="main__title">Istaknuto iz Ponude</h1>
+    <h1 class="main__title"><a href="/prodavnica/istaknuto">Istaknuto iz Ponude</a></h1>
     <div class="cards__container">
       <% featuredItems.forEach(item => { %>
           <%- include('../include/card.ejs', {
@@ -59,7 +59,27 @@
               showId: false
           }) %>
       <% }) %>
+    </div>
   </div>
+
+  <div class="shop-featured">
+    <h1 class="main__title"><a href="/prodavnica/akcija" >Na Akciji</a></h1>
+    <div class="cards__container">
+      <% actionItems.forEach(item => { %>
+          <%- include('../include/card.ejs', {
+              item: item,
+              hasActions: true,
+              actions: [
+                  {
+                      type: 'link-name',
+                      link: "/prodavnica/artikal/",
+                      linkName: 'Pogledajte'
+                  }
+              ],
+              showId: false
+          }) %>
+      <% }) %>
+    </div>
   </div>
 
   <!-- Social proof sekcija (recenzije, ocene ili influencer endorsement) -->

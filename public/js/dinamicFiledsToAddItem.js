@@ -360,7 +360,7 @@ document.addEventListener('DOMContentLoaded', () => {
       sizeSelect.classList.add('main-form__select');
       sizeSelect.required = true;
     
-      const sizes = ["XS", "S", "M", "L", "XL", "2XL", "3XL", "4XL", "S/M", "M/L", "L/XL", "XL/2XL", "Uni"];
+      const sizes = ["XS", "S", "M", "L", "XL", "2XL", "3XL", "4XL", "S/M", "M/L", "L/XL", "XL/2XL", "2XL/3XL", "3XL/4XL", "Uni", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35"];
       sizes.forEach(size => {
         const option = document.createElement('option');
         option.value = size;

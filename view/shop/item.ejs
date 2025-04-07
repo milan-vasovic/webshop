@@ -62,6 +62,7 @@
       </div>
       <% if (isAuthenticated) { %>
         <div>
+          <br>
           <form action="/korisnik/<% if (!isWishlisted) { %>dodavanje-u-listu-zelja<% } else { %>izbacivanje-iz-liste-zelja<% } %>" method="post">
             <input class="main-form__input" id="itemId" type="hidden" name="itemId" value="<%= item.ID.value %>">
             <input name="honeypot" type="hidden">

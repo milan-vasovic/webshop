@@ -1,10 +1,9 @@
 <%- include('../include/head.ejs') %>
 <link rel="stylesheet" href="/css/form.css">
 <%- include('../include/navigation.ejs') %>
-<section class="flex flex-column main__container">
-    <div class="main-form__container">
-        <h1 class="main-form__title"><%= pageTitle %></h1>
-        <form class="main-form width-100" action="/prodavnica/potvrdite-porudzbinu" method="post">
+<section class="main__container">
+    <h1 class="main__title"><%= pageTitle %></h1>
+        <form class="main-form__container" action="/prodavnica/potvrdite-porudzbinu" method="post">
             <input class="main-form__input" type="hidden" name="CSRFToken" value="<%= csrfToken %>">
             <input class="main-form__input" type="hidden" name="token" value="<%= token %>">
             <input name="honeypot" type="hidden">

@@ -1,10 +1,10 @@
 <%- include('../include/head.ejs') %>
 <link rel="stylesheet" href="/css/table.css">
 <%- include('../include/navigation.ejs') %>
-<section class="flex flex-column main__container">
+<section class="main__container">
     <h1 class="main__title"><%= pageTitle %></h1>
-    <div class="flex flex-row justify-between width-100">
-        <div class="width-20">
+    <div class="column-row__container">
+        <div class="left__container-30">
             <% if (order.Status.value === 'processing') { %>
                 <div>
                     <form action="/korisnik/otkazivanje-porudzbine" method="post">
@@ -29,7 +29,7 @@
             <p>Poštarina: <strong><%= order.Poštarina.value %> RSD</strong></p>
             <h2>Ukupna Cena: <%= order['Ukupna Cena'].value %></h2>
         </div>
-        <div class="width-70">
+        <div class="right__container-70">
             <%- include('../include/table.ejs', {
                 items: order.Artikli,
                 showId: false,

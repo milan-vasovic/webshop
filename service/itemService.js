@@ -178,13 +178,15 @@ class ItemService {
    * Finds all items.
    *
    * @returns {Promise<Array>} - A promise that resolves to an array of items.
+   * This is curently unused!
    */
-  static async findAllItems(limit = 10, skip = null) {
+  static async findAllItems(limit = 10, skip = 0) {
     const items = await ItemModel.find()
-      .sort({ soldCount: -1 })
+      .sort({ soldCount: -1, _id: 1  })
       .select(
         "title shortDescription price actionPrice categories tags featureImage status"
       )
+      .skip(skip)
       .limit(limit)
       .lean();
 
@@ -200,7 +202,7 @@ class ItemService {
    *
    * @returns {Promise<Array>} - A promise that resolves to an array of featured items.
    */
-  static async findFeaturedItems(category = null, tag = null, limit = 10) {
+  static async findFeaturedItems(category = null, tag = null, limit = 10, skip = 0) {
     const filter = { status: { $in: ["featured"] } };
 
     if (category) {
@@ -212,10 +214,11 @@ class ItemService {
     }
 
     const items = await ItemModel.find(filter)
-      .sort({ soldCount: -1 })
+      .sort({ soldCount: -1, _id: 1  })
       .select(
         "title shortDescription price actionPrice categories tags featureImage status"
       )
+      .skip(skip)
       .limit(limit)
       .lean();
 
@@ -231,7 +234,7 @@ class ItemService {
    *
    * @returns {Promise<Array>} - A promise that resolves to an array of action items.
    */
-  static async findActionItems(category = null, tag = null, limit = 10) {
+  static async findActionItems(category = null, tag = null, limit = 10, skip = 0) {
     const filter = { status: { $in: ["action"] } };
 
     if (category) {
@@ -243,10 +246,11 @@ class ItemService {
     }
 
     const items = await ItemModel.find(filter)
-      .sort({ soldCount: -1 })
+      .sort({ soldCount: -1, _id: 1  })
       .select(
         "title shortDescription price actionPrice categories tags featureImage status"
       )
+      .skip(skip)
       .limit(limit)
       .lean();
 
@@ -267,7 +271,8 @@ class ItemService {
     category,
     status = null,
     excludeStatus = null,
-    limit = 10
+    limit = 10,
+    skip = 0
   ) {
     const filter = { categories: category };
 
@@ -281,17 +286,26 @@ class ItemService {
       };
     }
 
+    console.log("Skip vrednost je: ", skip);
+    console.log("Limit vrednost je: ", limit);
     const items = await ItemModel.find(filter)
-      .sort({ soldCount: -1 })
+      .sort({ soldCount: -1, _id: 1  })
       .select("title shortDescription price actionPrice featureImage status")
+      .skip(skip)
       .limit(limit)
       .lean();
+
+      console.log("Items: ", items);
+    const itemCount = await ItemModel.find(filter).countDocuments();
 
     if (!items) {
       ErrorHelper.throwNotFoundError("Kategorije");
     }
 
-    return ItemService.mapItemsForShop(items);
+    return {
+      items: ItemService.mapItemsForShop(items),
+      totalCount: itemCount
+    };
   }
 
   /**
@@ -304,7 +318,8 @@ class ItemService {
     tag,
     status = null,
     excludeStatus = null,
-    limit = 10
+    limit = 10,
+    skip = 0
   ) {
     const filter = { tags: tag };
 
@@ -319,8 +334,9 @@ class ItemService {
     }
 
     const items = await ItemModel.find(filter)
-      .sort({ soldCount: -1 })
+      .sort({ soldCount: -1, _id: 1  })
       .select("title shortDescription price actionPrice featureImage status")
+      .skip(skip)
       .limit(limit)
       .lean();
 
@@ -328,7 +344,12 @@ class ItemService {
       ErrorHelper.throwNotFoundError("Tagovi");
     }
 
-    return ItemService.mapItemsForShop(items);
+    const itemCount = await ItemModel.find(filter).countDocuments();
+
+    return {
+      items: ItemService.mapItemsForShop(items),
+      totalCount: itemCount
+    };
   }
 
   /**
@@ -337,7 +358,7 @@ class ItemService {
    * @param {string} search - The search query to filter items by.
    * @returns {Promise<Array>} - A promise that resolves to an array of items.
    */
-  static async findItemsBySearch(filter, skip, limit) {
+  static async findItemsBySearch(filter, limit = 10, skip = 0) {
     const items = await ItemModel.find(filter)
       .select(
         "title shortDescription price actionPrice status categories tags keyWords featureImage"
@@ -350,7 +371,12 @@ class ItemService {
       ErrorHelper.throwNotFoundError("Artikli");
     }
 
-    return ItemService.mapItemsForCard(items);
+    const itemCount = await ItemModel.find(filter).countDocuments();
+
+    return {
+      items: ItemService.mapItemsForCard(items),
+      totalCount: itemCount
+    };
   }
 
   /**
@@ -389,7 +415,7 @@ class ItemService {
    * @param {string} [search] - The search query to filter items by.
    * @returns {Promise<Array>} - A promise that resolves to an array of admin items.
    */
-  static async findAdminItems(search, limit = 10, skip = null) {
+  static async findAdminItems(search, limit = 10, skip = 0) {
     let filter = {};
 
     if (search) {
@@ -595,28 +621,29 @@ class ItemService {
    * @returns {Promise<Object>} - A promise that resolves to the created item.
    */
   static async createNewItem(body, files) {
+    const featureImageFile = files.find(file => file.fieldname === 'featureImage');
     const featureImage = {
-      img: files.featureImage ? files.featureImage[0].originalname : null,
-      imgDesc: sanitize(body.featureImageDesc || ""),
+        img: featureImageFile ? featureImageFile.originalname : null,
+        imgDesc: sanitize(body.featureImageDesc || ""),
     };
 
-    // Variacije
+    // Variations
+    const variationImages = files.filter(file => file.fieldname.startsWith('variationImage'));
     const variations = [];
 
-    if (body.variations && files.variationImages) {
-      body.variations.forEach((variation, index) => {
-        variations.push({
-          size: sanitize(variation.size),
-          color: sanitize(variation.color),
-          amount: Number(sanitize(variation.amount)),
-          image: {
-            img: files.variationImages[index]
-              ? files.variationImages[index].originalname
-              : null,
-            imgDesc: sanitize(variation.imageDesc || null),
-          },
+    if (body.variations) {
+        body.variations.forEach((variation, index) => {
+            const variationImageFile = variationImages[index] || null;
+            variations.push({
+                size: sanitize(variation.size),
+                color: sanitize(variation.color),
+                amount: Number(sanitize(variation.amount)),
+                image: {
+                    img: variationImageFile ? variationImageFile.originalname : null,
+                    imgDesc: sanitize(variation.imgDesc || ""),
+                },
+            });
         });
-      });
     }
 
     let upSellItems = body.upSellItems ? sanitize(body.upSellItems) : [];
@@ -683,11 +710,12 @@ class ItemService {
     };
 
     // Video
+    const videoFile = files.find(file => file.fieldname === 'video');
     let video;
-    if (files.video) {
+    if (videoFile) {
       video = {
-        vid: files.video ? files.video[0].originalname : null,
-        vidDesc: sanitize(body.videoDesc || null),
+          vid: videoFile.originalname,
+          vidDesc: sanitize(body.videoDesc || null),
       };
 
       newItemData.video = video;
@@ -788,8 +816,8 @@ class ItemService {
       existingItem.status = body.status || existingItem.status;
 
       existingItem.price = body.price || existingItem.price;
-      existingItem.actionPrice = body.actionPrice || existingItem.actionPrice;
-      existingItem.upSellItems = body.upSellItems || existingItem.upSellItems;
+      existingItem.actionPrice = body.actionPrice || [];
+      existingItem.upSellItems = body.upSellItems || [];
       existingItem.crossSellItems =
         body.crossSellItems || existingItem.crossSellItems;
       existingItem.backorder.isAllowed =
@@ -1066,6 +1094,15 @@ class ItemService {
   }
 
   static mapItemDetails(item) {
+    // Prvo izvuci unikatne slike iz variations
+    const uniqueVariationImages = Array.from(
+      new Map(
+        item.variations
+          .filter(v => v.image && v.image.img) // ignoriši ako nema slike
+          .map(v => [v.image.img, { URL: v.image.img, Opis: v.image.imgDesc }])
+      ).values()
+    );
+  
     return {
       ID: { value: item._id },
       Naziv: { value: item.title },
@@ -1079,10 +1116,7 @@ class ItemService {
           URL: item.featureImage.img,
           Opis: item.featureImage.imgDesc,
         },
-        Slike: item.variations.map((variation) => ({
-          URL: variation.image.img,
-          Opis: variation.image.imgDesc,
-        })),
+        Slike: uniqueVariationImages
       },
       Video: {
         URL: item.video?.vid || "",
@@ -1094,7 +1128,9 @@ class ItemService {
       Backorder: {
         Dozvoljeno: item.backorder.isAllowed,
       },
-      Varijacije: item.variations.map((variation) => ({
+      Varijacije: [...item.variations]
+      .sort((a, b) => a.color.localeCompare(b.color)) // ili neka druga logika
+      .map((variation) => ({
         ID: variation._id,
         Veličina: variation.size,
         Boja: variation.color,
@@ -1119,6 +1155,7 @@ class ItemService {
       "Lista Želja": item.wishlist
     };
   }
+  
 
   static mapItemDetailsForAdmin(item) {
     return {

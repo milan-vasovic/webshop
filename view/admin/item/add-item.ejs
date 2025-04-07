@@ -175,7 +175,7 @@
       <div class="main-form__group" id="statusContainer">
         <label class="main-form__label">Status:</label>
         <% 
-          const allStatuses = ["action", "featured", "empty", "normal", "partnership"];
+          const allStatuses = ["normal", "featured", "empty", "action", "partnership"];
           let selectedStatuses = [];
           if (existingData && existingData.Status) {
             if (Array.isArray(existingData.Status.value)) {
@@ -223,8 +223,8 @@
             <div class="variation dynamic-group">
               <label for="variationSize<%= index %>" class="main-form__label">Veličina:</label>
               <select id="variationSize<%= index %>" name="variations[<%= index %>][size]" class="main-form__select" required>
-                <% ["XS", "S", "M", "L", "XL", "2XL", "3XL", "4XL", "S/M", "M/L", "L/XL", "XL/2XL", "Uni"].forEach(size => { %>
-                  <option value="<%= size %>" <%= size === variation.Veličina ? "selected" : "" %>><%= size %></option>
+                <% ["XS", "S", "M", "L", "XL", "2XL", "3XL", "4XL", "S/M", "M/L", "L/XL", "XL/2XL", "2XL/3XL", "3XL/4XL", "Uni", "26","27","28","29","30","31","32","33","34","35"].forEach(size => { %>
+                  <option value="<%= String(size) %>" <%= size === variation.Veličina ? "selected" : "" %>><%= size %></option>
                 <% }) %>
               </select>
         
@@ -251,8 +251,8 @@
           <div class="variation dynamic-group">
             <label for="variationSize0" class="main-form__label">Veličina:</label>
             <select id="variationSize0" name="variations[0][size]" class="main-form__select" required>
-              <% ["XS", "S", "M", "L", "XL", "2XL", "3XL", "4XL", "S/M", "M/L", "L/XL", "XL/2XL", "Uni"].forEach(size => { %>
-                <option value="<%= size %>"><%= size %></option>
+              <% ["XS", "S", "M", "L", "XL", "2XL", "3XL", "4XL", "S/M", "M/L", "L/XL", "XL/2XL", "2XL/3XL", "3XL/4XL", "Uni", "26","27","28","29","30","31","32","33","34","35"].forEach(size => { %>
+                <option value="<%= String(size) %>"><%= size %></option>
               <% }) %>
             </select>
         
@@ -316,7 +316,7 @@
           <% existingData["CrossSell Artikli"].forEach((item, index) => { %>
             <div class="dynamic-group">
               <label class="main-form__label" for="crossSellItems<%= index %>">Odaberite artikal:</label>
-              <select id="crossSellItems<%= index %>" name="crossSellItems[]" class="main-form__select" required>
+              <select id="crossSellItems<%= index %>" name="crossSellItems[]" class="main-form__select" <% if (editing ) { %>required<% } %>>
                 <option value="<%= item.ID %>" selected><%= item.Naziv %></option>
                 <% allCrosselItems.forEach(optionItem => { %>
                   <option value="<%= optionItem.ID.value %>" <%= optionItem.ID.value === item.ID.value ? 'selected' : '' %>><%= optionItem.Naziv.value %></option>
@@ -328,7 +328,7 @@
         <% } else { %>
           <div class="dynamic-group">
             <label class="main-form__label" for="crossSellItems0">Odaberite artikal:</label>
-            <select id="crossSellItems0" name="crossSellItems[]" class="main-form__select" required>
+            <select id="crossSellItems0" name="crossSellItems[]" class="main-form__select" <% if (editing ) { %>required<% } %>>
               <% allCrosselItems.forEach(item => { %>
                 <option value="<%= item.ID.value %>"><%= item.Naziv.value %></option>
               <% }) %>

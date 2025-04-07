@@ -44,7 +44,13 @@ router.post('/kontaktiranje', [
         .notEmpty().withMessage("Poruka je obavezna.")
         .isLength({ min: 10, max: 1000 }).withMessage("Poruka mora imati između 10 i 1000 karaktera.")
         .customSanitizer((value) => sanitizeHtml(value, { allowedTags: [], allowedAttributes: {} })),
-    
+    body('acceptance')
+        .custom((value) => {
+        if (!value) {
+            throw new Error('Morate prihvatiti uslove.');
+        }
+        return true;
+        }),
     body("honeypot")
         .custom((value) => {
         if (value) {

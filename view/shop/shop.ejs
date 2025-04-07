@@ -6,11 +6,9 @@
 <section class="main__container">
     <h1 class="main__title"><%= pageTitle %></h1>
     
-    <!-- Wrapper za shop layout -->
     <div class="column-row__container">
-        <!-- Lijevi dio: Glavna sekcija sa artiklima -->
         <div class="left__container">
-            <!-- Pretraga -->
+            <!-- Search -->
             <div>
                 <form class="width-100 flex flex-row" action="/prodavnica/pretraga" method="post">
                     <div class="main-form__group">
@@ -22,8 +20,7 @@
                     <button type="submit" class="btn-secondary">Pretraga</button>
                 </form>
             </div>
-            
-            <!-- Istaknuti Artikli -->
+            <!-- Featured Items -->
             <% if (shop["Istaknuti Artikli"] && shop["Istaknuti Artikli"].length > 0) { %>
                 <div>
                     <h1><a href="/prodavnica/istaknuto">Istaknuto:</a></h1>
@@ -43,10 +40,11 @@
                             }) %>
                         <% }) %>
                     </div>
+                    
                 </div>
             <% } %>
             
-            <!-- Artikli na Akciji -->
+            <!-- Items on Action -->
             <% if (shop["Artikli Na Akciji"] && shop["Artikli Na Akciji"].length > 0) { %>
                 <div>
                     <h1><a href="/prodavnica/akcija">Artikli na Akciji:</a></h1>
@@ -69,7 +67,7 @@
                 </div>
             <% } %>
             
-            <!-- Artikli Po Kategorijama -->
+            <!-- Items by category -->
             <% if (shop["Artikli Po Kategorijama"] && shop["Artikli Po Kategorijama"].length > 0) { %>
                 <div>
                     <% shop["Artikli Po Kategorijama"].forEach(item => { %>
@@ -94,7 +92,7 @@
                 </div>
             <% } %>
             
-            <!-- Ostali Artikli -->
+            <!-- All items that are showed on category, tag and search cases -->
             <% if (shop.Artikli && shop.Artikli.length > 0) { %>
                 <div>
                     <h1>Ostali Artikli:</h1>
@@ -114,6 +112,12 @@
                             }) %>
                         <% }) %>
                     </div>
+                    <%- include('../include/pagination.ejs', {
+                        currentPage: currentPage,
+                        totalPages: totalPages,
+                        basePath: basePath
+                      }) %>
+                      
                 </div>
             <% } %>
         </div>

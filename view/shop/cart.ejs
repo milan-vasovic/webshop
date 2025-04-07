@@ -2,11 +2,11 @@
 <link rel="stylesheet" href="/css/table.css">
 <%- include('../include/navigation.ejs') %>
 
-<section class="flex flex-column main__container">
+<section class="main__container">
     <h1 class="main__title"><%= pageTitle %></h1>
     <div class="flex flex-column width-100" style="gap: var(--grid-gap-medium);">
         <% if (cart.length > 0) { %>
-            <div class="flex flex-row flex-between align-center width-100" style="margin-bottom: 1rem;">
+            <div class="flex flex-row  width-100" >
                 <a class="btn-primary" href="/prodavnica/porudzbina">Nastavite Sa Poručivanjem</a>
                 <form action="/prodavnica/korpa-praznjenje" method="POST" class="flex flex-row align-center">
                     <input name="honeypot" type="hidden">

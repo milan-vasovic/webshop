@@ -14,17 +14,18 @@ class ShopService {
 
             const tags = await ItemService.findAllTags();
 
-            const featuredItems = await ItemService.findFeaturedItems();
+            const featuredItems = await ItemService.findFeaturedItems(null, null, 5);
 
-            const actionItems = await ItemService.findActionItems();
+            const actionItems = await ItemService.findActionItems(null, null, 5);
 
             const itemsByCategory = await Promise.all(
                 categories.Kategorije.map(async (category) => {
-                    const items = await ItemService.findItemsByCategory(category);
+                    const items = await ItemService.findItemsByCategory(category, null, null, 5);
 
                     return {
                         Kategorija: { value: category },
-                        Artikli: items,
+                        Artikli: items.items,
+                        Ukupno: items.totalCount,
                     };
                 })
             );
@@ -50,13 +51,15 @@ class ShopService {
     * @param {string} category - The category to filter items by.
     * @returns {Promise<Object>} - A promise that resolves to an object containing items by category and their tags.
     */
-    static async findItemsByCategory(category) {
+    static async findItemsByCategory(category, page = 1, limit = 10) {
         try {
-            const featuredCategoryItems = await ItemService.findFeaturedItems(category)
+            const skip = (page - 1) * limit;
+            console.log("Preskociti: " +skip)
+            const featuredCategoryItems = await ItemService.findFeaturedItems(category, null, limit, skip);
 
-            const actionedCategoryItems = await ItemService.findActionItems(category);
+            const actionedCategoryItems = await ItemService.findActionItems(category, null, limit, skip);
                 
-            const otherCategoryItems = await ItemService.findItemsByCategory(category, null, ['featured', 'action'])
+            const otherCategoryItems = await ItemService.findItemsByCategory(category, null, ['featured', 'action'], limit, skip);
 
             const tags = await ItemService.findAllTags(category);
             
@@ -64,7 +67,8 @@ class ShopService {
                 Tagovi: { value: tags.Tagovi },
                 "Istaknuti Artikli": featuredCategoryItems,
                 "Artikli Na Akciji": actionedCategoryItems,
-                Artikli: otherCategoryItems,
+                Artikli: otherCategoryItems.items,
+                Ukupno: otherCategoryItems.totalCount,
             };
     
             return result;
@@ -80,13 +84,14 @@ class ShopService {
     * @param {Array<string>} tags - The tags to filter items by.
     * @returns {Promise<Array>} - A promise that resolves to an array of items.
     */
-    static async findItemsByTags(tag) {
+    static async findItemsByTags(tag, page = 1, limit = 10) {
         try {
-            const featuredTagItems = await ItemService.findFeaturedItems(null, tag);
+            const skip = (page - 1) * limit;
+            const featuredTagItems = await ItemService.findFeaturedItems(null, tag, limit, skip);
 
-            const actionedTagItems = await ItemService.findActionItems(null, tag);
+            const actionedTagItems = await ItemService.findActionItems(null, tag, limit, skip);
                 
-            const otherTagItems = await ItemService.findItemsByTag(tag, null, ['featured', 'action']);
+            const otherTagItems = await ItemService.findItemsByTag(tag, null, ['featured', 'action'], limit, skip);
 
             const categories = await ItemService.findAllCategories(tag);
 
@@ -94,7 +99,8 @@ class ShopService {
                 Kategorije: { value: categories.Kategorije },
                 "Istaknuti Artikli": featuredTagItems,
                 "Artikli Na Akciji": actionedTagItems,
-                Artikli: otherTagItems,
+                Artikli: otherTagItems.items,
+                Ukupno: otherTagItems.totalCount,
             };
     
             return result;
@@ -122,10 +128,11 @@ class ShopService {
                 ],
             };
         
-            const items = await ItemService.findItemsBySearch(filter);
+            const items = await ItemService.findItemsBySearch(filter, limit, skip);
         
             const result = {
-                Artikli: items
+                Artikli: items.items,
+                Ukupno: items.totalCount,
             };
 
             return result
@@ -150,9 +157,10 @@ class ShopService {
         }
     }
 
-    static async findFeaturedItems() {
+    static async findFeaturedItems(page = 1, limit = 10) {
         try {
-            const items = await ItemService.findFeaturedItems();
+            const skip = (page - 1) * limit;
+            const items = await ItemService.findFeaturedItems(null, null, limit, skip);
 
             if (!items) {
                 ErrorHelper.throwNotFoundError("Artikli");
@@ -188,9 +196,10 @@ class ShopService {
         }
     }
 
-    static async findActionedItems() {
+    static async findActionedItems(page = 1, limit = 10) {
         try {
-            const items = await ItemService.findActionItems();
+            const skip = (page - 1) * limit;
+            const items = await ItemService.findActionItems(null, null, limit, skip);
 
             if (!items) {
                 ErrorHelper.throwNotFoundError("Artikli");

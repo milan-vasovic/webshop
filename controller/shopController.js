@@ -28,14 +28,21 @@ async function getShopPage(req, res, next) {
 
 async function getShopPageByCategory(req, res, next) {
     try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = 3;
         const category = req.params.category ? req.params.category : "";
 
-        const shop = await ShopService.findItemsByCategory(category);
+        const shop = await ShopService.findItemsByCategory(category, page, limit);
+        const totalPages = Math.ceil(shop.Ukupno / limit);
 
+        console.log(shop);
         return res.render("shop/shop", {
             path: "/prodavnica",
-            pageTitle: `Prodavnica: ${category}`,
+            pageTitle: `Prodavnica Kategorija: ${category}`,
             shop: shop,
+            currentPage: page,
+            totalPages: totalPages,
+            basePath: `/prodavnica/kategorija/${category}`,
         })
 
     } catch (error) {
@@ -45,14 +52,20 @@ async function getShopPageByCategory(req, res, next) {
 
 async function getShopPageByTag(req, res, next) {
     try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = 10;
         const tag = req.params.tag ? req.params.tag : "";
 
-        const shop = await ShopService.findItemsByTags(tag);
+        const shop = await ShopService.findItemsByTags(tag, page, limit);
+        const totalPages = Math.ceil(shop.Ukupno / limit);
 
         return res.render("shop/shop", {
             path: "/prodavnica",
             pageTitle: `Prodavnica ${tag}`,
             shop: shop,
+            currentPage: page,
+            totalPages: totalPages,
+            basePath: `/prodavnica/oznaka/${tag}`,
         })
 
     } catch (error) {
@@ -62,14 +75,21 @@ async function getShopPageByTag(req, res, next) {
 
 async function getShopPageBySearch(req, res, next) {
     try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = 10;
         const search = req.params.search ? req.params.search : "";
 
         const param = sanitize(search)
-        const shop = await ShopService.findItemsBySearch(param);
+        const shop = await ShopService.findItemsBySearch(param, page, limit);
+        const totalPages = Math.ceil(shop.Ukupno / limit);
+
         return res.render("shop/shop", {
             path: "/prodavnica",
             pageTitle: `Prodavnica ${search}`,
             shop: shop,
+            currentPage: page,
+            totalPages: totalPages,
+            basePath: `/prodavnica/pretraga/${param}`,
         })
 
     } catch (error) {
@@ -79,12 +99,18 @@ async function getShopPageBySearch(req, res, next) {
 
 async function getFeautredShopPage(req, res, next) {
     try {
-        const shop = await ShopService.findFeaturedItems();
+        const page = parseInt(req.query.page) || 1;
+        const limit = 10;
+        const shop = await ShopService.findFeaturedItems(page, limit);
+        const totalPages = Math.ceil(shop.Ukupno / limit);
 
         return res.render("shop/shop", {
             path: "/prodavnica",
             pageTitle: "Prodavnica",
             shop: shop,
+            currentPage: page,
+            totalPages: totalPages,
+            basePath: `/prodavnica/istaknuto}`,
         })
     } catch (error) {
         next(error);
@@ -93,12 +119,18 @@ async function getFeautredShopPage(req, res, next) {
 
 async function getActionedShopPage(req, res, next) {
     try {
-        const shop = await ShopService.findActionedItems();
+        const page = parseInt(req.query.page) || 1;
+        const limit = 10;
+        const shop = await ShopService.findActionedItems(page, limit);
+        const totalPages = Math.ceil(shop.Ukupno / limit);
 
         return res.render("shop/shop", {
             path: "/prodavnica",
             pageTitle: "Prodavnica",
             shop: shop,
+            currentPage: page,
+            totalPages: totalPages,
+            basePath: `/prodavnica/akcija}`,
         })
 
     } catch (error) {

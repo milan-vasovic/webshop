@@ -18,6 +18,8 @@ async function getHomePage(req, res, next) {
     try {
         const featuredItems = await ItemService.findFeaturedItems(null,null, 5);
 
+        const actionItems = await ItemService.findActionItems(null,null, 5);
+
         const forumPosts = await ForumService.findPosts(null,5);
 
         return res.render("leanding/leanding-page", {
@@ -26,6 +28,7 @@ async function getHomePage(req, res, next) {
             pageKeyWords: "Pocetna, Naslovna, Početna, Glavna, Home",
             pageDescription: "Najbolja online prodavnica, najveći izbor proizvoda, najbolje cene, najbolji kvalitet, najbolje usluge. Sve na jednom mestu, samo kod nas!",
             featuredItems: featuredItems,
+            actionItems: actionItems,
             forumPosts: forumPosts
         })
 

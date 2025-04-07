@@ -5,8 +5,6 @@ export default (req, res, next) => {
         return res.redirect(`/prijava?redirectTo=${encodeURIComponent(req.originalUrl)}`);
     }
 
-    console.log(req.session.user.confirmed);
-
     if (req.session.user?.status && !req.session.user.status.includes("active") || !req.session.user.confirmed) {
         return authController.postLogout(req, res, next);
     }
