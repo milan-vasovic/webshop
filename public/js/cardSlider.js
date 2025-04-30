@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
   
     const isMobile = window.innerWidth < 768;
     const gap = isMobile ? 20 : (containerWidth - (badgeCount * badgeWidth)) / badgeCount;
-    const speed = 1; // px po frame-u
+    const speed = 0.5; // px po frame-u
   
     let positions = [];
     let currentLeft = 0;
@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
           badge.style.transform = `translateX(${positions[index]}px)`;
   
           requestAnimationFrame(() => {
-            badge.style.transition = 'transform 0.3s linear';
+            badge.style.transition = 'transform linear';
           });
         }
       });

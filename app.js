@@ -88,6 +88,7 @@ app.use(csrfSynchronisedProtection);
 app.use((req, res, next) => {
   res.locals.isAuthenticated = req.session.isLoggedIn;
   res.locals.role = req.session?.user?.role || "guest";
+  res.locals.cartItemCount = req.session.cartItemCount || 0;
   res.locals.csrfToken = req.csrfToken();
   next();
 });
@@ -99,6 +100,7 @@ app.use(async (req, res, next) => {
       req.session.cart = [];
     }
     req.session.cart = req.session.cart;
+    req.session.cartItemCount = req.session.cart.length;
     req.session.user = null;
     return next();
   }
@@ -112,6 +114,7 @@ app.use(async (req, res, next) => {
     } else {
       req.session.guest = false;
       req.session.user = user;
+      req.session.cartItemCount = user.cart.length;
     }
   } catch (error) {
     console.error("Greška pri dobavljanju korisnika:", error);

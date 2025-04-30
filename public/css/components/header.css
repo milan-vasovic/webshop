@@ -1,4 +1,4 @@
-/* === header.css (refactored with new z-index levels) === */
+/* === header.css (refactored with z-index levels and mobile icons) === */
 
 /* Backdrop for mobile menu overlay */
 .backdrop {
@@ -32,6 +32,63 @@
   position: sticky;
   top: 0;
   z-index: var(--z-header);
+}
+
+/* Mobile cart icon + logo container */
+.mobile-nav__icons {
+  display: flex;
+  align-items: center;
+  gap: var(--grid-gap-medium);
+  margin-left: auto;
+}
+
+.mobile-logo img {
+  height: 40px;
+  width: auto;
+}
+
+.cart-icon {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  color: var(--white-color);
+  text-decoration: none;
+}
+
+.cart-badge {
+  position: absolute;
+  top: -6px;
+  right: -10px;
+  background: red;
+  color: white;
+  font-size: 0.75rem;
+  font-weight: bold;
+  border-radius: 50%;
+  padding: 2px 6px;
+  line-height: 1;
+  z-index: 1;
+}
+
+.cart-icon,
+.main-header__item a {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  color: var(--white-color);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+.cart-icon:hover,
+.main-header__item a:hover .material-symbols-outlined {
+  color: var(--accent-color);
+}
+
+/* Hide on desktop */
+@media (min-width: 768px) {
+  .mobile-nav__icons {
+    display: none;
+  }
 }
 
 /* Button for opening mobile menu */
@@ -71,6 +128,8 @@
   color: var(--white-color);
   text-decoration: none;
   transition: color var(--transition-fast);
+  display: flex;
+  align-items: center;
 }
 .main-header__item a:hover,
 .main-header__item a.active {
@@ -121,7 +180,6 @@
 }
 
 /* === DROPDOWN SUPPORT === */
-
 .dropdown {
   position: relative;
 }
@@ -142,8 +200,6 @@
   font-size: 0.8rem;
   transition: transform var(--transition-fast);
 }
-
-/* Animacija na hover */
 .dropdown:hover .dropdown__arrow {
   transform: rotate(180deg);
 }
@@ -184,4 +240,52 @@
   .backdrop {
     display: none;
   }
+}
+
+/* === LANDSCAPE FIX === */
+@media (max-width: 767px) and (orientation: landscape) {
+  .main-header {
+    height: 3.5rem; /* povećana visina */
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    align-items: center;
+  }
+
+  .mobile-logo img {
+    height: 32px;
+  }
+
+  .cart-icon {
+    font-size: 1.8rem;
+  }
+
+  .cart-badge {
+    top: -4px;
+    right: -8px;
+    font-size: 0.65rem;
+    padding: 1px 5px;
+  }
+}
+
+/* === DESKTOP: Bedž za korpu i hover === */
+.main-header__item .material-symbols-outlined:hover {
+  color: var(--accent-color);
+}
+
+.main-header__item {
+  position: relative;
+}
+
+.main-header__item .cart-badge {
+  position: absolute;
+  top: -6px;
+  right: -10px;
+  background: red;
+  color: white;
+  font-size: 0.75rem;
+  font-weight: bold;
+  border-radius: 50%;
+  padding: 2px 6px;
+  line-height: 1;
+  z-index: 2;
 }

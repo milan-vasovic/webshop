@@ -2,59 +2,46 @@ document.addEventListener('DOMContentLoaded', () => {
   const container = document.querySelector('.testimonial-track');
   const cards = Array.from(container.querySelectorAll('.card__container--testimonial'));
 
-  const containerWidth = container.offsetWidth;
-  const cardWidth = cards[0].offsetWidth;
-  const cardCount = cards.length;
+  const speed = 0.5;
+  const gap = parseFloat(getComputedStyle(container).gap) || 20;
 
-  // Dinamički gap
-  const totalCardWidth = cardWidth * cardCount;
-  const availableSpace = containerWidth - totalCardWidth;
-  const gap = cardCount > 0 ? availableSpace / (cardCount - 1) : 20;
-
-  const speed = 1; // px po frame-u
-
+  container.style.position = 'relative';
   let positions = [];
-  let currentLeft = 0 + gap;
-  console.log(`Current left: ${currentLeft}`);
-  console.log(`Container width: ${containerWidth}\n`);
 
-  // Inicijalno rasporedi
-  cards.forEach(card => {
-    card.style.transform = `translateX(${currentLeft}px)`;
-    card.style.transition = 'transform 0.3s linear';
-    positions.push(currentLeft);
-    console.log(`Card position: ${currentLeft}`);
-    console.log(`Positions: ${positions}`);
-    currentLeft += cardWidth + gap;
+  // Inicijalna postavka
+  let currentLeft = 0;
+  cards.forEach((card, i) => {
+    card.style.position = 'absolute';
+    card.style.left = `${currentLeft}px`;
+    positions[i] = currentLeft;
+    currentLeft += card.offsetWidth + gap;
   });
 
-  function animateCards() {
-    // Prvo pomeraj sve kartice
+  function animate() {
     for (let i = 0; i < cards.length; i++) {
       positions[i] -= speed;
-      cards[i].style.transform = `translateX(${positions[i]}px)`;
+      cards[i].style.left = `${positions[i]}px`;
     }
 
-    // Sada proveri samo NAJLEVLJU
-    const minPosition = Math.min(...positions);
-    console.log(`Min position: ${minPosition}`);
-    const minIndex = positions.indexOf(minPosition);
-    console.log(`Min index: ${minIndex}`);
+    for (let i = 0; i < cards.length; i++) {
+      if (positions[i] + cards[i].offsetWidth < 0) {
+        // Pronađi krajnju desnu poziciju
+        let maxRight = 0;
+        for (let j = 0; j < positions.length; j++) {
+          if (j !== i) {
+            const rightEdge = positions[j] + cards[j].offsetWidth;
+            if (rightEdge > maxRight) maxRight = rightEdge;
+          }
+        }
 
-    if (positions[minIndex] + cardWidth < 0) {
-      // === Samo nju premestamo iza ===
-      cards[minIndex].style.transition = 'none';
-      
-      positions[minIndex] = containerWidth + cardWidth + gap*2;
-      cards[minIndex].style.transform = `translateX(${positions[minIndex]}px)`;
-
-      requestAnimationFrame(() => {
-        cards[minIndex].style.transition = 'transform 0.3s linear';
-      });
+        // Postavi karticu tačno iza najdesnije
+        positions[i] = maxRight + gap;
+        cards[i].style.left = `${positions[i]}px`;
+      }
     }
 
-    requestAnimationFrame(animateCards);
+    requestAnimationFrame(animate);
   }
 
-  animateCards();
+  animate();
 });

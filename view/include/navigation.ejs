@@ -50,7 +50,18 @@
 
 <header class="main-header z-header">
   <button id="side-menu-toggle" class="btn-primary" aria-label="Otvori meni">☰</button>
-
+  <div class="mobile-nav__icons">
+    <a href="/prodavnica/korpa" class="cart-icon">
+      <span class="material-symbols-outlined">shopping_bag</span>
+      <% if (cartItemCount > 0) { %>
+        <span class="cart-badge"><%= cartItemCount %></span>
+      <% } %>
+    </a>
+    <a href="/" class="mobile-logo">
+      <img src="/images/tophelanke_logo.png" alt="Logo" />
+    </a>
+  </div>
+  
   <nav class="main-header__nav">
     <ul class="main-header__item-list">
       <li class="main-header__item"><a href="/" class="<%= path === '/' ? 'active' : '' %>">Početna</a></li>
@@ -105,7 +116,14 @@
     </ul>
 
     <ul class="main-header__item-list">
-      <li class="main-header__item"><a href="/prodavnica/korpa" class="<%= path === '/prodavnica/korpa' ? 'active' : '' %>">Korpa</a></li>
+      <li class="main-header__item">
+        <a href="/prodavnica/korpa" class="<%= path === '/prodavnica/korpa' ? 'active' : '' %>">
+          Korpa <span class="material-symbols-outlined">shopping_bag</span>
+          <% if (cartItemCount > 0) { %>
+            <span class="cart-badge"><%= cartItemCount %></span>
+          <% } %>
+        </a>
+      </li>
       <% if (!isAuthenticated) { %>
         <li class="main-header__item"><a href="/prijava" class="<%= path === '/prijava' ? 'active' : '' %>">Prijava</a></li>
         <li class="main-header__item"><a href="/registracija" class="<%= path === '/registracija' ? 'active' : '' %>">Registracija</a></li>

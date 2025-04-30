@@ -1,6 +1,6 @@
-/* === testimonial-slider.css === */
+/* === testimonial-slider.css (refaktor) === */
 
-/* Main slider container */
+/* Slider wrapper */
 .testimonial-slider {
   position: relative;
   overflow: hidden;
@@ -8,46 +8,42 @@
   margin: var(--margin-big) auto;
 }
 
-/* Track with testimonials */
+/* Sliding track */
 .testimonial-track {
-  display: flex;
-  margin: 1rem;
-  gap: var(--grid-gap-medium);
-  transition: transform 0.5s ease-in-out;
-  will-change: transform;
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 450px;
 }
 
-/* Single card inside the track */
-.testimonial-slider .card__container--testimonial {
-  flex: 0 0 auto;
-  width: 80%;
-  max-width: 350px;
-  scroll-snap-align: center;
-}
-
-/* Centered testimonial content */
+/* Testimonial card */
 .card__container--testimonial {
+  position: absolute;
+  top: 0;
+  width: 320px; /* fiksna širina za sve */
+  height: 400px;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   align-items: center;
-  justify-content: space-evenly;
-  background: var(--white-color);
+  background-color: var(--white-color);
   border-radius: var(--border-radius-normal);
   box-shadow: 0 4px 6px var(--shadow-box-color);
   padding: var(--padding-normal);
   text-align: center;
+  transition: transform linear;
 }
 
 /* Image */
 .testimonial__image img {
-  width: 80px;
-  height: 80px;
+  width: 100px;
+  height: 100px;
   border-radius: 50%;
   object-fit: cover;
   margin-bottom: var(--margin-small);
 }
 
-/* Name */
+/* Name, Stars, Text */
 .testimonial__name {
   font-size: var(--font-size-large);
   font-weight: var(--font-weight-bold);
@@ -55,7 +51,6 @@
   margin-bottom: var(--margin-small);
 }
 
-/* Stars */
 .testimonial__stars {
   display: flex;
   justify-content: center;
@@ -71,7 +66,6 @@
   color: var(--accent-color);
 }
 
-/* Text */
 .testimonial__text {
   font-size: var(--font-size-base);
   color: var(--text-color);
@@ -105,17 +99,4 @@
 
 .testimonial-btn--next {
   right: 0.5rem;
-}
-
-/* Responsive: adjust card width */
-@media (min-width: 768px) {
-  .testimonial-slider .card__container--testimonial {
-    width: 45%;
-  }
-}
-
-@media (min-width: 1024px) {
-  .testimonial-slider .card__container--testimonial {
-    width: 30%;
-  }
 }
