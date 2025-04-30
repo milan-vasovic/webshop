@@ -2,16 +2,16 @@
 
 User-agent: *
 Allow: /
-Allow: /proandji
-Allow: /auth
 Allow: /prodavnica
 Allow: /forum
 Allow: /kontakt
 Allow: /uslovi-koriscenja
 Allow: /politika-privatnosti
 Allow: /o-nama
+Allow: /partnerstvo
 
 # Blokiraj pristup određenim delovima sajta
+Disallow: /auth
 Disallow: /admin
 Disallow: /korinsik
 

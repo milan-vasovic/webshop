@@ -1,9 +1,7 @@
 <%- include('../include/head.ejs') %>
-<link rel="stylesheet" href="/css/form.css">
-<link rel="stylesheet" href="/css/contact.css">
 <%- include('../include/navigation.ejs') %>
 
-<section class="flex flex-column main__container">
+<section class="container main__container">
     <h1 class="main__title"><%= pageTitle %></h1>
     <div class="width-100">
         <h3>Za sve informacije, pitanja i nedoumice</h3>
@@ -46,7 +44,7 @@
                     <p>
                         Prihvatate <a class="main__link" href="/uslovi-koriscenja">Uslove Korišćenja</a> i <a class="main__link" href="/politika-privatnosti">Politiku Privatnosti</a>
                     </p>
-                    <input class="main-form__input" id="acceptance" name="acceptance" type="checkbox" <% if (existingData) { %>value='<%= existingData.acceptance %>'<% } %>>
+                    <input class="main-form__input" id="acceptance" name="acceptance" type="checkbox" required>
                 </div>
                 <input class="main-form__input" type="hidden" name="CSRFToken" value="<%= csrfToken %>" required>
                 <input name="honeypot" type="hidden">

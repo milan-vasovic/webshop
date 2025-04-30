@@ -1,8 +1,7 @@
 <%- include('../../include/head.ejs') %>
-<link rel="stylesheet" href="/css/form.css">
 <%- include('../../include/navigation.ejs') %>
 
-<section class="main__container">
+<section class="container main__container">
   <div class="main-form__container">
     <h1 class="main-form__title"><%= pageTitle %></h1>
     
@@ -175,7 +174,7 @@
       <div class="main-form__group" id="statusContainer">
         <label class="main-form__label">Status:</label>
         <% 
-          const allStatuses = ["normal", "featured", "empty", "action", "partnership"];
+          const allStatuses = ["normal", "featured", "empty", "action", "partnership","not-published"];
           let selectedStatuses = [];
           if (existingData && existingData.Status) {
             if (Array.isArray(existingData.Status.value)) {
@@ -223,7 +222,7 @@
             <div class="variation dynamic-group">
               <label for="variationSize<%= index %>" class="main-form__label">Veličina:</label>
               <select id="variationSize<%= index %>" name="variations[<%= index %>][size]" class="main-form__select" required>
-                <% ["XS", "S", "M", "L", "XL", "2XL", "3XL", "4XL", "S/M", "M/L", "L/XL", "XL/2XL", "2XL/3XL", "3XL/4XL", "Uni", "26","27","28","29","30","31","32","33","34","35"].forEach(size => { %>
+                <% ["XS", "S", "M", "L", "XL", "2XL", "3XL", "4XL", "XS/S", "S/M", "M/L", "L/XL", "XL/2XL", "2XL/3XL", "3XL/4XL", "Uni", "26","27","28","29","30","31","32","33","34","35"].forEach(size => { %>
                   <option value="<%= String(size) %>" <%= size === variation.Veličina ? "selected" : "" %>><%= size %></option>
                 <% }) %>
               </select>
@@ -251,7 +250,7 @@
           <div class="variation dynamic-group">
             <label for="variationSize0" class="main-form__label">Veličina:</label>
             <select id="variationSize0" name="variations[0][size]" class="main-form__select" required>
-              <% ["XS", "S", "M", "L", "XL", "2XL", "3XL", "4XL", "S/M", "M/L", "L/XL", "XL/2XL", "2XL/3XL", "3XL/4XL", "Uni", "26","27","28","29","30","31","32","33","34","35"].forEach(size => { %>
+              <% ["XS", "S", "M", "L", "XL", "2XL", "3XL", "4XL","XS/S", "S/M", "M/L", "L/XL", "XL/2XL", "2XL/3XL", "3XL/4XL", "Uni", "26","27","28","29","30","31","32","33","34","35"].forEach(size => { %>
                 <option value="<%= String(size) %>"><%= size %></option>
               <% }) %>
             </select>

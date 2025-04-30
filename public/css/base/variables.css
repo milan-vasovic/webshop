@@ -1,0 +1,70 @@
+/* === variables.css === */
+:root {
+  /* === Colors === */
+  --primary-color: #1c1f26;
+  --secondary-color: #d1d1d1;
+  --accent-color: #e62485; /* #01b3e9; */
+  --accent-hover-color: #ff88c4;
+  --danger-color: #b00020;
+  --neutral-color: #e0e0e0;
+  --neutral-color-light: #fafafa;
+  --white-color: #ffffff;
+  --black-color: #000000;
+  --title-color: #1c1f26;
+  --text-color: #4a4a4a;
+  --primary-text-color: #1a1a1a;
+  --white-text-color: #ffffff;
+  --black-text-color: #000000;
+  --hover-color: #eeeeee;
+
+  /* === Borders & Shadows === */
+  --border-color: #d1d1d1;
+  --shadow-box-color: rgba(0, 0, 0, 0.1);
+  --shadow-hover-color: rgba(0, 0, 0, 0.2);
+  --border-radius-small: 4px;
+  --border-radius-normal: 8px;
+  --border-radius-large: 12px;
+
+  /* === Typography === */
+  --font-family: "Verdana", Helvetica, Arial, sans-serif;
+  --font-size-extra-small: 0.75rem;
+  --font-size-small: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-large: 1.25rem;
+  --font-size-extra-large: 2rem;
+  --font-weight-regular: 400;
+  --font-weight-bold: 700;
+
+  /* === Spacing === */
+  --padding-small: 0.3rem;
+  --padding-normal: 1rem;
+  --padding-big: 1.5rem;
+  --margin-small: 0.5rem;
+  --margin-normal: 1rem;
+  --margin-big: 4rem;
+
+  /* === Layout === */
+  --grid-gap-small: 0.2rem;
+  --grid-gap-medium: 1rem;
+  --grid-gap-large: 1.5rem;
+  --header-footer-height: 7vh;
+
+  /* === Animations === */
+  --transition-fast: 0.2s ease;
+  --transition-medium: 0.4s ease;
+  --transition-slow: 0.6s ease;
+
+  /* === Breakpoints === */
+  --breakpoint-sm: 576px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 992px;
+  --breakpoint-xl: 1200px;
+
+  --z-footer: 100;          /* najniži, uvek u pozadini */
+  --z-header: 900;          /* sticky header */
+  --z-dropdown: 1000;       /* padajući meni iz headera */
+  --z-backdrop: 1100;       /* pozadina za mobilni meni, modale itd. */
+  --z-mobile-nav: 1200;     /* mobilni meni – mora biti iznad backdrop-a */
+  --z-modal: 1300;          /* modal dijalozi */
+  --z-overlay: 1400;        /* globalni overlay, npr. zoom slike */
+}

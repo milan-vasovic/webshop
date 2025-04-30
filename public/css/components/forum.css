@@ -1,0 +1,89 @@
+/* === blog-content.css === */
+
+.blog__content-container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--grid-gap-medium);
+    color: var(--text-color);
+    line-height: 1.7;
+    font-size: var(--font-size-base);
+  }
+  
+  .blog__content-container h1,
+  .blog__content-container h2,
+  .blog__content-container h3,
+  .blog__content-container h4 {
+    margin-top: var(--margin-normal);
+    margin-bottom: var(--margin-small);
+    line-height: 1.2;
+    color: var(--title-color);
+  }
+  
+  .blog__content-container h1 {
+    font-size: var(--font-size-xxl);
+    font-weight: var(--font-weight-bold);
+  }
+  
+  .blog__content-container h2 {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-bold);
+  }
+  
+  .blog__content-container h3 {
+    font-size: var(--font-size-large);
+    font-weight: var(--font-weight-semibold);
+  }
+  
+  .blog__content-container p {
+    margin-bottom: var(--margin-normal);
+    text-align: justify;
+  }
+  
+  .blog__content-container ul,
+  .blog__content-container ol {
+    margin: var(--margin-normal) 0;
+    padding-left: var(--padding-big);
+  }
+  
+  .blog__content-container ul li,
+  .blog__content-container ol li {
+    margin-bottom: var(--margin-small);
+    list-style-position: outside;
+  }
+  
+  .blog__content-container a {
+    color: var(--accent-color);
+    text-decoration: underline;
+  }
+  
+  .blog__content-container a:hover {
+    color: var(--accent-hover-color);
+    text-decoration: none;
+  }
+  
+  .blog__content-container em {
+    font-style: italic;
+  }
+  
+  .blog__content-container strong {
+    font-weight: var(--font-weight-bold);
+    color: var(--title-color);
+  }
+  
+  .blog__content-container img {
+    max-width: 100%;
+    height: auto;
+    margin: var(--margin-normal) 0;
+    border-radius: var(--border-radius-normal);
+    box-shadow: 0 2px 6px var(--shadow-box-color);
+    display: block;
+  }
+  
+  .blog__content-container blockquote {
+    border-left: 4px solid var(--accent-color);
+    padding-left: var(--padding-normal);
+    margin: var(--margin-normal) 0;
+    font-style: italic;
+    color: var(--text-color);
+  }
+  

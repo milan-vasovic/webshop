@@ -1,69 +1,65 @@
 <%- include('../include/head.ejs') %>
-    <link rel="stylesheet" href="/css/form.css">
-    <link rel="stylesheet" href="/css/contact.css">
-    <%- include('../include/navigation.ejs') %>
+<%- include('../include/navigation.ejs') %>
 
-        <section class="main__container">
-            <h1 class="main__title">
-                <%= pageTitle %>
-            </h1>
-            <div class="width-100">
-                <section>
-                    <p>
-                        Tophelanke je online prodavnica posvećena reklamiranju i prodaji
-                        savremene ženske garderobe. Naša ponuda uključuje <strong>helanke, farmerice, kupaće, pantalone, trenerke, fitness
-                        komplete, majice, šorceve </strong>i još mnogo toga.
-                    </p><br>     
-                    <p>
-                        Sa sedištem u Novom Sadu, naš cilj je da obezbedimo brzo
-                        i lako poručivanje, sigurnu kupovinu i vrhunsku uslugu.
-                    </p><br>               
-                    <p>
-                        Nudimo mogućnost <strong>povrata novca ili zamene, postexpress dostavu</strong>, te ogromnu paletu veličina, modela i
-                        boja kako bi svaka žena pronašla svoj savršen stil.
-                    </p>  
-                </section>
-                
-                <section>
-                    <h2>Benefiti kreiranja naloga</h2>
-                    <ul>
-                        <li>Lako poručivanje i brzo plaćanje.</li><br>
-                        <li>Mogućnost praćenja statusa i istorije porudžbina.</li><br>
-                        <li>Pravljenje liste želja. (wishlist)</li><br>
-                        <li>Dobijanje najnovijih informacija i ponuda putem newslettera.</li><br>
-                        <li>Personalizovana podrška i ekskluzivne akcije.</li>
-                    </ul>
-                </section>
-                       
-                <section>
-                    <h2>Pratite nas</h2>
-                    <br>
-                    <p>Budite u toku sa najnovijim trendovima i ponudama!</p>
-                    <a href="https://www.instagram.com/tophelanke021" target="_blank" rel="noopener">Instagram</a>
-                    <br>
-                    <a href="https://www.tiktok.com/@tophelanke021" target="_blank" rel="noopener">TikTok</a>
-                </section>
-            
-                <section>
-                    <h2>Naša misija</h2>
-                    <br>
-                    <p>
-                        Naša misija je da omogućimo ženama širom zemlje da uživaju u vrhunskom stilu uz pouzdanu i sigurnu
-                        online kupovinu. Kontinuirano radimo na unapređenju našeg sistema – od jednostavnog procesa
-                        poručivanja, preko praćenja narudžbina, do napredne administracije i kontrole kvaliteta.
-                    </p>
-                    <br>
-                    <p>
-                        Takođe, omogućavamo korisnicima da postanu partneri, čime se kreira dodatna vrednost kroz affiliate
-                        marketing, a na najvišem nivou partnerima nudimo personalizovane prodavnice unutar naše platforme.
-                    </p>
-                    <br>
-                    <p>
-                        Partneri se fokusiraju na prodaju, dok mi upravljamo logistikom, dostavom i finansijskim
-                        transakcijama.
-                    </p>
-                </section>            
-            </div>
-        </section>
+<section class="container main__container">
+  <h1 class="main__title"><%= pageTitle %></h1>
 
-        <%- include('../include/end.ejs') %>
+  <div class="width-100 flex flex-column gap-large">
+
+    <!-- Uvodna sekcija -->
+    <div class="section__block">
+      <p>
+        Tophelanke je online prodavnica posvećena reklamiranju i prodaji
+        savremene ženske garderobe. Naša ponuda uključuje 
+        <strong>helanke, farmerice, kupaće, pantalone, trenerke, fitness komplete, majice, šorceve</strong> i još mnogo toga.
+      </p>
+      <p>
+        Sa sedištem u Novom Sadu, naš cilj je da obezbedimo brzo i lako poručivanje, sigurnu kupovinu i vrhunsku uslugu.
+      </p>
+      <p>
+        Nudimo mogućnost <strong>povrata novca ili zamene, postexpress dostavu</strong>, te ogromnu paletu veličina, modela i boja
+        kako bi svaka žena pronašla svoj savršen stil.
+      </p>
+    </div>
+
+    <!-- Benefiti naloga -->
+    <div class="section__block">
+      <h2 class="main__subtitle">Benefiti kreiranja naloga</h2>
+      <ul class="list-disc">
+        <li>Lako poručivanje i brzo plaćanje.</li>
+        <li>Mogućnost praćenja statusa i istorije porudžbina.</li>
+        <li>Pravljenje liste želja (wishlist).</li>
+        <li>Dobijanje najnovijih informacija i ponuda putem newslettera.</li>
+        <li>Personalizovana podrška i ekskluzivne akcije.</li>
+      </ul>
+    </div>
+
+    <!-- Društvene mreže -->
+    <div class="section__block">
+      <h2 class="main__subtitle">Pratite nas</h2>
+      <p>Budite u toku sa najnovijim trendovima i ponudama!</p>
+      <a href="https://www.instagram.com/tophelanke021" target="_blank" rel="noopener">Instagram</a><br>
+      <a href="https://www.tiktok.com/@tophelanke021" target="_blank" rel="noopener">TikTok</a>
+    </div>
+
+    <!-- Naša misija -->
+    <div class="section__block">
+      <h2 class="main__subtitle">Naša misija</h2>
+      <p>
+        Naša misija je da omogućimo ženama širom zemlje da uživaju u vrhunskom stilu uz pouzdanu i sigurnu online kupovinu.
+        Kontinuirano radimo na unapređenju našeg sistema – od jednostavnog procesa poručivanja, preko praćenja narudžbina, 
+        do napredne administracije i kontrole kvaliteta.
+      </p>
+      <p>
+        Takođe, omogućavamo korisnicima da postanu partneri, čime se kreira dodatna vrednost kroz affiliate marketing, 
+        a na najvišem nivou partnerima nudimo personalizovane prodavnice unutar naše platforme.
+      </p>
+      <p>
+        Partneri se fokusiraju na prodaju, dok mi upravljamo logistikom, dostavom i finansijskim transakcijama.
+      </p>
+    </div>
+
+  </div>
+</section>
+
+<%- include('../include/end.ejs') %>

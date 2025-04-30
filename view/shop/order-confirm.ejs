@@ -1,7 +1,6 @@
 <%- include('../include/head.ejs') %>
-<link rel="stylesheet" href="/css/form.css">
 <%- include('../include/navigation.ejs') %>
-<section class="main__container">
+<section class="container main__container">
     <h1 class="main__title"><%= pageTitle %></h1>
         <form class="main-form__container" action="/prodavnica/potvrdite-porudzbinu" method="post">
             <input class="main-form__input" type="hidden" name="CSRFToken" value="<%= csrfToken %>">
@@ -12,6 +11,5 @@
                 <div class="user-message--error"><%= errorMessage %></div>
             <% } %>
         </form>
-    </div>
 </section>
 <%- include('../include/end.ejs') %>

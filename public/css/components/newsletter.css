@@ -1,0 +1,52 @@
+/* === newsletter.css === */
+
+/* Section wrapper */
+.newsletter-cta {
+  text-align: center;
+  background-color: var(--neutral-color-light);
+  padding: var(--padding-big) var(--padding-normal);
+  margin-top: 0;
+  border-radius: var(--border-radius-normal);
+  box-shadow: 0 2px 4px var(--shadow-box-color);
+}
+
+/* Title */
+.newsletter-cta__title {
+  font-size: var(--font-size-large);
+  font-weight: var(--font-weight-bold);
+  margin-bottom: var(--margin-small);
+  color: var(--primary-color);
+}
+
+/* Subtitle text */
+.newsletter-cta__text {
+  font-size: var(--font-size-base);
+  color: var(--text-color);
+  margin-bottom: var(--margin-normal);
+}
+
+/* Form layout */
+.newsletter-cta__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--grid-gap-small);
+  align-items: center;
+}
+
+.newsletter-cta__form .main-form__input {
+  max-width: 400px;
+  width: 100%;
+  text-align: center;
+}
+
+/* Responsive tweaks */
+@media (min-width: 768px) {
+  .newsletter-cta__form {
+    flex-direction: row;
+    justify-content: center;
+  }
+
+  .newsletter-cta__form .btn-primary {
+    margin-left: var(--margin-small);
+  }
+}

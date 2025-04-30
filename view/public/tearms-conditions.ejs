@@ -1,45 +1,84 @@
 <%- include('../include/head.ejs') %>
 <%- include('../include/navigation.ejs') %>
-<section class="flex flex-column main__container">
-    <h1 class="main__title"><%= pageTitle %></h1>
-    <div class="width-100">
-        <p>Ovi Uslovi korišćenja predstavljaju pravni sporazum između Vas kao korisnika i naše web prodavnice. Korišćenjem naše stranice, bilo da ste registrovani korisnik ili kupujete kao gost, potvrđujete da ste pročitali, razumeli i prihvatili sve odredbe ovih uslova, kao i našu Politiku privatnosti.</p>
-        
-        <h2>1. Prihvaćanje uslova</h2>
-        <p>Pri naručivanju ili kreiranju naloga u našoj prodavnici, automatski prihvatate ove uslove. Kupac može izvršiti porudžbinu i bez kreiranja korisničkog naloga, ali time se smatra da je prihvatio sve navedene uslove i politiku privatnosti.</p>
-        
-        <h2>2. Registracija i korisnički nalog</h2>
-        <p>Korisnik može kreirati nalog u našoj prodavnici kako bi mogao da:</p>
-        <ul>
+
+<section class="container main__container">
+  <h1 class="main__title"><%= pageTitle %></h1>
+
+  <div class="width-100 flex flex-column gap-large">
+    <p>
+      Ovi Uslovi korišćenja predstavljaju pravni sporazum između Vas kao korisnika i naše web prodavnice. Korišćenjem naše stranice, bilo da ste registrovani korisnik ili kupujete kao gost, potvrđujete da ste pročitali, razumeli i prihvatili sve odredbe ovih uslova, kao i našu Politiku privatnosti.
+    </p>
+
+    <div class="section__block">
+      <h2 class="main__subtitle">1. Prihvaćanje uslova</h2>
+      <p>
+        Pri naručivanju ili kreiranju naloga u našoj prodavnici, automatski prihvatate ove uslove. Kupac može izvršiti porudžbinu i bez kreiranja korisničkog naloga, ali time se smatra da je prihvatio sve navedene uslove i politiku privatnosti.
+      </p>
+    </div>
+
+    <div class="section__block">
+      <h2 class="main__subtitle">2. Registracija i korisnički nalog</h2>
+      <p>Korisnik može kreirati nalog u našoj prodavnici kako bi mogao da:</p>
+      <ul class="list-disc">
         <li>Ubacuje i izbacuje artikle iz korpe</li>
         <li>Kreira porudžbine</li>
         <li>Prati status porudžbina i istoriju svojih porudžbina</li>
-        </ul>
-        <p>Kreiranjem naloga, korisnik potvrđuje da su svi dostavljeni podaci tačni i da će ih ažurirati ukoliko dođe do promena. Korisnik je odgovoran za čuvanje svoje lozinke i neovlašćeni pristup nalogu.</p>
-        
-        <h2>3. Porudžbine i plaćanje</h2>
-        <p>Bilo da ste registrovani korisnik ili kupujete kao gost, prilikom porudžbine prihvatate ove uslove. Porudžbine se obrađuju u skladu sa našim procedurama, a plaćanje se vrši putem ponuđenih metoda. Svi podaci vezani za porudžbinu i plaćanje se obrađuju uz primenu odgovarajućih sigurnosnih mera.</p>
-        
-        <h2>4. Otkazivanje porudžbine</h2>
-        <p>Korisnik može otkazati porudžbinu sve dok ista nije poslata, odnosno dok se nalazi u statusu "pending". Otkazivanje porudžbine moguće je izvršiti putem korisničkog naloga ili kontaktiranjem naše službe za korisnike.</p>
-        
-        <h2>5. Zamena i povraćaj novca</h2>
-        <p>Ukoliko primite robu koja nije u skladu sa porudžbinom, oštećenu, prljavu ili na drugi način neodgovarajućeg kvaliteta, možete zatražiti zamenu ili povraćaj novca u roku od 7 dana od dana prijema robe. Vraćena roba mora biti neoštećena, neočišćena i u originalnom pakovanju. Roba koja je iskorišćena, oštećena ili prljava neće biti prihvaćena za zamenu ili povraćaj novca.</p>
-        
-        <h2>6. Korisnička odgovornost i mogućnost partnerstva</h2>
-        <p>Korisnik je odgovoran za svaku aktivnost na svom nalogu. Pored toga, u budućnosti korisnik može postati naš partner. Detaljni uslovi partnerstva biće naknadno definisani i dostupni putem posebnog ugovora.</p>
-        
-        <h2>7. Izmene uslova</h2>
-        <p>Zadržavamo pravo da u bilo kom trenutku izmenimo ove uslove korišćenja. Sve izmene će biti objavljene na ovoj stranici, a nastavkom korišćenja naše prodavnice smatrate da ste saglasni sa izmenjenim uslovima.</p>
-        
-        <h2>8. Odricanje odgovornosti</h2>
-        <p>Naša prodavnica neće biti odgovorna za bilo kakve direktne ili indirektne štete nastale korišćenjem naše web stranice, porudžbina ili proizvoda, osim u slučajevima kada je to zakonom drugačije propisano.</p>
-        
-        <h2>9. Kontakt informacije</h2>
-        <p>Ukoliko imate pitanja ili nedoumice u vezi sa ovim uslovima, molimo Vas da nas kontaktirate putem email adrese navedene na stranici "Kontakt".</p>
-        
-        <p><em>Poslednja izmena: [unesite datum]</em></p>
+      </ul>
+      <p>
+        Kreiranjem naloga, korisnik potvrđuje da su svi dostavljeni podaci tačni i da će ih ažurirati ukoliko dođe do promena. Korisnik je odgovoran za čuvanje svoje lozinke i neovlašćeni pristup nalogu.
+      </p>
     </div>
+
+    <div class="section__block">
+      <h2 class="main__subtitle">3. Porudžbine i plaćanje</h2>
+      <p>
+        Bilo da ste registrovani korisnik ili kupujete kao gost, prilikom porudžbine prihvatate ove uslove. Porudžbine se obrađuju u skladu sa našim procedurama, a plaćanje se vrši putem ponuđenih metoda. Svi podaci vezani za porudžbinu i plaćanje se obrađuju uz primenu odgovarajućih sigurnosnih mera.
+      </p>
+    </div>
+
+    <div class="section__block">
+      <h2 class="main__subtitle">4. Otkazivanje porudžbine</h2>
+      <p>
+        Korisnik može otkazati porudžbinu sve dok ista nije poslata, odnosno dok se nalazi u statusu "pending". Otkazivanje porudžbine moguće je izvršiti putem korisničkog naloga ili kontaktiranjem naše službe za korisnike.
+      </p>
+    </div>
+
+    <div class="section__block">
+      <h2 class="main__subtitle">5. Zamena i povraćaj novca</h2>
+      <p>
+        Ukoliko primite robu koja nije u skladu sa porudžbinom, oštećenu, prljavu ili na drugi način neodgovarajućeg kvaliteta, možete zatražiti zamenu ili povraćaj novca u roku od 14 dana od dana prijema robe. Vraćena roba mora biti neoštećena, neočišćena i u originalnom pakovanju. Roba koja je iskorišćena, oštećena ili prljava neće biti prihvaćena za zamenu ili povraćaj novca.
+      </p>
+    </div>
+
+    <div class="section__block">
+      <h2 class="main__subtitle">6. Korisnička odgovornost i mogućnost partnerstva</h2>
+      <p>
+        Korisnik je odgovoran za svaku aktivnost na svom nalogu. Pored toga, u budućnosti korisnik može postati naš partner. Detaljni uslovi partnerstva biće naknadno definisani i dostupni putem posebnog ugovora.
+      </p>
+    </div>
+
+    <div class="section__block">
+      <h2 class="main__subtitle">7. Izmene uslova</h2>
+      <p>
+        Zadržavamo pravo da u bilo kom trenutku izmenimo ove uslove korišćenja. Sve izmene će biti objavljene na ovoj stranici, a nastavkom korišćenja naše prodavnice smatrate da ste saglasni sa izmenjenim uslovima.
+      </p>
+    </div>
+
+    <div class="section__block">
+      <h2 class="main__subtitle">8. Odricanje odgovornosti</h2>
+      <p>
+        Naša prodavnica neće biti odgovorna za bilo kakve direktne ili indirektne štete nastale korišćenjem naše web stranice, porudžbina ili proizvoda, osim u slučajevima kada je to zakonom drugačije propisano.
+      </p>
+    </div>
+
+    <div class="section__block">
+      <h2 class="main__subtitle">9. Kontakt informacije</h2>
+      <p>
+        Ukoliko imate pitanja ili nedoumice u vezi sa ovim uslovima, molimo Vas da nas kontaktirate putem email adrese navedene na stranici "Kontakt".
+      </p>
+      <p><em>Poslednja izmena: [unesite datum]</em></p>
+    </div>
+  </div>
 </section>
 
 <%- include('../include/end.ejs') %>

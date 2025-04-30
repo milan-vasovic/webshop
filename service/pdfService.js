@@ -40,7 +40,7 @@ export default class PDFService {
           doc
             .fontSize(12)
             .text(
-              `${item.Naziv} | Velicina: ${item.Velicina} | Boja: ${item.Boja} | Cena: ${item.Cena} RSD`
+              `${item.Naziv} | Velicina: ${item.Velicina} | Boja: ${item.Boja} | Kolicina: ${item['Količina']} | Cena: ${item.Cena} RSD`
             );
           doc.moveDown(0.5);
         });

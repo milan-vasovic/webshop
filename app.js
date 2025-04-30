@@ -16,6 +16,7 @@ import helmet from 'helmet';
 import crypto from "crypto";
 import mongoSanitize from 'express-mongo-sanitize';
 import methodOverride from 'method-override';
+import ItemModel from "./model/item.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -47,7 +48,7 @@ app.use(
           directives: {
               "default-src": ["'self'"],
               "script-src": ["'self'", "https://www.instagram.com/"], 
-              "style-src": ["'self'", "'unsafe-inline'"],
+              "style-src": ["'self'", "'unsafe-inline'","https://fonts.googleapis.com"],
               frameSrc: ["'self'", "https://www.google.com", "https://maps.google.com", "https://www.instagram.com/"],
           },
       },
@@ -128,6 +129,18 @@ app.use("/prodavnica", shopRoutes);
 app.use(userRoutes);
 app.use("/admin", adminRoutes);
 
+// app.use(async (req, res, next) => {
+//   await ItemModel.updateMany(
+//     { status: { $in: ["not-published"] } },
+//     { $pull: { status: "not-published" } }
+//   );
+//   await ItemModel.updateMany(
+//     { status: { $nin: ["normal"] } }, // Samo ako "normal" nije već tu
+//     { $addToSet: { status: "normal" } }
+//   );
+//   next()
+// });
+
 app.use(ErrorMiddleware);
 
 connect(MONGODB_URI)
@@ -136,6 +149,6 @@ connect(MONGODB_URI)
       console.log("Server is running...");
     });
   })
-  .catch((err) => {
-    console.log(err);
+  .catch((error) => {
+    console.log(error);
 });

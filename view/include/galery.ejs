@@ -1,5 +1,3 @@
-<link rel="stylesheet" href="/css/galery.css">
-
 <div class="gallery__container">
   <div class="gallery__main-media">
     <!-- Glavna slika koja se menja prilikom promene varijacije -->
@@ -14,7 +12,7 @@
           data-url="<%= video.URL %>" 
           data-description="<%= video.Opis %>" 
           nonce="<%= cspNonce %>">
-        <source src="/videos/<%= video.URL %>" type="video/mp4">
+        <source src="/videos/<%= video.URL %>" type="video/mp4"  autoplay loop muted playsinline>
         <%= video.Opis %>
       </video>
     <% } %>

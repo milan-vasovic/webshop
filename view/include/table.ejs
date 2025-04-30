@@ -22,7 +22,7 @@
                 <% if (key === "Slika" && field) { %>
                   <img class="table__image" src="/images/<%= field.value || field.img %>" alt="<%= field.value %>">
                 <% } else if (field && typeof field === 'object' && field.link) { %>
-                  <a class="main__link" href="<%= field.link %>"><%= field.value %></a>
+                  <a class="card__link" href="<%= field.link %>"><%= field.value %></a>
                 <% } else if (field && typeof field === 'object' && field.value) { %>
                   <%= field.value %>
                 <% } else { %>
@@ -33,7 +33,7 @@
           <% }); %>
           <% if (hasActions) { %>
             <td data-label="Akcije">
-              <div class="flex flex-row align-center">
+              <div class="table__action">
                 <% actions.forEach(action => { %>
                   <% if (action.type === 'form') { %>
                     <form action="<%= action.formAction %>?_method=DELETE" method="POST">
@@ -56,7 +56,7 @@
       <tfoot>
         <tr>
           <td colspan="<%= Object.keys(items[0]).length + (hasActions ? 1 : 0) %>">
-            <strong><%= caption %> Ukupno:</strong> <%= items.length %> stavki
+            <strong><%= caption %> Prikazano:</strong> <%= items.length %> stavki
           </td>
         </tr>
         <% if (totals) { %>
@@ -96,5 +96,5 @@
     <% } %>
   </table>
 <% } else { %>
-  <p>Nema dostupnih podataka za "<%= caption %>".</p>
+  <p class="text-center">Nema dostupnih podataka za "<%= caption %>".</p>
 <% } %>

@@ -17,27 +17,55 @@ import UserService from "../service/userService.js";
  */
 async function getItemsPage(req, res, next) {
   try {
-    const search = sanitize(req.query.search);
+    const page = parseInt(req.query.page) || 1;
+    const limit = 10;
 
-    let items;
-    if (search) {
-      items = await ItemService.findAdminItems(search);
-    } else {
-      items = await ItemService.findAdminItems();
-    }
+    const items = await ItemService.findAdminItems(limit, page);
 
+    const totalPages = Math.ceil(items.totalCount / limit);
     return res.render("admin/item/items", {
       path: "/admin/artikli",
       pageTitle: "Admin Artikli",
       pageDescription: "Prikaz svih artikala za admina",
       pageKeyWords: "Admin, Artikli, Upravljanje, Dodavanje",
       items: items,
+      currentPage: page,
+      totalPages: totalPages,
+      basePath: `/admin/artikli`,
+      index: false,
+      featureImage: undefined,
     });
   } catch (error) {
     next(error);
   }
 }
 
+async function getSearchItemsPage(req, res, next) {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = 10;
+    const search = req.params.search ? req.params.search : "";
+    
+    const param = sanitize(search)
+    const items = await ItemService.findItemsBySearch(param, limit, page, true);
+    const totalPages = Math.ceil(items.totalCount / limit);
+
+    return res.render("admin/item/items", {
+      path: "/admin/artikli",
+      pageTitle: "Admin Artikli Pretraga: " + param,
+      pageDescription: "Prikaz svih artikala za admina",
+      pageKeyWords: "Admin, Artikli, Upravljanje, Dodavanje",
+      items: items,
+      currentPage: page,
+      totalPages: totalPages,
+      basePath: `/admin/artikli/pretraga/${search}`,
+      index: false,
+      featureImage: undefined,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
 /**
  * Renders the item details page for the admin.
  */
@@ -53,6 +81,8 @@ async function getItemDetailsPage(req, res, next) {
       pageDescription: item["Kratak Opis"],
       pageKeyWords: item["Ključne Reči"],
       item: item,
+      index: false,
+      featureImage: undefined,
     });
   } catch (error) {
     next(error);
@@ -65,18 +95,20 @@ async function getItemDetailsPage(req, res, next) {
 async function getAddItemPage(req, res, next) {
   try {
     const allUpsellItems = await ItemService.findAllAdminAddItems("");
-    const allCrosselItems = await ItemService.findAllAdminAddItemsByCategory(
-      ""
-    );
+    const allCrosselItems = await ItemService.findAllAdminAddItemsByCategory("");
 
     return res.render("admin/item/add-item", {
       path: "/admin/add-item",
       pageTitle: "Dodajte Artikal",
+      pageDescription: "Dodajte novi artikal",
+      pageKeyWords: "Dodavanje, Artikla, Admin",
       editing: false,
       existingData: null,
       errorMessage: "",
       allUpsellItems: allUpsellItems,
       allCrosselItems: allCrosselItems,
+      index: false,
+      featureImage: undefined,
     });
   } catch (error) {
     next(error);
@@ -101,12 +133,16 @@ async function getEditItemPage(req, res, next) {
 
     return res.render("admin/item/add-item", {
       path: "/admin/add-item",
-      pageTitle: "Dodajte Artikal",
+      pageTitle: "Izmenite Artikal",
+      pageDescription: "Izmenite artikal",
+      pageKeyWords: "Izmena, Artikla, Admin",
       errorMessage: "",
       editing: true,
       existingData: item,
       allUpsellItems: allUpsellItems,
       allCrosselItems: allCrosselItems,
+      index: false,
+      featureImage: undefined,
     });
   } catch (error) {
     next(error);
@@ -179,6 +215,8 @@ async function postAddItem(req, res, next) {
       return res.render("admin/item/add-item", {
         path: "/admin/add-item",
         pageTitle: "Dodajte Artikal",
+        pageDescription: "Dodajte novi artikal",
+        pageKeyWords: "Dodavanje, Artikla, Admin",
         errorMessage: errors.array()[0].msg,
         existingData: {
           Naziv: { value: body.title },
@@ -213,6 +251,8 @@ async function postAddItem(req, res, next) {
         editing: false,
         allUpsellItems: allUpsellItems,
         allCrosselItems: allCrosselItems,
+        index: false,
+        featureImage: undefined,
       });
     }
 
@@ -222,7 +262,7 @@ async function postAddItem(req, res, next) {
       ErrorHelper.throwConflictError("Nije uspelo");
     }
 
-    return res.redirect("/prodavnica");
+    return res.redirect("/admin/artikli");
   } catch (error) {
     next(error);
   }
@@ -281,7 +321,9 @@ async function postEditItem(req, res, next) {
 
       return res.render("admin/item/add-item", {
         path: "/admin/add-item",
-        pageTitle: "Uredite Artikal",
+        pageTitle: "Izmena Artikal",
+        pageDescription: "Izmena artikal",
+        pageKeyWords: "Izmena, Artikla, Admin",
         errorMessage: errors.array()[0].msg,
         existingData: {
           ID: itemId,
@@ -317,6 +359,8 @@ async function postEditItem(req, res, next) {
         editing: true,
         allUpsellItems: allUpsellItems,
         allCrosselItems: allCrosselItems,
+        index: false,
+        featureImage: undefined,
       });
     }
 
@@ -369,7 +413,7 @@ async function postSearchItems(req, res, next) {
       return res.redirect("/admin/artikli");
     }
 
-    return res.redirect(`/admin/artikli?search=${search}`);
+    return res.redirect(`/admin/artikli/pretraga/${search}`);
   } catch (error) {
     next(error);
   }
@@ -436,6 +480,7 @@ async function deleteItemById(req, res, next) {
 
 export default {
   getItemsPage,
+  getSearchItemsPage,
   getItemDetailsPage,
   getAddItemPage,
   getEditItemPage,

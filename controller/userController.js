@@ -8,22 +8,23 @@ async function getUsersPage(req, res, next) {
         // Getting user _id from logged user so i don't show him
         const userId = req.session.user._id;
 
-        const search = sanitize(req.query.search);
-        let users;
+        const page = parseInt(req.query.page) || 1;
+        const limit = 10;
 
-        // Passing userId that needs to be skipped
-        if (search) {
-            users = await UserService.findUsers(userId, search);
-        } else {
-            users = await UserService.findUsers(userId);
-        }
+        const users = await UserService.findUsers(userId, limit, page);
+        const totalPages = Math.ceil(users.totalCount / limit);
 
         return res.render("admin/user/users", {
             path: "/admin/korisnici",
             pageTitle: "Korisnici",
             pageDescription: "Admin prikaz svih korisnika, detalji i brisanje",
             pageKeyWords: "Admin, Korisnici, Upravljanje, Informacije",
-            users: users
+            users: users,
+            currentPage: page,
+            totalPages: totalPages,
+            basePath: `/admin/korisnici`,
+            index: false,
+            featureImage: undefined,
         })
 
     } catch (error) {
@@ -31,6 +32,37 @@ async function getUsersPage(req, res, next) {
     }
 }
 
+async function getUserBySearchPage(req, res, next) {
+    try {
+        const userId = req.session.user._id;
+        const search = req.query.search ? sanitize(req.query.search) : null;
+
+        if (!search) {
+            return res.redirect("/admin/korisnici");
+        }
+
+        const page = parseInt(req.query.page) || 1;
+        const limit = 10;
+
+        const users = await UserService.findUsersBySearch(userId, search, limit, page);
+        const totalPages = Math.ceil(users.totalCount / limit);
+
+        return res.render("admin/user/users", {
+            path: "/admin/korisnici",
+            pageTitle: "Korisnici Pretraga: " + search,
+            pageDescription: "Admin prikaz svih korisnika, detalji i brisanje",
+            pageKeyWords: "Admin, Korisnici, Upravljanje, Informacije",
+            users: users,
+            currentPage: page,
+            totalPages: totalPages,
+            basePath: `/admin/korisnici/pretraga/${search}`,
+            index: false,
+            featureImage: undefined,
+        })
+    } catch (error) {
+        next(error)
+    }
+}
 async function getUserByIdPage(req, res, next) {
     try {
         const userId = req.params.userId;
@@ -38,11 +70,13 @@ async function getUserByIdPage(req, res, next) {
         const user = await UserService.findUserById(userId);
 
         return res.render('admin/user/user-details', {
-            path: "/admin/korisnik-detalji",
+            path: "/admin/korisnik-detalji" + userId,
             pageTitle: user.Ime.value,
             pageDescription: "Profili korisnika, informacije, detalji, upravljanje",
             pageKeyWords: "Admin, Korisnik Profil, Upravljanje, Informacije",
-            user: user
+            user: user,
+            index: false,
+            featureImage: undefined,
         });
 
     } catch (error) {
@@ -61,7 +95,9 @@ async function getMyProfilePage(req, res, next) {
                 pageTitle: "Moj Profil",
                 pageDescription: "Prikaz profila korisnikaa",
                 pageKeyWords: "Profil, Porudzbine, Adrese, Brojevi",
-                user: user
+                user: user,
+                index: false,
+                featureImage: undefined,
         })
     } catch (error) {
         next(error);
@@ -86,11 +122,13 @@ async function getUserOrderDetails(req, res, next) {
             const order = await OrderService.findUserOrderDetails(orderId, userId);
 
             return res.render('user/order-details', {
-                path: "/porudzbina-detalji",
+                path: "/porudzbina-detalji" + orderId,
                 pageTitle: "Porudžbina Detalji",
                 pageDescription: "Prikaz svih detalja porudžbine korisnika",
                 pageKeyWords: "Porudžbine, Detalji, Korisnik, Informacije",
-                order: order
+                order: order,
+                index: false,
+                featureImage: undefined,
             })
         }
 
@@ -141,7 +179,7 @@ function postSearchUser(req, res, next) {
             return res.redirect("/admin/korisnici");
         }
 
-        return res.redirect(`/admin/korisnici?search=${search}`);
+        return res.redirect(`/admin/korisnici/pretraga/${search}`);
     } catch (error) {
         next(error);
     }
@@ -193,6 +231,7 @@ async function deleteAdressById(req, res, next) {
 
 export default {
     getUsersPage,
+    getUserBySearchPage,
     getUserByIdPage,
     getMyProfilePage,
     getMyShopPage,

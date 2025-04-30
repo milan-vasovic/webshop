@@ -1,0 +1,27 @@
+/* === contact.css === */
+
+/* Wrapper for form and map layout */
+.contact__content {
+  display: flex;
+  flex-direction: column; /* Default: stacked for mobile */
+  gap: var(--grid-gap-medium);
+  width: 100%;
+}
+
+/* Form and map share full width on mobile */
+.contact__form,
+.contact__map {
+  width: 100%;
+}
+
+/* On larger screens: split layout */
+@media (min-width: 768px) {
+  .contact__content {
+    flex-direction: row;
+  }
+
+  .contact__form,
+  .contact__map {
+    width: 50%;
+  }
+}

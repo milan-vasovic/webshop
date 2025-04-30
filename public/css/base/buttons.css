@@ -1,0 +1,70 @@
+/* === buttons.css === */
+
+/* Base reset for all buttons */
+button {
+  font-family: var(--font-family);
+  font-size: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+  padding: 0.5rem;
+  border-radius: var(--border-radius-small);
+}
+
+/* Primary button – used for main actions */
+.btn-primary {
+  padding: var(--padding-small) var(--padding-big);
+  border: none;
+  border-radius: var(--border-radius-normal);
+  background-color: var(--accent-color);
+  color: var(--white-color);
+  transition: background-color var(--transition-fast),
+    transform var(--transition-fast);
+}
+.btn-primary:hover {
+  background-color: var(--accent-hover-color);
+  color: var(--white-color);
+}
+
+/* Secondary button – used for alternative actions */
+.btn-secondary {
+  padding: var(--padding-small);
+  margin: var(--margin-small);
+  border: 1px solid var(--primary-color);
+  border-radius: var(--border-radius-normal);
+  background-color: var(--primary-color);
+  color: var(--white-color);
+  transition: background-color var(--transition-fast),
+    transform var(--transition-fast);
+}
+.btn-secondary:hover {
+  background-color: var(--white-color);
+  color: var(--primary-color);
+}
+
+/* Form button – subtle button style for forms */
+.btn-form {
+  padding: var(--padding-small) var(--padding-normal);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-small);
+  background-color: var(--neutral-color);
+  color: var(--text-color);
+  transition: background-color var(--transition-fast);
+}
+.btn-form:hover {
+  background-color: var(--hover-color);
+}
+
+/* Danger button – used for delete, cancel, or critical actions */
+.btn-danger {
+  padding: var(--padding-small) var(--padding-big);
+  border: none;
+  border-radius: var(--border-radius-normal);
+  background-color: var(--danger-color);
+  color: var(--white-color);
+  transition: background-color var(--transition-fast),
+    transform var(--transition-fast);
+}
+.btn-danger:hover {
+  background-color: #b71c1c;
+}

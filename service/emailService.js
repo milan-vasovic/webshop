@@ -59,7 +59,7 @@ class EmailService {
                     <p style="color: ${  styles.textColor }; font-size: ${  styles.textFontSize }; margin-bottom: ${  styles.textMarginBottom };">
                         Prijavite se u administraciju kako biste pregledali upit.
                     </p>
-                    <a href="http://localhost:3000/admin/kontakt-detalji/${ contactId }" 
+                    <a href="${ process.env.BASE_URL}${ process.env.PORT }/admin/kontakt-detalji/${ contactId }" 
                         style="display: inline-block; padding: ${  styles.buttonPadding }; background-color: ${  styles.buttonBackground }; color: ${  styles.buttonTextColor }; text-decoration: none; border-radius: ${  styles.buttonBorderRadius }; font-size: ${  styles.buttonFontSize }; transition: ${  styles.buttonTransition };">
                         Pogledajte upit
                     </a>
@@ -78,7 +78,7 @@ class EmailService {
 
     static async sendConfirmAccount(email, token, session = null) {
         try {
-            const confirmUrl = `http://localhost:3000/auth/confirm?token=${token}`;
+            const confirmUrl = `${ process.env.BASE_URL}/auth/confirm?token=${token}`;
 
             const mailOptions = {
                 from: "Tophelanke <no-reply@tophelanke.com>",
@@ -127,7 +127,7 @@ class EmailService {
 
     static async sendOrderConfirmation(name, email, token) {
         try {
-            const confirmUrl = `http://localhost:3000/prodavnica/potvrdite-porudzbinu?token=${token}`;
+            const confirmUrl = `${ process.env.BASE_URL}/prodavnica/potvrdite-porudzbinu?token=${token}`;
 
             const mailOptions = {
                 from: "Tophelanke <no-reply@tophelanke.com>",
@@ -179,6 +179,7 @@ class EmailService {
                 Naziv: item.title,
                 Velicina: item.size,
                 Boja: item.color,
+                Količina: item.amount,
                 Cena: item.price
               }));
           
@@ -219,7 +220,7 @@ class EmailService {
               // Pošalji email
                 transporter.sendMail(mailOptions);
         } catch (error) {
-            console.log("email nije poslat");
+            console.log("Email nije poslat");
         }
     }
 
@@ -245,7 +246,7 @@ class EmailService {
                             <p style="color: ${  styles.textColor }; font-size: ${  styles.textFontSize }; margin-bottom: ${  styles.textMarginBottom };">
                                 Zatražili ste restartovanje šifre. Kliknite na link ispod da biste kreirali novu šifru:
                             </p>
-                            <a href="http://localhost:3000/napravite-novu-sifru/${  user.resetToken }" 
+                            <a href="${ process.env.BASE_URL}/napravite-novu-sifru/${  user.resetToken }" 
                                 style="display: inline-block; padding: ${  styles.buttonPadding }; background-color: ${  styles.buttonBackground }; color: ${  styles.buttonTextColor }; text-decoration: none; border-radius: ${  styles.buttonBorderRadius }; font-size: ${  styles.buttonFontSize }; transition: ${  styles.buttonTransition };">
                                 Restartujte šifru
                             </a>
@@ -308,7 +309,7 @@ class EmailService {
                                         <p style="color: ${  styles.textColor }; font-size: ${  styles.textFontSize }; margin-bottom: ${  styles.textMarginBottom };">
                                             Klikom na link možete proveriti akciju na artiklu <strong>${  item.title }</strong>:
                                         </p>
-                                        <a href="http://localhost:3000/prodavnica/artikal/${  encodeURIComponent(item.title) }" 
+                                        <a href="${ process.env.BASE_URL}/prodavnica/artikal/${  encodeURIComponent(item.title) }" 
                                             style="display: inline-block; padding: ${  styles.buttonPadding }; background-color: ${  styles.buttonBackground }; color: ${  styles.buttonTextColor }; text-decoration: none; border-radius: ${  styles.buttonBorderRadius }; font-size: ${  styles.buttonFontSize }; transition: ${  styles.buttonTransition };">
                                             Pogledajte
                                         </a>
@@ -353,7 +354,7 @@ class EmailService {
                         <p style="color: ${  styles.textColor }; font-size: ${  styles.textFontSize }; margin-bottom: ${  styles.textMarginBottom };">
                             Klikom na link možete proveriti status vaše porudžbine:
                         </p>
-                        <a href="http://localhost:3000/korisnik/porudzbina-detalji/${  orderInfo }" 
+                        <a href="${ process.env.BASE_URL}/korisnik/porudzbina-detalji/${  orderInfo }" 
                             style="display: inline-block; padding: ${  styles.buttonPadding }; background-color: ${  styles.buttonBackground }; color: ${  styles.buttonTextColor }; text-decoration: none; border-radius: ${  styles.buttonBorderRadius }; font-size: ${  styles.buttonFontSize }; transition: ${  styles.buttonTransition };">
                             Pogledajte
                         </a>
@@ -389,9 +390,9 @@ class EmailService {
                             Pozdrav ${  name },
                         </p>
                         <p style="color: ${  styles.textColor }; font-size: ${  styles.textFontSize }; margin-bottom: ${  styles.textMarginBottom };">
-                            Klikom na link možete proveriti status vaše porudžbine:
+                            Ako imate nalog, klikom na link možete proveriti status vaše porudžbine, u suprotnom registrujte se koristeći ovu email adresu:
                         </p>
-                        <a href="http://localhost:3000/korisnik/porudzbina-detalji/${  orderInfo }" 
+                        <a href="${ process.env.BASE_URL}/korisnik/porudzbina-detalji/${  orderInfo }" 
                             style="display: inline-block; padding: ${  styles.buttonPadding }; background-color: ${  styles.buttonBackground }; color: ${  styles.buttonTextColor }; text-decoration: none; border-radius: ${  styles.buttonBorderRadius }; font-size: ${  styles.buttonFontSize }; transition: ${  styles.buttonTransition };">
                             Pogledajte
                         </a>
@@ -427,9 +428,9 @@ class EmailService {
                             Poštovani/a ${  name || "Korisniče/ce" }, vaša porudžbina: <strong>${  orderInfo }</strong> je otkazana!
                         </p>
                         <p style="color: ${  styles.textColor }; font-size: ${  styles.textFontSize }; margin-bottom: ${  styles.textMarginBottom };">
-                            Klikom na link možete proveriti status vaše porudžbine:
+                            Ako imate nalog, klikom na link možete proveriti status vaše porudžbine, u suprotnom registrujte se koristeći ovu email adresu:
                         </p>
-                        <a href="http://localhost:3000/korisnik/porudzbina-detalji/${  orderInfo }" 
+                        <a href="${ process.env.BASE_URL}/korisnik/porudzbina-detalji/${  orderInfo }" 
                             style="display: inline-block; padding: ${  styles.buttonPadding }; background-color: ${  styles.buttonBackground }; color: ${  styles.buttonTextColor }; text-decoration: none; border-radius: ${  styles.buttonBorderRadius }; font-size: ${  styles.buttonFontSize }; transition: ${  styles.buttonTransition };">
                             Pogledajte
                         </a>
@@ -466,7 +467,7 @@ class EmailService {
                         <p style="color: ${  styles.textColor }; font-size: ${  styles.textFontSize }; margin-bottom: ${  styles.textMarginBottom };">
                             Porudžbina od strane: <strong>${  name }</strong> na email: <strong>${  email }</strong> je otkazana!
                         </p>
-                        <a href="http://localhost:3000/admin/porudzbina-detalji/${  orderInfo }" 
+                        <a href="${ process.env.BASE_URL}/admin/porudzbina-detalji/${  orderInfo }" 
                             style="display: inline-block; padding: ${  styles.buttonPadding }; background-color: ${  styles.buttonBackground }; color: ${  styles.buttonTextColor }; text-decoration: none; border-radius: ${  styles.buttonBorderRadius }; font-size: ${  styles.buttonFontSize }; transition: ${  styles.buttonTransition };">
                             Pogledajte
                         </a>
@@ -502,7 +503,7 @@ class EmailService {
                         <h1 style="color: ${  styles.alertHeadingColor }; margin-bottom: ${  styles.headingMarginBottom };">
                             Količina artikla ${  itemId }, varijacije: ${  variationId } se smanjila!
                         </h1>
-                        <a href="http://localhost:3000/admin/artikal-detalji/${  itemId }" 
+                        <a href="${ process.env.BASE_URL}/admin/artikal-detalji/${  itemId }" 
                             style="display: inline-block; padding: ${  styles.buttonPadding }; background-color: ${  styles.buttonBackground }; color: ${  styles.buttonTextColor }; text-decoration: none; border-radius: ${  styles.buttonBorderRadius }; font-size: ${  styles.buttonFontSize }; transition: ${  styles.buttonTransition };">
                             Pogledajte
                         </a>
@@ -542,7 +543,7 @@ class EmailService {
                         <h1 style="color: ${  styles.alertHeadingColor }; margin-bottom: ${  styles.headingMarginBottom };">
                             Količina artikla ${  itemId }, varijacije: ${  variationId } se izpraznila!
                         </h1>
-                        <a href="http://localhost:3000/admin/artikal-detalji/${  itemId }" 
+                        <a href="${ process.env.BASE_URL}/admin/artikal-detalji/${  itemId }" 
                             style="display: inline-block; padding: ${  styles.buttonPadding }; background-color: ${  styles.buttonBackground }; color: ${  styles.buttonTextColor }; text-decoration: none; border-radius: ${  styles.buttonBorderRadius }; font-size: ${  styles.buttonFontSize }; transition: ${  styles.buttonTransition };">
                             Pogledajte
                         </a>

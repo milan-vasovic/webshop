@@ -6,22 +6,11 @@ import OrderService from "../service/orderService.js";
 
 async function getOrdersPage(req, res, next) {
   try {
-    const search = sanitize(req.query.search);
+    const page = parseInt(req.query.page) || 1;
+    const limit = 10;
 
-    if (search) {
-      const orders = await OrderService.findOrders(search);
-
-      return res.render("admin/order/orders", {
-        path: "/admin/porudzbine",
-        pageTitle: "Porudžbine",
-        pageDescription:
-          "Prikaz svih porudžbina za administratora sa mogućnošću pretrage!",
-        pageKeyWords: "Admin, Porudzbine, Pretraga, Informacije",
-        orders: orders,
-      });
-    }
-
-    const orders = await OrderService.findOrders();
+    const orders = await OrderService.findOrders(limit, page);
+    const totalPages = Math.ceil(orders.totalCount / limit);
 
     return res.render("admin/order/orders", {
       path: "/admin/porudzbine",
@@ -30,6 +19,39 @@ async function getOrdersPage(req, res, next) {
         "Prikaz svih porudžbina za administratora sa mogućnošću pretrage!",
       pageKeyWords: "Admin, Porudzbine, Pretraga, Informacije",
       orders: orders,
+      currentPage: page,
+      totalPages: totalPages,
+      basePath: `/admin/porudzbine`,
+      index: false,
+      featureImage: undefined,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function getSearchOrdersPage(req, res, next) {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = 10;
+    const search = req.params.search ? req.params.search : "";
+    
+    const param = sanitize(search)
+    const orders = await OrderService.findOrdersBySearch(param, limit, page);
+    const totalPages = Math.ceil(orders.totalCount / limit);
+
+    return res.render("admin/order/orders", {
+      path: "/admin/porudzbine",
+      pageTitle: "Porudžbine Pretraga: " + param,
+      pageDescription:
+        "Prikaz svih porudžbina za administratora sa mogućnošću pretrage!",
+      pageKeyWords: "Admin, Porudzbine, Pretraga, Informacije",
+      orders: orders,
+      currentPage: page,
+      totalPages: totalPages,
+      basePath: `/admin/porudzbine/pretraga/${search}`,
+      index: false,
+      featureImage: undefined,
     });
   } catch (error) {
     next(error);
@@ -43,12 +65,14 @@ async function getOrderDetailsPage(req, res, next) {
     const order = await OrderService.findOrderById(orderId);
 
     return res.render("admin/order/order-details", {
-      path: "/admin/porudzbina-detalji",
+      path: "/admin/porudzbina-detalji/" + orderId,
       pageTitle: "Porudžbina Detalji",
       pageDescription: "Prikaz svih detalja porudžbine!",
       pageKeyWords: "Admin, Porudzbina Detalji, Informacije",
       order: order,
       errorMessage: null,
+      index: false,
+      featureImage: undefined,
     });
   } catch (error) {
     next(error);
@@ -62,7 +86,7 @@ async function postOrderSearch(req, res, next) {
       return res.redirect("/admin/porudzbine");
     }
 
-    return res.redirect(`/admin/porudzbine?search=${search}`);
+    return res.redirect(`/admin/porudzbine/pretraga/${search}`);
   } catch (error) {
     next(error);
   }
@@ -88,6 +112,8 @@ async function postEditOrderStatus(req, res, next) {
         pageKeyWords: "Admin, Porudzbina Detalji, Informacije",
         order: order,
         errorMessage: errors.array()[0].msg,
+        index: false,
+        featureImage: undefined,
       });
     }
 
@@ -119,6 +145,7 @@ async function postEditOrderStatus(req, res, next) {
 export default {
   getOrdersPage,
   getOrderDetailsPage,
+  getSearchOrdersPage,
   postOrderSearch,
   postEditOrderStatus,
 };

@@ -1,0 +1,162 @@
+/* === utilities.css === */
+
+/* Flexbox utilities */
+.flex {
+  display: flex;
+  gap: 0.5rem;
+}
+.flex-row {
+  flex-direction: row;
+}
+.flex-column {
+  flex-direction: column;
+  gap: var(--grid-gap-medium);
+}
+.flex-wrap {
+  flex-wrap: wrap;
+}
+
+/* Justify content */
+.justify-start {
+  justify-content: flex-start;
+}
+.justify-center {
+  justify-content: center;
+}
+.justify-end {
+  justify-content: flex-end;
+}
+.justify-between {
+  justify-content: space-between;
+}
+.justify-around {
+  justify-content: space-around;
+}
+.justify-evenly {
+  justify-content: space-evenly;
+}
+
+/* Align items */
+.align-start {
+  align-items: flex-start;
+}
+.align-center {
+  align-items: center;
+}
+.align-end {
+  align-items: flex-end;
+}
+.align-stretch {
+  align-items: stretch;
+}
+.align-baseline {
+  align-items: baseline;
+}
+
+/* Align self */
+.self-start {
+  align-self: flex-start;
+}
+.self-center {
+  align-self: center;
+}
+.self-end {
+  align-self: flex-end;
+}
+.self-stretch {
+  align-self: stretch;
+}
+.self-baseline {
+  align-self: baseline;
+}
+
+/* Grid layout utilities */
+.grid {
+  display: grid;
+  gap: var(--grid-gap-medium);
+  text-align: left;
+}
+.grid-1 {
+  grid-template-columns: 1fr;
+}
+.grid-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+.grid-3 {
+  grid-template-columns: 1fr;
+}
+.grid-4 {
+  grid-template-columns: 1fr;
+}
+
+/* Width utilities */
+.width-10 {
+  width: 10%;
+}
+.width-20 {
+  width: 20%;
+}
+.width-30 {
+  width: 30%;
+}
+.width-40 {
+  width: 40%;
+}
+.width-50 {
+  width: 50%;
+}
+.width-60 {
+  width: 60%;
+}
+.width-70 {
+  width: 70%;
+}
+.width-80 {
+  width: 80%;
+}
+.width-90 {
+  width: 90%;
+}
+.width-100 {
+  width: 100%;
+}
+
+/* Height utilities */
+.height-50 {
+  height: 50%;
+}
+.height-100 {
+  height: 100%;
+}
+
+@media (max-width: 768px){
+    .flex-column-normal-force {
+        flex-direction: column !important;
+    }
+}
+
+.margin__normal {
+    margin: var(--margin-normal) 0;
+}
+
+/* === Responsive grid override === */
+@media (min-width: 600px) {
+    .flex-column-normal-force {
+        flex-direction: row !important;
+    }
+  .grid-3 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .grid-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 992px) {
+  .grid-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .grid-4 {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}

@@ -1,0 +1,111 @@
+/* === hero.css === */
+
+/* Base hero layout */
+.hero {
+  display: flex;
+  flex-direction: column;
+  gap: var(--grid-gap-medium);
+  padding: var(--padding-big) var(--padding-normal);
+  min-height: 65vh;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--margin-big);
+  background-color: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+/* Content and image blocks */
+.hero__content,
+.hero__image {
+  width: 100%;
+  max-width: 600px;
+}
+
+.hero__content {
+  padding: var(--padding-normal);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+}
+
+/* Image wrapper and img style */
+.hero__image {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.hero__image img {
+  max-width: 300px;
+  height: auto;
+  border-radius: var(--border-radius-normal);
+  object-fit: cover;
+  box-shadow: 0 2px 4px var(--shadow-box-color);
+}
+
+/* Textual content */
+.hero__title {
+  font-size: var(--font-size-extra-large);
+  font-weight: var(--font-weight-bold);
+  color: var(--primary-color);
+  text-align: center;
+}
+
+.hero__subtitle {
+  font-size: var(--font-size-large);
+  font-weight: var(--font-weight-bold);
+  color: var(--accent-color);
+  text-align: center;
+}
+
+.hero__paragraph {
+  font-size: var(--font-size-base);
+  color: var(--text-color);
+  line-height: 1.6;
+  text-align: center;
+}
+
+.hero__cta {
+  margin-top: var(--margin-normal);
+  align-self: center;
+}
+
+/* === Desktop layout variations === */
+@media (min-width: 768px) {
+  .hero--left-right {
+    flex-direction: row;
+  }
+
+  .hero--right-left {
+    flex-direction: row-reverse;
+  }
+
+  .hero--top-bottom {
+    flex-direction: column;
+  }
+
+  .hero--bottom-top {
+    flex-direction: column-reverse;
+  }
+
+  .hero__content,
+  .hero__image {
+    width: 50%;
+    max-width: none;
+  }
+
+  .hero__title,
+  .hero__subtitle,
+  .hero__paragraph {
+    text-align: left;
+  }
+
+  .hero__cta {
+    align-self: flex-start;
+  }
+
+  .hero__image img {
+    max-width: 400px;
+  }
+}

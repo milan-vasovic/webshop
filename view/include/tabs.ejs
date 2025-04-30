@@ -1,21 +1,19 @@
-<link rel="stylesheet" href="/css/tabs.css">
-
-<div class="tabs-container">
-  <!-- Header tabova -->
-  <div class="tabs-header">
+<div class="tabs__container">
+  <!-- Tab buttons -->
+  <div class="tabs__header">
     <% tabsData.forEach((tab, index) => { %>
       <button 
-        class="tab-btn <%= index === 0 ? 'active' : '' %>" 
+        class="tabs__btn <%= index === 0 ? 'active' : '' %>" 
         data-tab="<%= index %>">
         <%= tab.title %>
       </button>
     <% }); %>
   </div>
 
-  <!-- Sadržaj tabova -->
-  <div class="tabs-content">
+  <!-- Tab content blocks -->
+  <div class="tabs__content">
     <% tabsData.forEach((tab, index) => { %>
-      <div class="tab-content <%= index === 0 ? 'active' : '' %>" data-tab="<%= index %>">
+      <div class="tabs__panel <%= index === 0 ? 'active' : '' %>" data-tab="<%= index %>">
         <% if (tab.type === 'table') { %>
           <%- include('../include/table.ejs', {
               items: tab.data,
@@ -34,7 +32,7 @@
               showId: false
           }) %>
         <% } else { %>
-          <p>Tip sadržaja nije podržan za "<%= tab.title %>".</p>
+          <p>Unsupported content type for "<%= tab.title %>".</p>
         <% } %>
       </div>
     <% }); %>

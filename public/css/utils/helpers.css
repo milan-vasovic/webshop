@@ -1,0 +1,13 @@
+.mt-0 { margin-top: 0 !important; }
+.mt-1 { margin-top: 0.5rem !important; }
+.mt-2 { margin-top: 1rem !important; }
+
+.pt-1 { padding-top: 0.5rem !important; }
+.pb-2 { padding-bottom: 1rem !important; }
+
+.text-center { text-align: center !important; }
+.text-uppercase { text-transform: uppercase !important; }
+.text-danger { color: var(--danger-color) !important; }
+
+.d-none { display: none !important; }
+.d-block { display: block !important; }

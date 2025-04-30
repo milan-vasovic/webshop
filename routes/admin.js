@@ -20,23 +20,35 @@ router.get("/dashboard", isAuth, isAdmin, AdminController.getDashboardPage);
 
 router.get("/kontakti", isAuth, isAdmin, ContactController.getContactsPage);
 
+router.get("/kontakti/pretraga/:search", isAuth, isAdmin, ContactController.getContactsSearchPage);
+
 router.get("/kontakt-detalji/:contactId", isAuth, isAdmin, ContactController.getContactDetailsPage);
 
 router.get("/kuponi", isAuth, isAdmin, CouponController.getCouponsPage);
+
+router.get("/kuponi/pretraga/:search", isAuth, isAdmin, CouponController.getCouponBySearch);
 
 router.get("/kupon-detalji/:couponId", isAuth, isAdmin, CouponController.getCouponDetailsPage);
 
 router.get("/dodajte-kupon", isAuth, isAdmin, CouponController.getAddCouponPage);
 
+router.get("/izmenite-kupon/:couponId", isAuth, isAdmin, CouponController.getEditCouponPage);
+
 router.get("/kupci", isAuth, isAdmin, CustomerController.getCustomersPage);
+
+router.get("/kupci/pretraga/:search", isAuth, isAdmin, CustomerController.getCustomersBySearchPage);
 
 router.get("/kupac-detalji/:customerId", isAuth, isAdmin, CustomerController.getCustomerProfilePage);
 
 router.get("/korisnici", isAuth, isAdmin, UserController.getUsersPage);
 
+router.get("/korisnici/pretraga/:search", isAuth, isAdmin, UserController.getUserBySearchPage);
+
 router.get("/korisnik-detalji/:userId", isAuth, isAdmin, UserController.getUserByIdPage);
 
 router.get("/artikli", isAuth, isAdmin, ItemController.getItemsPage);
+
+router.get("/artikli/pretraga/:search", isAuth, isAdmin, ItemController.getSearchItemsPage);
 
 router.get("/artikal-detalji/:itemId", isAuth, isAdmin, ItemController.getItemDetailsPage);
 
@@ -54,11 +66,15 @@ router.get("/istroja-detalji/:historyId", isAuth, isAdmin, HistoryController.get
 
 router.get("/objave", isAuth, isAdmin, ForumController.getAdminForumPage);
 
+router.get("/objave/pretraga/:search", isAuth, isAdmin, ForumController.getAdminSearchForumsPage);
+
 router.get("/objava-detalji/:postId", isAuth, isAdmin, ForumController.getAdminForumPostDetailsPage);
 
 router.get("/dodajte-objavu", isAuth, isAdmin, ForumController.getAddForumPostPage);
 
 router.get('/porudzbine', isAuth, isAdmin, OrderController.getOrdersPage);
+
+router.get('/porudzbine/pretraga/:search', isAuth, isAdmin, OrderController.getSearchOrdersPage);
 
 router.get('/porudzbina-detalji/:orderId', isAuth, isAdmin, OrderController.getOrderDetailsPage);
 
@@ -114,7 +130,7 @@ router.post("/artikal-dodavanje", [
     body("status")
         .isArray({ min: 1 })
         .withMessage("Status must be an array with at least one value.")
-        .custom((status) => status.every((stat) => ["action", "featured", "empty", "normal"].includes(stat)))
+        .custom((status) => status.every((stat) => ["action", "featured", "empty", "normal","not-published"].includes(stat)))
         .withMessage("Invalid status value."),
 
     body("price")
@@ -147,7 +163,7 @@ router.post("/artikal-dodavanje", [
     body("variations.*.size")
         .isString()
         .withMessage("Variation size must be a string.")
-        .isIn(["XS", "S", "M", "L", "XL", "2XL", "3XL", "4XL", "S/M", "M/L", "L/XL", "XL/2XL", "2XL/3XL", "3XL/4XL", "Uni", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35"])
+        .isIn(["XS", "S", "M", "L", "XL", "2XL", "3XL", "4XL", "XS/S", "S/M", "M/L", "L/XL", "XL/2XL", "2XL/3XL", "3XL/4XL", "Uni", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35"])
         .withMessage("Invalid variation size."),
 
     body("variations.*.color")
@@ -283,7 +299,7 @@ router.post("/artikal-izmena", [
         .optional()
         .isArray({ min: 1 })
         .withMessage("Status must be an array with at least one value.")
-        .custom((status) => status.every((stat) => ["action", "featured", "empty", "normal", "partnership"].includes(stat)))
+        .custom((status) => status.every((stat) => ["action", "featured", "empty", "normal", "partnership","not-published"].includes(stat)))
         .withMessage("Invalid status value."),
 
     body("price")
@@ -319,7 +335,7 @@ router.post("/artikal-izmena", [
         .optional()
         .isString()
         .withMessage("Variation size must be a string.")
-        .isIn(["XS", "S", "M", "L", "XL", "2XL", "3XL", "4XL", "S/M", "M/L", "L/XL", "XL/2XL", "2XL/3XL", "3XL/4XL", "Uni", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35"])
+        .isIn(["XS", "S", "M", "L", "XL", "2XL", "3XL", "4XL", "XS/S", "S/M", "M/L", "L/XL", "XL/2XL", "2XL/3XL", "3XL/4XL", "Uni", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35"])
         .withMessage("Invalid variation size."),
 
     body("variations.*.color")
@@ -464,6 +480,45 @@ router.post('/kupon-dodavanje',[
         })
 ], isAuth, isAdmin, CouponController.postNewCoupon);
 
+router.post('/kupon-izmena',[
+    body('status')
+    .isArray({ min: 1 })
+    .withMessage('Morate izabrati bar jedan status.'),
+
+    body('discount')
+    .notEmpty()
+    .withMessage('Popust je obavezan.')
+    .bail()
+    .isFloat({ min: 5, max: 100 })
+    .withMessage('Popust mora biti između 5 i 100.'),
+
+    body('amount')
+    .optional({ checkFalsy: true })
+    .isFloat({ min: 0 })
+    .withMessage('Količina mora biti broj veći ili jednako 0.'),
+
+    body('startDate')
+    .optional({ checkFalsy: true })
+    .isISO8601()
+    .withMessage('Datum početka nije validan.'),
+
+    body('endDate')
+    .optional({ checkFalsy: true })
+    .isISO8601()
+    .withMessage('Datum završetka nije validan.'),
+
+    body('couponId')
+    .isMongoId()
+    .withMessage('Kupon ID nije validan.'),
+
+    body("honeypot")
+        .custom((value) => {
+        if (value) {
+            throw new Error("Spam detektovan.");
+        }
+        return true;
+        })
+], isAuth, isAdmin, CouponController.postEditCoupon);
 
 router.post('/porudzbine/pretraga', [], isAuth, isAdmin, OrderController.postOrderSearch);
 
@@ -473,9 +528,13 @@ router.post('/kupci/pretraga', [], isAuth, isAdmin, CustomerController.postSearc
 
 router.post('/kuponi/pretraga', [], isAuth, isAdmin, CouponController.postSearchCoupon);
 
-router.post('/napravite-objavu', [], isAuth, isAdmin, ForumController.postAddtPost);
+router.post('/napravite-objavu', [], isAuth, isAdmin, ForumController.postAddPost);
 
-router.post("/izmenite-porudzbinu", [], isAuth, isAdmin, OrderController.postEditOrderStatus)
+router.post("/izmenite-porudzbinu", [], isAuth, isAdmin, OrderController.postEditOrderStatus);
+
+router.post('/objave/pretraga', [], isAuth, isAdmin, ForumController.postAdminSearchPost);
+
+router.delete('/izbrisite-objavu', isAuth, isAdmin, ForumController.deletePostById);
 
 router.delete('/izbrisite-kupon', isAuth, isAdmin, CouponController.deleteCouponById);
 

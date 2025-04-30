@@ -12,23 +12,51 @@ import CustomerService from '../service/customerService.js';
  */
 async function getCustomersPage(req, res, next) {
     try {
-        const search = req.query.search;
-        let customers;
+        const page = parseInt(req.query.page) || 1;
+        const limit = 10;
 
-        if (search) {
-            customers = await CustomerService.findCustomers(search);
-        } else {
-            customers = await CustomerService.findCustomers();
-        }
+        const customers = await CustomerService.findCustomers(limit, page);
+        const totalPages = Math.ceil(customers.totalCount / limit);
 
         return res.render("admin/customer/customers", {
             path: "/admin/kupci",
             pageTitle: "Admin Kupci",
             pageDescription: "Prikaz svih Kupaca za admina",
             pageKeyWords: "Admin, Kupci, Upravljanje, Informacije",
-            customers: customers
+            customers: customers,
+            currentPage: page,
+            totalPages: totalPages,
+            basePath: `/admin/kupci`,
+            index: false,
+            featureImage: undefined,
         })
 
+    } catch (error) {
+        next(error);
+    }
+}
+
+async function getCustomersBySearchPage(req, res, next) {
+    try {
+        const search = req.params.search;
+        const page = parseInt(req.query.page) || 1;
+        const limit = 10;
+
+        const customers = await CustomerService.findCustomersBySearch(search, limit, page);
+        const totalPages = Math.ceil(customers.totalCount / limit);
+
+        return res.render("admin/customer/customers", {
+            path: "/admin/kupci",
+            pageTitle: "Admin Kupci Pretraga: " + search,
+            pageDescription: "Prikaz svih Kupaca za admina",
+            pageKeyWords: "Admin, Kupci, Upravljanje, Informacije",
+            customers: customers,
+            currentPage: page,
+            totalPages: totalPages,
+            basePath: `/admin/kupci/pretraga/${search}`,
+            index: false,
+            featureImage: undefined,
+        })
     } catch (error) {
         next(error);
     }
@@ -40,15 +68,25 @@ async function getCustomersPage(req, res, next) {
 async function getCustomerProfilePage(req, res, next) {
     try {
         const customerId = req.params.customerId;
+        const email = req.query.email;
+    
+        let customer;
+        if (email) {
+            customer = await CustomerService.findCustomerByEmail(email);
 
-        const customer = await CustomerService.findCustomerById(customerId);
+            return res.redirect(`/admin/korisnik-detalji/${customer._id}`);
+        } else {
+            customer = await CustomerService.findCustomerById(customerId);
+        }
 
         return res.render("admin/customer/customer-details", {
             path: "/admin/kupac-detalji",
             pageTitle: "Profil Kupca",
             pageDescription: "Prikaz profila kupca, sve informacije i porudžbine",
             pageKeyWords: "Admin, Kupac Detalji, Informacije, Porudzbine",
-            customer: customer
+            customer: customer,
+            index: false,
+            featureImage: undefined,
         })
 
     } catch (error) {
@@ -66,7 +104,7 @@ function postSearchCustomer(req, res, next) {
             return res.redirect("/admin/kupci");
         }
 
-        return res.redirect(`/admin/kupci?search=${search}`);
+        return res.redirect(`/admin/kupci/pretraga/${search}`);
     } catch (error) {
         next(error);
     }
@@ -74,6 +112,7 @@ function postSearchCustomer(req, res, next) {
 
 export default {
     getCustomersPage,
+    getCustomersBySearchPage,
     getCustomerProfilePage,
     postSearchCustomer
 }

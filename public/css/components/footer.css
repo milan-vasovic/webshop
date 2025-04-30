@@ -1,0 +1,102 @@
+/* === footer.css === */
+
+/* Main footer wrapper */
+.main-footer {
+  width: 100%;
+  background-color: var(--primary-color);
+  color: var(--white-color);
+  padding: var(--padding-normal);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--grid-gap-medium);
+  text-align: center;
+}
+
+/* Child blocks – shared structure */
+.footer-info,
+.main-footer__nav,
+.footer-bottom {
+  width: 100%;
+}
+
+/* Navigation block */
+.main-footer__nav {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.main-footer__item-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.main-footer__item a {
+  text-decoration: none;
+  color: var(--white-color);
+  font-size: var(--font-size-base);
+  transition: color var(--transition-fast);
+}
+.main-footer__item a:hover,
+.main-footer__item a:active,
+.main-footer__item a.active {
+  color: var(--accent-color);
+}
+
+/* Informacije: adresa, telefon itd. */
+.footer-info {
+  font-size: var(--font-size-small);
+  color: var(--white-color);
+}
+.footer-info p {
+  margin: 0.2rem 0;
+}
+.footer-info a {
+  color: var(--accent-color);
+  text-decoration: none;
+}
+.footer-info a:hover {
+  color: var(--accent-hover-color);
+}
+
+/* Dno footera – autorska prava */
+.footer-bottom {
+  font-size: var(--font-size-small);
+  color: var(--white-color);
+}
+.footer-bottom p {
+  margin: 0.2rem 0;
+}
+.footer-bottom a {
+  color: var(--accent-color);
+  text-decoration: none;
+}
+.footer-bottom a:hover {
+  color: var(--accent-hover-color);
+}
+
+/* === DESKTOP LAYOUT === */
+@media (min-width: 768px) {
+  .main-footer {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .footer-info,
+  .main-footer__nav,
+  .footer-bottom {
+    width: auto;
+  }
+
+  .main-footer__item-list {
+    justify-content: flex-start;
+  }
+}

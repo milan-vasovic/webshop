@@ -1,0 +1,13 @@
+/* === checkout.css === */
+
+/* Mobile-first layout adjustment:
+   By default, everything stacks vertically – override order if needed */
+@media (max-width: 767px) {
+  .right__container-50 {
+    order: -1; /* move right column to top */
+  }
+
+  .left__container-50 {
+    order: 1; /* move left column below */
+  }
+}

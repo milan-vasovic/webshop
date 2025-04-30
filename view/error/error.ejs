@@ -1,8 +1,12 @@
-<div class="error-container">
+<%- include('../include/head.ejs') %>
+<%- include('../include/navigation.ejs') %>
+<section class="container main__container flex flex-column align-center">
     <p class="error-code"><%= statusCode %></p>
     <p class="error-message"><%= errorMsg || "Došlo je do greške. Pokušajte ponovo kasnije." %></p>
     <% if (errorDetails) { %>
         <p class="error-details"><%= errorDetails %></p>
     <% } %>
     <a href="/" class="back-link">Nazad na početnu stranicu</a>
-</div>
+    </section>
+
+<%- include('../include/end.ejs') %>

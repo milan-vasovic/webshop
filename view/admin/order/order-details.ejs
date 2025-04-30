@@ -1,12 +1,9 @@
 <%- include('../../include/head.ejs') %>
-<link rel="stylesheet" href="/css/table.css">
-<link rel="stylesheet" href="/css/form.css">
-
 <%- include('../../include/navigation.ejs') %>
-<section class="main__container">
+<section class="container main__container">
     <h1 class="main__title"><%= pageTitle %></h1>
     <div class="column-row__container">
-        <div class="left__container-20">
+        <div class="left__container-30">
             <% if (order.Status.value !== 'failed' && order.Status.value !== 'cancelled') { %>
                 <div>
                     <button id="toggleBtn" class="btn-secondary">Upravljanje</button>
@@ -38,7 +35,7 @@
             <h3>Datum: <%= order.Datum.value %></h3>
             <h3>Status: <%= order.Status.value %></h3>
             <hr><br>
-            <h3>Kupac: <a href="/admin/<% if (order.Kupac.Tip.value === 'User') { %>korisnik-detalji<% } else { %>kupac-detalji<% } %>/<%= order.Kupac.ID.value %>" class="main__title"><%= order.Kupac.Ime.value %> <%= order.Kupac.Prezime.value %></a></h3>
+            <h3>Kupac: <a href="/admin/<% if (order.Kupac.Tip.value === 'User') { %>korisnik-detalji<% } else { %>kupac-detalji<% } %>/<%= order.Kupac.ID.value %>?email=<%= order.Kupac.Email.value %>" class="main__title"><%= order.Kupac.Ime.value %> <%= order.Kupac.Prezime.value %></a></h3>
             <p>Broj Telefona: <%= order.Telefon.value %></p>
             <p>Adresa: <%= order.Adresa.Grad.value %>, <%= order.Adresa.Ulica.value %>, <%= order.Adresa.Broj.value %>, <%= order.Adresa["Poštanski Broj"].value %></p>
             <p>Napomena: <%= order.Napomena.value %></p>
@@ -48,7 +45,7 @@
             <p>Poštarina: <strong><%= order.Poštarina.value %> RSD</strong></p>
             <h2>Ukupna Cena: <%= order['Ukupna Cena'].value %></h2>
         </div>
-        <div class="right__container-80">
+        <div class="right__container-70">
             <%- include('../../include/table.ejs', {
                 items: order.Artikli,
                 showId: false,

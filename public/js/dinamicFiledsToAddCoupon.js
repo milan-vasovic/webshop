@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const availableStatuses = ["acitve", "inactive", "single-use", "multiple-use","time-sensitive","amoun-sensitive"];
+    const availableStatuses = ["active", "inactive", "single-use", "multiple-use", "time-sensitive", "amount-sensitive"]
 
     // Lista za praćenje izabranih statusa
     const selectedStatuses = [];
@@ -100,5 +100,24 @@ document.addEventListener('DOMContentLoaded', () => {
     // Inicijalno ažuriranje opcija u postojećim poljima
     updateSelectedStatuses();
     updateStatusOptions();
+
+    // Dodavanje event listener-a na već postojeće dugmiće "Izbriši"
+    const existingRemoveButtons = statusesContainer.querySelectorAll('.removeField');
+    existingRemoveButtons.forEach((removeButton) => {
+        removeButton.addEventListener('click', (e) => {
+            const group = removeButton.closest('.dynamic-group');
+            const select = group.querySelector('select');
+            if (select && select.value) {
+                const index = selectedStatuses.indexOf(select.value);
+                if (index !== -1) {
+                    selectedStatuses.splice(index, 1);
+                }
+            }
+            group.remove();
+            updateSelectedStatuses();
+            updateStatusOptions();
+    });
+});
+
 
 });

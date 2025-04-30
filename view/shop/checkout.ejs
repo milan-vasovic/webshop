@@ -1,10 +1,7 @@
 <%- include('../include/head.ejs') %>
-<link rel="stylesheet" href="/css/form.css">
-<link rel="stylesheet" href="/css/table.css">
-<link rel="stylesheet" href="/css/checkout.css">
 <%- include('../include/navigation.ejs') %>
 
-<section class="main__container">
+<section class="container main__container">
   <h1 class="main__title"><%= pageTitle %></h1>
   <!-- Responsive kontejner: na mobilu kolona, na desktopu red -->
   <div class="column-row__container">
@@ -28,7 +25,7 @@
         </div>
         <div class="main-form__group">
           <label class="main-form__label" for="telephoneInput">Broj Telefona:</label>
-          <% if (userInfo && userInfo.Telefoni) { %>
+          <% if (userInfo && userInfo.Telefoni && userInfo.Telefoni.length > 0) { %>
             <select class="main-form__select" name="telephone" id="telephoneInput">
               <% userInfo.Telefoni.forEach(tel => { %>
                 <option value="<%= tel.Broj %>"><%= tel.Broj %></option>
@@ -41,7 +38,7 @@
             <input type="hidden" name="isNewTelephone" value="true">
           <% } %>
         </div>
-        <% if (userInfo && userInfo.Adrese) { %>
+        <% if (userInfo && userInfo.Adrese && userInfo.Adrese.length > 0) { %>
           <div class="main-form__group">
             <label class="main-form__label" for="addressInput">Adrese:</label>
             <select class="main-form__select" name="address" id="addressInput">

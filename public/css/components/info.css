@@ -1,0 +1,57 @@
+/* === info.css === */
+
+/* Main wrapper */
+.info__container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--grid-gap-medium);
+  padding: var(--padding-normal);
+}
+
+/* Each item group */
+.info__item {
+  background-color: var(--white-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-normal);
+  box-shadow: 0 2px 4px var(--shadow-box-color);
+  padding: var(--padding-normal);
+  display: flex;
+  flex-direction: column;
+  gap: var(--grid-gap-small);
+}
+
+/* Key-value pair line */
+.info__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+/* Label */
+.info__key {
+  font-weight: var(--font-weight-bold);
+  color: var(--primary-color);
+}
+
+/* Value block */
+.info__value {
+  color: var(--text-color);
+  flex: 1;
+}
+
+/* Nested list display */
+.info__list {
+  margin-top: 0.3rem;
+  margin-left: 1rem;
+  list-style-type: none;
+  color: var(--text-color);
+  font-size: var(--font-size-small);
+}
+
+/* Responsive spacing */
+@media (max-width: 768px) {
+  .info__row {
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+}

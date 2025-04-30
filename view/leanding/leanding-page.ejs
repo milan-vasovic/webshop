@@ -1,10 +1,7 @@
 <%- include('../include/head.ejs') %>
-<link rel="stylesheet" href="/css/leanding.css">
-<link rel="stylesheet" href="/css/card.css">
-<link rel="stylesheet" href="/css/form.css">
 <%- include('../include/navigation.ejs') %>
 
-<section class="main__container">
+<section class="container main__container">
   <!-- Hero sekcija -->
   <%- include('../include/hero.ejs', {
     orientation: "left-right",
@@ -17,28 +14,42 @@
     ],
     ctaLink: "/prodavnica",
     ctaText: "Posetite prodavnicu",
-    imageSrc: "/images/hero.png",
-    imageAlt: "hero image"
+    imageSrc: "/images/tophelanke_hero.jpg",
+    imageAlt: "tophelanke hero helanke prodavnica"
   }) %>
   
-
   <!-- Policies sekcija (kratki info o garanciji, dostavi, sl. ) -->
   <div class="circular-badges-container">
-    <%- include('../include/circularBadge.ejs', {
-      title: "Brza Dostava",
-      text: "Post Express",
-      image: ""
-    }) %>
-    <%- include('../include/circularBadge.ejs', {
-      title: "Garancija Zamene",
-      text: "U roku od 7 dana, bez pitanja.",
-      image: ""
-    }) %>
-    <%- include('../include/circularBadge.ejs', {
-      title: "Povrata Novca",
-      text: "U roku od 7 dana, bez pitanja.",
-      image: ""
-    }) %>
+    <div class="circular-badges-slider">
+      <div class="circular-badges-track">
+        <%- include('../include/circularBadge.ejs', {
+          title: "Brza Dostava",
+          text: "Post Express",
+          icon: "local_shipping"
+        }) %>
+        <%- include('../include/circularBadge.ejs', {
+          title: "Garancija Zamene",
+          text: "U roku od 14 dana, bez pitanja.",
+          icon: "sync_alt"
+        }) %>
+        <%- include('../include/circularBadge.ejs', {
+          title: "Povrata Novca",
+          text: "U roku od 14 dana, bez pitanja.",
+          icon: "currency_exchange"
+        }) %>
+        <%- include('../include/circularBadge.ejs', {
+          title: "Sigurna Kupovina",
+          text: "Vaši podaci su enkriptovani i bezbedni.",
+          icon: "lock"
+        }) %>
+        <%- include('../include/circularBadge.ejs', {
+          title: "Lako Dostupni",
+          text: "Možete nas kontaktirati putem forme, email ili teleofna.",
+          icon: "contact_support"
+        }) %>
+      </div>
+    </div>
+
   </div>
 
   <!-- Shop Featured sekcija -->
@@ -62,6 +73,38 @@
     </div>
   </div>
 
+  <!-- Social proof sekcija (recenzije, ocene ili influencer endorsement) -->
+  <div class="social-proof">
+    <h1 class="main__title">Šta kažu naše zadovoljne klijentkinje?</h1>
+    <div class="testimonial-slider">
+      <div class="testimonial-track">
+        <%- include('../include/testimonialCard.ejs', {
+          image: "/images/1.png", 
+          name: "Eleonora Vasović",
+          rating: 5,
+          text: "Odlična usluga, brza dostava i kvalitetni proizvodi. Preporučujem svima!"
+        }) %>
+        <%- include('../include/testimonialCard.ejs', {
+          image: "/images/1.png", 
+          name: "Jovana Jovanović",
+          rating: 5,
+          text: "Sve pohvale za brzu dostavu i kvalitet proizvoda. Jako sam zadovoljna!"
+        }) %>
+        <%- include('../include/testimonialCard.ejs', {
+          image: "/images/1.png", 
+          name: "Ana Anić",
+          rating: 5,
+          text: "Sve je bilo super, veličina nije odgovarala, uspešno i lako je urađena zamena. Sve u svemu, zadovoljna sam."
+        }) %>
+        
+      </div>
+    
+      <!-- Prev/Next buttons -->
+      <button class="testimonial-btn testimonial-btn--prev" aria-label="Prethodni">‹</button>
+      <button class="testimonial-btn testimonial-btn--next" aria-label="Sledeći">›</button>
+    </div> 
+  </div>
+
   <div class="shop-featured">
     <h1 class="main__title"><a href="/prodavnica/akcija" >Na Akciji</a></h1>
     <div class="cards__container">
@@ -82,37 +125,11 @@
     </div>
   </div>
 
-  <!-- Social proof sekcija (recenzije, ocene ili influencer endorsement) -->
-  <div class="social-proof">
-    <h1 class="main__title">Šta kažu naše zadovoljne klijentkinje?</h1>
-      <div class="testimonials">
-        <!-- Pretpostavimo da imaš niz "testimonials" iz kontrolera -->
-        <%- include('../include/testimonialCard.ejs', {
-          image: "/images/1.png", 
-          name: "Eleonora Vasović",
-          rating: 5,
-          text: "Odlična usluga, brza dostava i kvalitetni proizvodi. Preporučujem svima!"
-        }) %>
-        <%- include('../include/testimonialCard.ejs', {
-          image: "/images/1.png", 
-          name: "Jovana Jovanović",
-          rating: 5,
-          text: "Sve pohvale za brzu dostavu i kvalitet proizvoda. Jako sam zadovoljna!"
-        }) %>
-        <%- include('../include/testimonialCard.ejs', {
-          image: "/images/1.png", 
-          name: "Ana Anić",
-          rating: 5,
-          text: "Sve je bilo super, veličina nije odgovarala, uspešno i lako je urađena zamena. Sve u svemu, zadovoljna sam."
-        }) %>
-    </div>
-  </div>
-
   <!-- Blog sekcija -->
   <div class="blog-section">
     <h1 class="main__title">Najnovije sa Foruma</h1>
     <div class="cards__container">
-      <% forumPosts.forEach(item => { %>
+      <% forumPosts.posts.forEach(item => { %>
         <%- include('../include/card.ejs', {
             item: item,
             showId: false,
@@ -140,5 +157,4 @@
     </div>
   </div>
 </section>
-
 <%- include('../include/end.ejs') %>

@@ -1,0 +1,177 @@
+/* === form.css === */
+
+/* Main container for the entire form */
+.main-form__container {
+  margin: auto;
+  padding: var(--padding-normal);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Wrapper form block – visually isolated */
+.main-form {
+  margin: auto;
+  padding: var(--padding-big);
+  background-color: var(--white-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-normal);
+  box-shadow: 0 2px 4px var(--shadow-box-color);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  width: 100%;
+  max-width: 600px;
+}
+
+/* Labels */
+.main-form__label {
+  cursor: pointer;
+  font-weight: var(--font-weight-bold);
+  margin-bottom: var(--margin-small);
+}
+
+/* Standard inputs */
+.main-form__input,
+.main-form__textarea,
+.main-form__select,
+.main-form__datetime {
+  width: 100%;
+  padding: var(--padding-small);
+  margin: var(--margin-small) 0;
+  font: inherit;
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-small);
+}
+
+/* File input */
+.main-form__file {
+  width: 100%;
+  font: inherit;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-small);
+  margin: var(--margin-small) 0;
+  padding: var(--padding-small);
+}
+
+/* Focus state for inputs */
+.main-form__input:focus,
+.main-form__textarea:focus,
+.main-form__select:focus,
+.main-form__datetime:focus,
+.main-form__file:focus {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 5px var(--accent-color);
+  outline: none;
+}
+
+/* Select specific styles */
+.main-form__select option {
+  padding: var(--padding-small);
+  font-size: var(--font-size-small);
+}
+
+/* Grouping input elements */
+.main-form__group {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin-bottom: var(--margin-normal);
+}
+
+/* Grouping for checkbox/acceptance – mobile: column, desktop: row */
+.main-form__group-acceptance {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin: var(--margin-small) 0;
+}
+
+@media (min-width: 768px) {
+  .main-form__group-acceptance {
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+  }
+}
+
+/* Dynamic group spacing (e.g. repeated fields) */
+.dynamic-group {
+  margin-bottom: 0.5rem;
+}
+
+/* Step container (for multi-step forms) */
+.main-form__step-container textarea {
+  width: 100%;
+}
+.main-form__step-container button {
+  margin-left: 0;
+}
+
+/* User feedback messages */
+.main-form__user-message,
+.user-message--error {
+  width: 100%;
+  padding: var(--padding-small);
+  border-radius: var(--border-radius-small);
+  text-align: center;
+  margin-top: var(--margin-small);
+  font-size: var(--font-size-small);
+}
+
+.main-form__user-message {
+  background: var(--danger-color);
+  border: 1px solid var(--primary-color);
+  color: var(--white-color);
+}
+
+.user-message--error {
+  background: var(--danger-color);
+  border: 1px solid var(--accent-text-color);
+  color: var(--white-color);
+}
+
+/* Input container layout – responsive alignment */
+.input-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-items: start;
+}
+
+@media (min-width: 768px) {
+  .input-container {
+    flex-direction: row;
+    justify-content: space-evenly;
+  }
+}
+
+/* Full-width inputs for specific grouped sections */
+.main-form__category-container input,
+.main-form__image-container input,
+.main-form__ingredient input {
+  width: 100%;
+}
+
+/* Select optgroups and sub-options */
+.main-form__select optgroup {
+  font-weight: var(--font-weight-bold);
+  color: var(--black-color);
+  font-size: var(--font-size-base);
+}
+
+.sub-optgroup {
+  font-weight: var(--font-weight-regular);
+  font-size: var(--font-size-small);
+}
+
+.sub-optgroup2 {
+  font-size: var(--font-size-extra-small) !important;
+}
+
+.sub-optgroup3 {
+  font-size: calc(var(--font-size-extra-small) - 0.1rem) !important;
+}

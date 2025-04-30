@@ -1,8 +1,7 @@
 <%- include('../../include/head.ejs') %>
-<link rel="stylesheet" href="/css/form.css">
 <%- include('../../include/navigation.ejs') %>
 
-<section class="main__container">
+<section class="container main__container">
   <div class="main-form__container">
     <h1 class="main-form__title"><%= pageTitle %></h1>
 
@@ -12,11 +11,13 @@
       <% } %>
 
       <!-- Kod kupona -->
-      <div class="main-form__group">
-        <label for="code" class="main-form__label">Kod:</label>
-        <input type="text" id="code" name="code" class="main-form__input" 
-               value="<%= existingData ? existingData.Kod.value : '' %>" required>
-      </div>
+       <% if (!editing) { %>
+        <div class="main-form__group">
+          <label for="code" class="main-form__label">Kod:</label>
+          <input type="text" id="code" name="code" class="main-form__input" 
+                value="<%= existingData ? existingData.Kod.value : '' %>" required>
+        </div>
+      <% } %>
 
       <!-- Status (dinamički dodavanje polja) -->
       <div class="main-form__group" id="statusContainer">
@@ -69,19 +70,29 @@
                value="<%= existingData ? existingData.Količina.value : '' %>">
       </div>
 
+      <%
+        function toLocalDatetimeString(date) {
+          if (!date || !(date instanceof Date)) return '';
+          const offset = date.getTimezoneOffset(); // u minutima
+          const local = new Date(date.getTime() - offset * 60000); // pomeri u lokalno vreme
+          return local.toISOString().slice(0, 16); // 'YYYY-MM-DDTHH:MM'
+        }
+      %>
+
       <!-- Datum početka -->
       <div class="main-form__group">
         <label for="startDateInput" class="main-form__label">Datum Početka:</label>
         <input class="main-form__datetime" type="datetime-local" id="startDateInput" name="startDate"
-               value="<%= existingData ? existingData['Datum Početka'].value : '' %>">
+          value="<%= (editing && existingData && existingData['Datum Početka']) ? toLocalDatetimeString(existingData['Datum Početka'].value) : '' %>">
       </div>
 
       <!-- Datum završetka -->
       <div class="main-form__group">
         <label for="endDateInput" class="main-form__label">Datum Završetka:</label>
         <input class="main-form__datetime" type="datetime-local" id="endDateInput" name="endDate"
-               value="<%= existingData ? existingData['Datum Završetka'].value : '' %>">
+          value="<%= (editing && existingData && existingData['Datum Završetka']) ? toLocalDatetimeString(existingData['Datum Završetka'].value) : '' %>">
       </div>
+
 
       <% if (editing && existingData) { %>
         <input class="main-form__input" id="couponId" type="hidden" name="couponId" 

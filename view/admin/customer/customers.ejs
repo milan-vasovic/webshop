@@ -1,8 +1,6 @@
 <%- include('../../include/head.ejs') %>
-<link rel="stylesheet" href="/css/table.css">
-<link rel="stylesheet" href="/css/form.css">
 <%- include('../../include/navigation.ejs') %>
-<section class="main__container">
+<section class="container main__container">
     <h1 class="main__title"><%= pageTitle %></h1>
     <form class="width-100 flex flex-row" action="/admin/kupci/pretraga" method="post">
         <div class="main-form__group width-80">
@@ -13,7 +11,7 @@
         <button type="submit" class="btn-secondary">Pretraga</button>
     </form>
     <%- include('../../include/table.ejs', {
-        items: customers,
+        items: customers.customers,
         showId: true,
         caption: "Kupci",
         hasActions: true,
@@ -26,6 +24,11 @@
                 linkName: 'Detalji'
             }
         ]
+    }) %>
+    <%- include('../../include/pagination.ejs', {
+        currentPage: currentPage,
+        totalPages: totalPages,
+        basePath: basePath
     }) %>
 </section>
 <%- include('../../include/end.ejs') %>

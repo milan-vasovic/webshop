@@ -1,12 +1,11 @@
 <%- include('../../include/head.ejs') %>
-<link rel="stylesheet" href="/css/form.css">
 <%- include('../../include/navigation.ejs') %>
 
-<section class="main__container">
+<section class="container main__container">
   <div class="main-form__container">
     <h1 class="main-form__title"><%= pageTitle %></h1>
 
-    <form action="/admin/kupon-dodavanje" 
+    <form action="/admin/napravite-objavu" 
           method="POST" class="main-form width-100" enctype="multipart/form-data">
       <% if (errorMessage) { %>
         <div class="user-message--error"><%= errorMessage %></div>
@@ -190,5 +189,5 @@
   </div>
 </section>
 
-<script src="/js/dinamicFiledsToAddPost.js"></script>
+<script src="/js/dinamicFiledsToAddPost.js"></script> 
 <%- include('../../include/end.ejs') %>

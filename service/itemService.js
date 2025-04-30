@@ -106,6 +106,8 @@ class ItemService {
    * @returns {Promise<Array>} - A promise that resolves to an array of categories.
    */
   static async findAllCategories(tag = null) {
+    let filter = { status: { $ne: "not-published" } };
+  
     if (tag) {
       let tags;
       try {
@@ -113,30 +115,16 @@ class ItemService {
       } catch (err) {
         tags = tag;
       }
-
-      const categories = await ItemModel.distinct("categories", {
-        tags: { $in: tags },
-      });
-
-      if (!categories) {
-        ErrorHelper.throwNotFoundError("Kategorije");
-      }
-
-      return {
-        Kategorije: categories,
-      };
+  
+      filter.tags = { $in: tags };
     }
-
-    const categories = await ItemModel.distinct("categories");
-
-    if (!categories) {
-      ErrorHelper.throwNotFoundError("Kategorije");
-    }
-
+  
+    const categories = await ItemModel.distinct("categories", filter);
+  
     return {
       Kategorije: categories,
     };
-  }
+  }  
 
   /**
    * Finds all tags.
@@ -144,6 +132,8 @@ class ItemService {
    * @returns {Promise<Array>} - A promise that resolves to an array of tags.
    */
   static async findAllTags(category = null) {
+    const filter = { status: { $ne: "not-published" } };
+  
     if (category) {
       let categories;
       try {
@@ -151,28 +141,18 @@ class ItemService {
       } catch (err) {
         categories = category;
       }
-      const tags = await ItemModel.distinct("tags", {
-        categories: { $in: categories },
-      });
-
-      if (!tags) {
-        ErrorHelper.throwNotFoundError("Tagovi");
-      }
-
-      return {
-        Tagovi: tags,
-      };
+  
+      filter.categories = { $in: categories };
     }
-    const tags = await ItemModel.distinct("tags");
-
-    if (!tags) {
-      ErrorHelper.throwNotFoundError("Tagovi");
-    }
+  
+    const tags = await ItemModel.distinct("tags", filter);
+  
+    const sortedTags = tags.sort((a, b) => a.localeCompare(b, "sr", { sensitivity: 'base' }));
 
     return {
-      Tagovi: tags,
+      Tagovi: sortedTags,
     };
-  }
+  }  
 
   /**
    * Finds all items.
@@ -203,7 +183,12 @@ class ItemService {
    * @returns {Promise<Array>} - A promise that resolves to an array of featured items.
    */
   static async findFeaturedItems(category = null, tag = null, limit = 10, skip = 0) {
-    const filter = { status: { $in: ["featured"] } };
+    const filter = { 
+      status: { 
+        $in: ["featured"],
+        $nin: ["not-published"]
+      }
+    };
 
     if (category) {
       filter.categories = { $regex: category, $options: "i" };
@@ -216,7 +201,7 @@ class ItemService {
     const items = await ItemModel.find(filter)
       .sort({ soldCount: -1, _id: 1  })
       .select(
-        "title shortDescription price actionPrice categories tags featureImage status"
+        "title shortDescription price actionPrice featureImage status"
       )
       .skip(skip)
       .limit(limit)
@@ -226,7 +211,7 @@ class ItemService {
       ErrorHelper.throwNotFoundError("Istaknuti Artikli");
     }
 
-    return ItemService.mapItemsForCard(items);
+    return ItemService.mapItemsForShop(items);
   }
 
   /**
@@ -235,7 +220,12 @@ class ItemService {
    * @returns {Promise<Array>} - A promise that resolves to an array of action items.
    */
   static async findActionItems(category = null, tag = null, limit = 10, skip = 0) {
-    const filter = { status: { $in: ["action"] } };
+    const filter = {
+      status: {
+        $in: ["action"],
+        $nin: ["not-published"]
+      }
+    };    
 
     if (category) {
       filter.categories = { $regex: category, $options: "i" };
@@ -248,7 +238,7 @@ class ItemService {
     const items = await ItemModel.find(filter)
       .sort({ soldCount: -1, _id: 1  })
       .select(
-        "title shortDescription price actionPrice categories tags featureImage status"
+        "title shortDescription price actionPrice featureImage status"
       )
       .skip(skip)
       .limit(limit)
@@ -258,7 +248,7 @@ class ItemService {
       ErrorHelper.throwNotFoundError("Akcijski Artikli");
     }
 
-    return ItemService.mapItemsForCard(items);
+    return ItemService.mapItemsForShop(items);
   }
 
   /**
@@ -274,39 +264,42 @@ class ItemService {
     limit = 10,
     skip = 0
   ) {
-    const filter = { categories: category };
-
+    const filter = {
+      categories: category,
+      $and: []
+    };
+  
     if (status) {
-      filter.status = { $in: Array.isArray(status) ? status : [status] };
+      const statuses = Array.isArray(status) ? status : [status];
+      filter.$and.push({ status: { $in: statuses } });
     }
-
-    if (excludeStatus) {
-      filter.status = {
-        $nin: Array.isArray(excludeStatus) ? excludeStatus : [excludeStatus],
-      };
+  
+    if (excludeStatus || !status) {
+      const excluded = Array.isArray(excludeStatus)
+        ? excludeStatus
+        : [excludeStatus || "not-published"];
+      filter.$and.push({ status: { $nin: excluded } });
     }
-
-    console.log("Skip vrednost je: ", skip);
-    console.log("Limit vrednost je: ", limit);
-    const items = await ItemModel.find(filter)
-      .sort({ soldCount: -1, _id: 1  })
-      .select("title shortDescription price actionPrice featureImage status")
-      .skip(skip)
-      .limit(limit)
-      .lean();
-
-      console.log("Items: ", items);
-    const itemCount = await ItemModel.find(filter).countDocuments();
-
-    if (!items) {
-      ErrorHelper.throwNotFoundError("Kategorije");
+  
+    if (filter.$and.length === 0) {
+      delete filter.$and;
     }
-
+  
+    const [items, itemCount] = await Promise.all([
+      ItemModel.find(filter)
+        .sort({ soldCount: -1, _id: 1 })
+        .select("title shortDescription price actionPrice featureImage status")
+        .skip(skip)
+        .limit(limit)
+        .lean(),
+      ItemModel.countDocuments(filter)
+    ]);
+  
     return {
       items: ItemService.mapItemsForShop(items),
       totalCount: itemCount
     };
-  }
+  }  
 
   /**
    * Finds items by tag.
@@ -321,36 +314,45 @@ class ItemService {
     limit = 10,
     skip = 0
   ) {
-    const filter = { tags: tag };
-
-    if (status) {
-      filter.status = { $in: Array.isArray(status) ? status : [status] };
-    }
-
+    const filter = {
+      tags: tag
+    };
+  
+    // Uvek isključi not-published
+    const excluded = new Set();
     if (excludeStatus) {
+      const excl = Array.isArray(excludeStatus) ? excludeStatus : [excludeStatus];
+      excl.forEach(e => excluded.add(e));
+    }
+    excluded.add("not-published");
+  
+    // Ako postoji status, koristi $in i $nin zajedno
+    if (status) {
+      const statuses = Array.isArray(status) ? status : [status];
       filter.status = {
-        $nin: Array.isArray(excludeStatus) ? excludeStatus : [excludeStatus],
+        $in: statuses,
+        $nin: Array.from(excluded)
       };
+    } else {
+      filter.status = { $nin: Array.from(excluded) };
     }
-
-    const items = await ItemModel.find(filter)
-      .sort({ soldCount: -1, _id: 1  })
-      .select("title shortDescription price actionPrice featureImage status")
-      .skip(skip)
-      .limit(limit)
-      .lean();
-
-    if (!items) {
-      ErrorHelper.throwNotFoundError("Tagovi");
-    }
-
-    const itemCount = await ItemModel.find(filter).countDocuments();
-
+    
+    const [items, itemCount] = await Promise.all([
+      ItemModel.find(filter)
+        .sort({ soldCount: -1, _id: 1 })
+        .select("title shortDescription price actionPrice featureImage status")
+        .skip(skip)
+        .limit(limit)
+        .lean(),
+      ItemModel.countDocuments(filter)
+    ]);
+  
     return {
       items: ItemService.mapItemsForShop(items),
       totalCount: itemCount
     };
   }
+  
 
   /**
    * Finds items by search query.
@@ -358,26 +360,59 @@ class ItemService {
    * @param {string} search - The search query to filter items by.
    * @returns {Promise<Array>} - A promise that resolves to an array of items.
    */
-  static async findItemsBySearch(filter, limit = 10, skip = 0) {
-    const items = await ItemModel.find(filter)
-      .select(
-        "title shortDescription price actionPrice status categories tags keyWords featureImage"
-      )
-      .skip(skip)
-      .limit(limit)
-      .lean();
-
-    if (!items) {
+  static async findItemsBySearch(search, limit = 10, page = 1, cond = false) {
+    const skip = (page - 1) * limit;
+  
+    const filter = {
+      $and: []
+    };
+  
+    if (!cond) {
+      filter.$and.push({ status: { $ne: "not-published" } });
+    }
+  
+    if (search) {
+      const searchNumber = parseFloat(search);
+      const conditions = [
+        { title: { $regex: search, $options: "i" } },
+        { sku: { $regex: search, $options: "i" } },
+        { categories: { $regex: search, $options: "i" } },
+        { tags: { $regex: search, $options: "i" } },
+        { keyWords: { $regex: search, $options: "i" } }
+      ];
+  
+      if (!isNaN(searchNumber)) {
+        conditions.push({ price: searchNumber });
+        conditions.push({ actionPrice: searchNumber });
+      }
+  
+      filter.$and.push({ $or: conditions });
+    }
+  
+    // Ako je $and prazan, brišemo ga da ne bi pravio problem
+    if (filter.$and.length === 0) {
+      delete filter.$and;
+    }
+  
+    const [items, itemCount] = await Promise.all([
+      ItemModel.find(filter)
+        .sort({ soldCount: -1, _id: 1 })
+        .select("title shortDescription price actionPrice status categories tags keyWords featureImage")
+        .skip(skip)
+        .limit(limit)
+        .lean(),
+      ItemModel.countDocuments(filter)
+    ]);
+  
+    if (!items || items.length === 0) {
       ErrorHelper.throwNotFoundError("Artikli");
     }
-
-    const itemCount = await ItemModel.find(filter).countDocuments();
-
+  
     return {
       items: ItemService.mapItemsForCard(items),
       totalCount: itemCount
     };
-  }
+  }  
 
   /**
    * Finds item details by ID or name.
@@ -415,41 +450,27 @@ class ItemService {
    * @param {string} [search] - The search query to filter items by.
    * @returns {Promise<Array>} - A promise that resolves to an array of admin items.
    */
-  static async findAdminItems(search, limit = 10, skip = 0) {
-    let filter = {};
-
-    if (search) {
-      const searchNumber = parseFloat(search);
-      let conditions = [
-        { title: { $regex: search, $options: "i" } },
-        { sku: { $regex: search, $options: "i" } },
-        { categories: { $regex: search, $options: "i" } },
-        { tags: { $regex: search, $options: "i" } },
-        { status: { $regex: search, $options: "i" } },
-      ];
-
-      if (!isNaN(searchNumber)) {
-        conditions.push({ price: searchNumber });
-        conditions.push({ actionPrice: searchNumber });
-      }
-
-      filter = { $or: conditions };
-    }
-
-    const items = await ItemModel.find(filter)
+  static async findAdminItems(limit = 10, page = 1) {
+    const skip = (page - 1) * limit;
+    const items = await ItemModel.find()
+      .sort({ soldCount: -1, _id: 1 })
       .select(
         "title shortDescription price actionPrice categories tags status sku featureImage"
       )
-      .sort({ soldCount: -1 })
-      .limit(limit)
       .skip(skip)
+      .limit(limit)
       .lean();
 
     if (!items) {
       ErrorHelper.throwNotFoundError("Artikli");
     }
 
-    return ItemService.mapItemsForCardForAdmin(items);
+    const itemCount = await ItemModel.find().countDocuments();
+
+    return {
+      items: ItemService.mapItemsForCardForAdmin(items),
+      totalCount: itemCount
+    }
   }
 
   /**

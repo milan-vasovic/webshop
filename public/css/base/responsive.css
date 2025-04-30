@@ -1,0 +1,31 @@
+/* === responsive.css === */
+
+/* Default mobile-first layout – stacked direction */
+.responsive-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--grid-gap-medium);
+}
+
+/* Breakpoint: tablet and up (min-width: 768px) */
+@media (min-width: 768px) {
+  /* Two-column layout */
+  .two-columns {
+    flex-direction: row;
+  }
+
+  .two-columns > * {
+    width: 50%;
+  }
+
+  /* Width modifiers for responsive design */
+  .half-width {
+    width: 50%;
+  }
+  .third-width {
+    width: 33.33%;
+  }
+  .quarter-width {
+    width: 25%;
+  }
+}

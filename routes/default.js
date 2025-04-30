@@ -33,7 +33,7 @@ router.post('/kontaktiranje', [
     
     body("title")
         .trim()
-        .isIn(["Informacije", "Pitanje", "Partnerstvo", "Nalog"]).withMessage("Neispravan naslov."),
+        .isIn(["Informacije", "Pitanje", "Porudžbine", "Partnerstvo", "Nalog", "Greška"]).withMessage("Neispravan naslov."),
 
     body("phone")
         .optional({ checkFalsy: true })

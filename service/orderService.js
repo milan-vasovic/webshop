@@ -24,6 +24,7 @@ class OrderService {
    */
   static async createNewOrder(
     buyer,
+    email,
     telephone,
     address,
     items,
@@ -35,22 +36,19 @@ class OrderService {
     try {
       const newShipping = process.env.SHIPPING_PRICE;
 
-      const newTotalPrice =
-        (Number(totalPrice) + Number(newShipping)) *
-        (Number(coupon?.discount || 100) / 100);
-
       const newOrder = new OrderModel({
         buyer: {
           type: buyer.type,
           ref: buyer.ref,
           firstName: buyer.firstName,
           lastName: buyer.lastName,
+          email: email,
         },
         telephone: telephone,
         items: items,
         address: address,
         shipping: newShipping,
-        totalPrice: newTotalPrice,
+        totalPrice: totalPrice,
         note: note,
         coupon: coupon,
       });
@@ -115,13 +113,13 @@ class OrderService {
 
       const newShipping = process.env.SHIPPING_PRICE;
       const newTotalPrice =
-        (Number(totalPrice) + Number(newShipping)) *
-        (Number(coupon?.discount || 100) / 100);
+      (Number(totalPrice) + Number(newShipping)) - ((Number(totalPrice) + Number(newShipping)) *
+      (Number(coupon?.discount || 0) / 100));
 
       const verificationToken = await CryptoService.createToken();
       const tokenExpiration = Date.now() + 2 * 24 * 60 * 60 * 1000;
 
-      const newOrder = new TemporaryOrderModel({
+      const newTemoraryOrder = new TemporaryOrderModel({
         buyer: {
           type: buyer.type,
           firstName: buyer.firstName,
@@ -142,7 +140,7 @@ class OrderService {
         hasNewAddress: hasNewAddress,
       });
 
-      return await newOrder.save({ session });
+      return await newTemoraryOrder.save({ session });
     } catch (error) {
       ErrorHelper.throwServerError(error);
     }
@@ -162,7 +160,7 @@ class OrderService {
       }
 
       if (Date.now() > tempOrder.tokenExpiration) {
-        return { success: false, message: "Porudybina je istekla!" };
+        return { success: false, message: "Porudžbina je istekla!" };
       }
 
       return tempOrder;
@@ -179,8 +177,28 @@ class OrderService {
    * @param {number} [skip=0] - The number of orders to skip.
    * @returns {Promise<Array>} - A promise that resolves to an array of orders.
    */
-  static async findOrders(search = null, limit = 10, skip = 0) {
+  static async findOrders(limit = 10, page = 1) {
     try {
+      const skip = (page - 1) * limit;
+      const orders = await OrderModel.find().sort({ date: -1 }).skip(skip).limit(limit);
+
+      if (!orders) {
+        ErrorHelper.throwNotFoundError("Porudžbine");
+      }
+
+      const totalCount = await OrderModel.countDocuments({});
+      return {
+        orders: this.mapOrders(orders),
+        totalCount: totalCount
+      };
+    } catch (error) {
+      ErrorHelper.throwServerError(error);
+    }
+  }
+
+  static async findOrdersBySearch(search, limit = 10, page = 1) {
+    try {
+      const skip = (page - 1) * limit;
       let orders;
       let matchStage = {}; // Ovde više ne koristimo samo $or
 
@@ -248,9 +266,19 @@ class OrderService {
         },
       ];
 
+      const countPipeline = [
+        { $match: matchStage },
+        { $count: "totalCount" },
+      ];
+      
       orders = await OrderModel.aggregate(pipeline);
-
-      return this.mapOrders(orders);
+      const countResult = await OrderModel.aggregate(countPipeline);
+      const totalCount = countResult.length > 0 ? countResult[0].totalCount : 0;
+  
+      return {
+        orders: this.mapOrders(orders),
+        totalCount,
+      };
     } catch (error) {
       ErrorHelper.throwServerError(error);
     }
@@ -314,13 +342,6 @@ class OrderService {
         ErrorHelper.throwNotFoundError("Porudžbina");
       }
 
-      let userInfo;
-      if (order.buyer.type === "User") {
-        userInfo = await UserService.findUserEmailById(order.buyer.ref);
-      } else {
-        userInfo = await CustomerService.findCustomerEmailById(order.buyer.ref);
-      }
-
       switch (status) {
         case "pending-payment":
           // Need to sent email to user that will inform them that order is sent
@@ -328,7 +349,7 @@ class OrderService {
 
           await EmailService.notifyUserThatOrderIsSent(
             order.buyer.firstName,
-            userInfo.email,
+            order.buyer.email,
             order._id
           );
           break;
@@ -370,6 +391,11 @@ class OrderService {
                 item.amount,
                 session
               );
+              await ItemService.changeItemSoldCount(
+                item.itemId,
+                -item.amount,
+                session
+              );
               await ItemService.changeVariationAmount(
                 item.itemId,
                 item.size,
@@ -382,7 +408,7 @@ class OrderService {
 
           await EmailService.notifyUserThatOrderIsReturned(
             order.buyer.firstName,
-            userInfo.email,
+            order.buyer.email,
             order._id
           );
 
@@ -405,7 +431,7 @@ class OrderService {
 
           await EmailService.notifyUserThatOrderIsCancelled(
             order.buyer.firstName,
-            userInfo.email,
+            order.buyer.email,
             order._id
           );
 
@@ -497,7 +523,11 @@ class OrderService {
       Tip: { value: order.buyer.type },
       Kupac: { value: order.buyer.firstName },
       Datum: {
-        value: order.date,
+        value: order.date.toLocaleDateString("sr-RS", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+        }),
       },
       "Ukupna Cena": { value: `${order.totalPrice} RSD` },
       Status: { value: order.status },
@@ -518,6 +548,7 @@ class OrderService {
         Ime: { value: order.buyer.firstName },
         Prezime: { value: CryptoService.decryptData(order.buyer.lastName) },
         ID: { value: order.buyer.ref._id },
+        Email: { value: order.buyer.email },
       },
       Datum: {
         value: order.date.toLocaleDateString("sr-RS", {

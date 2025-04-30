@@ -1,0 +1,56 @@
+/* === pagination.css === */
+
+/* Main pagination container */
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin: var(--margin-big) 0;
+}
+
+/* List wrapper for page links */
+.pagination ul {
+  display: flex;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  gap: var(--grid-gap-small);
+}
+
+/* Each list item */
+.pagination li {
+  display: inline-block;
+}
+
+/* Page link styles */
+.pagination a {
+  display: inline-block;
+  padding: var(--padding-small) var(--padding-normal);
+  color: var(--primary-color);
+  background-color: var(--white-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-small);
+  text-decoration: none;
+  transition: background-color var(--transition-fast),
+    color var(--transition-fast);
+  font-weight: var(--font-weight-bold);
+}
+
+/* Hover effect on links */
+.pagination a:hover {
+  background-color: var(--hover-color);
+}
+
+/* Active page indicator */
+.pagination a.active {
+  background-color: var(--accent-color);
+  color: var(--white-color);
+  border-color: var(--accent-color);
+}
+
+/* Ellipsis (...) between distant page numbers */
+.pagination span {
+  display: inline-block;
+  padding: var(--padding-small) var(--padding-normal);
+  color: var(--text-color);
+  font-weight: var(--font-weight-bold);
+}

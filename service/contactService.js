@@ -5,13 +5,30 @@ import EmailService from './emailService.js';
 
 import ErrorHelper from '../helper/errorHelper.js';
 
-class ContactService {
-    static async findAllContacts() {
-        try {
-            const contacts = await ContactModel.find()
-                .select("firstName email title date")
+import mongoose from "mongoose";
 
-            return this.mapContacts(contacts);
+class ContactService {
+    static async findAllContacts(limit = 10, page = 1) {
+        try {
+            const skip = (page - 1) * limit;
+
+            const [contacts, totalCount] = await Promise.all([
+                ContactModel.find()
+                    .sort({ date: -1 })
+                    .select("firstName email title date")
+                    .skip(skip)
+                    .limit(limit),
+                ContactModel.countDocuments()
+            ]);
+
+            if (!contacts) {
+                ErrorHelper.throwNotFoundError("Kontakt");
+            }
+
+            return {
+                contacts: this.mapContacts(contacts),
+                totalCount: totalCount,
+           };
 
         } catch (error) {
             ErrorHelper.throwServerError(error);
@@ -33,18 +50,38 @@ class ContactService {
         }
     }
 
-    static async findContactBySearch(filter, skip, limit) {
-        const contacts = await ContactModel.find(filter)
-                    .select("firstName email title date")
-                    .skip(skip)
-                    .limit(limit)
-                    .lean();
-                
+    static async findContactBySearch(search, limit = 10, page = 1) {
+        const skip = (page - 1) * limit;
+        let filter = {};
+        const isValidObjectId = mongoose.Types.ObjectId.isValid(search);
+
+        if (search) {
+            filter = {
+                $or: [
+                    ...(isValidObjectId ? [{ _id: search }] : []),
+                    { title: { $regex: search, $options: "i" } },
+                    { firstName: { $regex: search, $options: "i" } },
+                    { email: { $regex: search, $options: "i" } },
+                ]
+            };
+        }
+
+        const [contacts, totalCount] = await Promise.all([
+            ContactModel.find(filter)
+                .sort({ date: -1 })
+                .select("firstName email title date")
+                .skip(skip)
+                .limit(limit),
+            ContactModel.countDocuments(filter)
+            ]);
+
         if (!contacts) {
             ErrorHelper.throwNotFoundError("Kontakt");
         }
-            
-        return this.mapContacts(contacts);
+        return {
+            contacts: this.mapContacts(contacts),
+            totalCount: totalCount,
+        };
     }
 
     static async createContact(name, email, title, msg, phone=null) {
@@ -88,7 +125,11 @@ class ContactService {
             "Broj Telefona": {value: CryptoService.decryptData(contact.telephoneNuber) },
             Naslov: {value: contact.title },
             Poruka: {value: CryptoService.decryptData(contact.message) },
-            Datum: {value: contact.date },
+            Datum: {value: contact.date.toLocaleDateString("sr-RS", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+              }) },
         }
     }
 }

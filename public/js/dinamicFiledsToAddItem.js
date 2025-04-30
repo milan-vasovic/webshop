@@ -216,7 +216,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Lista svih dostupnih statusa
-    const availableStatuses = ["action", "featured", "empty", "normal", "partnership"];
+    const availableStatuses = ["action", "featured", "empty", "normal", "partnership","not-published"];
 
     // Lista za praćenje izabranih statusa
     const selectedStatuses = [];
@@ -360,7 +360,7 @@ document.addEventListener('DOMContentLoaded', () => {
       sizeSelect.classList.add('main-form__select');
       sizeSelect.required = true;
     
-      const sizes = ["XS", "S", "M", "L", "XL", "2XL", "3XL", "4XL", "S/M", "M/L", "L/XL", "XL/2XL", "2XL/3XL", "3XL/4XL", "Uni", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35"];
+      const sizes = ["XS", "S", "M", "L", "XL", "2XL", "3XL", "4XL", "XS/S", "S/M", "M/L", "L/XL", "XL/2XL", "2XL/3XL", "3XL/4XL", "Uni", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35"];
       sizes.forEach(size => {
         const option = document.createElement('option');
         option.value = size;
@@ -536,7 +536,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const removeButton = document.createElement("button");
         removeButton.type = "button";
         removeButton.classList.add("btn", "btn-danger", "removeField");
-        removeButton.textContent = "Izbrišite";
+        removeButton.textContent = "Izbriši";
     
         group.appendChild(select);
         group.appendChild(removeButton);

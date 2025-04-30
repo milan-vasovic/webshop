@@ -1,14 +1,15 @@
-<link rel="stylesheet" href="/css/circularBadge.css">
 <% 
   // Parametri:
   // title (string): naslov bedža (opciono)
   // text (string): kratak tekst unutar bedža (opciono)
-  // image (string): putanja do slike (opciono)
+  // icon (string): putanja do slike (opciono)
 %>
 <div class="circular-badge">
-  <% if (image) { %>
+  <% if (icon) { %>
     <div class="badge-image">
-      <img src="<%= image %>" alt="<%= title || 'Badge' %>">
+      <span class="material-symbols-outlined">
+        <%= icon || 'Badge' %>
+      </span>
     </div>
   <% } %>
   <% if (title) { %>
@@ -22,3 +23,4 @@
     </div>
   <% } %>
 </div>
+<script src="/js/cardSlider.js"></script>

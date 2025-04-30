@@ -4,6 +4,9 @@ import CryptoService from "./cryptoService.js";
 
 import ErrorHelper from "../helper/errorHelper.js";
 
+import mongoose from "mongoose";
+import UserService from "./userService.js";
+
 class CustomerService {
   /**
    * Finds customers based on a search query.
@@ -11,28 +14,12 @@ class CustomerService {
    * @param {string} [search] - The search query to filter customers by (optional).
    * @returns {Promise<Array>} - A promise that resolves to an array of customers.
    */
-  static async findCustomers(search = null, limit = 10, skip = 0) {
+  static async findCustomers(limit = 10, page = 1) {
     try {
-      let filter;
-      if (search) {
-        filter = {
-          $or: [
-            {
-              $expr: {
-                $regexMatch: {
-                  input: { $toString: "$_id" },
-                  regex: search,
-                  options: "i",
-                },
-              },
-            },
-            { firstName: { $regex: search, $options: "i" } },
-            { email: { $regex: search, $options: "i" } },
-          ],
-        };
-      }
+      const skip = (page - 1) * limit;
 
-      const customers = await CustomerModel.find(filter)
+      const customers = await CustomerModel.find()
+        .sort({ "address.city": 1, _id: -1 })
         .select("firstName email address.city")
         .skip(skip)
         .limit(limit)
@@ -42,9 +29,62 @@ class CustomerService {
         ErrorHelper.throwNotFoundError("Kupci");
       }
 
-      return this.mapCustomers(customers);
+      const totalCount = await CustomerModel.find().countDocuments();
+
+      return {
+        customers: this.mapCustomers(customers),
+        totalCount: totalCount,
+      };
     } catch (error) {
       ErrorHelper.throwServerError("Kupci");
+    }
+  }
+
+  static async findCustomersBySearch(
+    search,
+    limit = 10,
+    page = 1,
+  ) {
+    try {
+      const skip = (page - 1) * limit;
+      const filter = {};
+
+      if (search) {
+        const trimedSearch = search.trim().toLowerCase();
+        const searchRegex = new RegExp(trimedSearch, "i");
+
+        filter.$or = [
+          { email: { $regex: searchRegex } },
+          { firstName: { $regex: searchRegex } },
+          { "address.city": { $regex: searchRegex } },
+        ];
+
+        // Pretraga po _id ako korisnik unese validan ObjectId
+        if (mongoose.Types.ObjectId.isValid(trimedSearch)) {
+          filter.$or.push({ _id: new mongoose.Types.ObjectId(trimedSearch) });
+        }
+      }
+
+      const [customers, totalCount] = await Promise.all([
+        CustomerModel.find(filter)
+          .sort({ "address.city": 1, _id: -1 })
+          .select("firstName email  address.city")
+          .skip(skip)
+          .limit(limit)
+          .lean(),
+        CustomerModel.find(filter).countDocuments(),
+      ]);
+
+      if (!customers || customers.length === 0) {
+        ErrorHelper.throwNotFoundError("Kupci");
+      }
+
+      return {
+        customers: this.mapCustomers(customers),
+        totalCount,
+      };
+    } catch (error) {
+      ErrorHelper.throwServerError(error);
     }
   }
 
@@ -86,13 +126,37 @@ class CustomerService {
     }
   }
 
-  static async validateCustomerByEmail(email, session) {
+  static async findCustomerByEmail(email) {
     try {
-      const customer = await CustomerModel.findOne({email: email})
-        .select("telephoneNumber address orders")
+      const customer = await CustomerModel.findOne({ email: email }).populate({
+        path: "orders",
+        select: "date totalPrice status",
+        options: { sort: { date: -1 } },
+      });
 
       if (!customer) {
-        ErrorHelper.throwNotFoundError("Kupac")
+        const user = await UserService.findUserByEmail(email);
+        if (user) {
+          return user;
+        } else {
+          ErrorHelper.throwNotFoundError("Kupac");
+        }
+      }
+
+      return customer;
+    } catch (error) {
+      ErrorHelper.throwServerError(error);
+    }
+  }
+
+  static async validateCustomerByEmail(email, session) {
+    try {
+      const customer = await CustomerModel.findOne({ email: email }).select(
+        "telephoneNumber address orders"
+      );
+
+      if (!customer) {
+        return false;
       }
 
       return customer;
@@ -120,15 +184,10 @@ class CustomerService {
     session
   ) {
     try {
-      const encryptedLastName = CryptoService.encryptData(lastName);
-      const encryptedTelephone = CryptoService.encryptData(telephone);
-      const encryptedStreet = CryptoService.encryptData(address.street);
-      const encryptedNumber = CryptoService.encryptData(address.number);
-
       const newAddress = {
         city: address.city,
-        street: encryptedStreet,
-        number: encryptedNumber,
+        street: address.street,
+        number: address.number,
         postalCode: address.postalCode,
       };
 
@@ -139,9 +198,9 @@ class CustomerService {
       if (!existingCustomer) {
         const newCustomer = new CustomerModel({
           firstName: firstName,
-          lastName: encryptedLastName,
+          lastName: lastName,
           email: email,
-          telephoneNumber: [{ number: encryptedTelephone }],
+          telephoneNumber: [{ number: telephone }],
           address: [newAddress],
         });
 
@@ -150,11 +209,11 @@ class CustomerService {
         let isUpdated = false;
 
         const phoneExists = existingCustomer.telephoneNumber.some(
-          (phone) => phone.number === encryptedTelephone
+          (phone) => phone.number === telephone
         );
 
         if (!phoneExists) {
-          existingCustomer.telephoneNumber.push({ number: encryptedTelephone });
+          existingCustomer.telephoneNumber.push({ number: telephone });
           isUpdated = true;
         }
 
@@ -210,7 +269,9 @@ class CustomerService {
 
   static async deleteCustomerById(customerId, session) {
     try {
-      const customer = await CustomerModel.deleteOne({ _id : customerId}).session(session);
+      const customer = await CustomerModel.deleteOne({
+        _id: customerId,
+      }).session(session);
       return customer;
     } catch (error) {
       ErrorHelper.throwServerError(error);

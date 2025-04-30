@@ -1,0 +1,121 @@
+/* === testimonial-slider.css === */
+
+/* Main slider container */
+.testimonial-slider {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  margin: var(--margin-big) auto;
+}
+
+/* Track with testimonials */
+.testimonial-track {
+  display: flex;
+  margin: 1rem;
+  gap: var(--grid-gap-medium);
+  transition: transform 0.5s ease-in-out;
+  will-change: transform;
+}
+
+/* Single card inside the track */
+.testimonial-slider .card__container--testimonial {
+  flex: 0 0 auto;
+  width: 80%;
+  max-width: 350px;
+  scroll-snap-align: center;
+}
+
+/* Centered testimonial content */
+.card__container--testimonial {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-evenly;
+  background: var(--white-color);
+  border-radius: var(--border-radius-normal);
+  box-shadow: 0 4px 6px var(--shadow-box-color);
+  padding: var(--padding-normal);
+  text-align: center;
+}
+
+/* Image */
+.testimonial__image img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: var(--margin-small);
+}
+
+/* Name */
+.testimonial__name {
+  font-size: var(--font-size-large);
+  font-weight: var(--font-weight-bold);
+  color: var(--title-color);
+  margin-bottom: var(--margin-small);
+}
+
+/* Stars */
+.testimonial__stars {
+  display: flex;
+  justify-content: center;
+  margin-bottom: var(--margin-small);
+}
+
+.testimonial__star {
+  font-size: 1.5rem;
+  color: var(--neutral-color);
+}
+
+.testimonial__star--filled {
+  color: var(--accent-color);
+}
+
+/* Text */
+.testimonial__text {
+  font-size: var(--font-size-base);
+  color: var(--text-color);
+  margin-bottom: var(--margin-small);
+  word-break: break-word;
+}
+
+/* Prev/Next buttons */
+.testimonial-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--primary-color);
+  color: var(--white-color);
+  border: none;
+  padding: 0.5rem 1rem;
+  font-size: 2rem;
+  cursor: pointer;
+  z-index: 800;
+  border-radius: var(--border-radius-small);
+  transition: background-color var(--transition-fast);
+}
+
+.testimonial-btn:hover {
+  background: var(--accent-color);
+}
+
+.testimonial-btn--prev {
+  left: 0.5rem;
+}
+
+.testimonial-btn--next {
+  right: 0.5rem;
+}
+
+/* Responsive: adjust card width */
+@media (min-width: 768px) {
+  .testimonial-slider .card__container--testimonial {
+    width: 45%;
+  }
+}
+
+@media (min-width: 1024px) {
+  .testimonial-slider .card__container--testimonial {
+    width: 30%;
+  }
+}

@@ -1,17 +1,14 @@
 <%- include('../include/head.ejs') %>
-<link rel="stylesheet" href="/css/card.css">
-<link rel="stylesheet" href="/css/form.css">
-<link rel="stylesheet" href="/css/table.css">
 <%- include('../include/navigation.ejs') %>
 
-<section class="main__container">
+<section class="container main__container">
   <h1 class="main__title"><%= pageTitle %></h1>
   <div class="column-row__container">
     <!-- Lijeva kolona: Pretraga i objave -->
     <div class="left__container-80">
       <!-- Pretraga -->
       <div>
-        <form class="width-100 flex flex-row" action="/forum-pretraga" method="post">
+        <form class="width-100 flex flex-row" action="/forum/pretraga" method="post">
           <div class="main-form__group">
             <input class="main-form__input" type="text" name="search" placeholder="Pretražite objave...">
             <input name="honeypot" type="hidden">
@@ -22,7 +19,7 @@
       </div>
       <!-- Lista objava -->
       <div class="cards__container" style="margin-top: var(--margin-big);">
-        <% posts.forEach(item => { %>
+        <% posts.posts.forEach(item => { %>
           <%- include('../include/card.ejs', {
               item: item,
               showId: false,
@@ -37,6 +34,11 @@
           }) %>
         <% }) %>
       </div>
+      <%- include('../include/pagination.ejs', {
+        currentPage: currentPage,
+        totalPages: totalPages,
+        basePath: basePath
+      }) %>
     </div>
     <!-- Desna kolona: Sidebar s kategorijama i tagovima -->
     <div class="right__container-20">
@@ -46,7 +48,7 @@
       <% if (categories && categories.length > 0) { %>
         <div style="margin-bottom: var(--margin-big);">
           <h1>Kategorije:</h1>
-          <ul>
+          <ul class="grid grid-3">
             <% categories.forEach(c => { %>
               <li>
                 <a href="/forum/kategorija/<%= encodeURIComponent(c) %>"><%= c %></a>
@@ -58,7 +60,7 @@
       <% if (tags && tags.length > 0) { %>
         <div>
           <h1>Tagovi:</h1>
-          <ul>
+          <ul class="grid grid-2">
             <% tags.forEach(t => { %>
               <li>
                 <a href="/forum/oznaka/<%= encodeURIComponent(t) %>"><%= t %></a>

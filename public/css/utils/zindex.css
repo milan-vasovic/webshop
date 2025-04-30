@@ -1,0 +1,34 @@
+/* === zindex.css === */
+
+/* These classes must be used on elements that already have position set (relative, sticky, fixed...) */
+
+.z-header {
+  z-index: var(--z-header);
+  position: sticky;
+  top: 0;
+}
+
+.z-footer {
+  z-index: var(--z-footer);
+  position: relative;
+}
+
+.z-overlay {
+  z-index: var(--z-overlay);
+  position: fixed;
+}
+
+.z-modal {
+  z-index: var(--z-modal);
+  position: fixed;
+}
+
+.z-dropdown {
+  z-index: var(--z-dropdown);
+  position: absolute;
+}
+
+.z-backdrop {
+  z-index: var(--z-backdrop);
+  position: fixed;
+}

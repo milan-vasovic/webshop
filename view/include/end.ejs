@@ -1,18 +1,38 @@
-<footer class="main-footer">
+<footer class="main-footer z-footer">
+
+    <!-- Informacije o firmi / kontakt -->
+    <div class="footer-info">
+        <p>Adresa: Boška Vrebalova 26, 21000 Novi Sad</p>
+        <p>Telefon: <a href="tel:+381659774000">+381 65 977 4000</a></p>
+        <p>PIB: 100154658</p>
+    </div>
+
+    <!-- Navigacija u footeru -->
     <nav class="main-footer__nav">
         <ul class="main-footer__item-list">
             <li class="main-footer__item">
-                <a class="<%= path === '/uslovi-koriscenja' ? 'active' : '' %>" href="/uslovi-koriscenja">Uslovi Korišćenja</a>
+                <a class="<%= path === '/uslovi-koriscenja' ? 'active' : '' %>" href="/uslovi-koriscenja">Uslovi
+                    Korišćenja</a>
             </li>
             <li class="main-footer__item">
-                <a class="<%= path === '/politika-privatnosti' ? 'active' : '' %>" href="/politika-privatnosti">Politika Privatnosti</a>
+                <a class="<%= path === '/politika-privatnosti' ? 'active' : '' %>" href="/politika-privatnosti">Politika
+                    Privatnosti</a>
             </li>
             <li class="main-footer__item">
                 <a class="<%= path === '/o-nama' ? 'active' : '' %>" href="/o-nama">O Nama</a>
             </li>
         </ul>
     </nav>
-</footer> 
+
+    <!-- Footer bottom / copyright -->
+    <div class="footer-bottom">
+        <p>© <%= new Date().getFullYear() %> Tophelanke. Sva prava zadržana.</p>
+        <p>Izradio: <a href="https://milanvasovic.dev" target="_blank">Milan Vasović</a> <a href="https://ariussystems.com" target="_blank">Arius Systems</a></p>
+    </div>
+
+</footer>
+
 <script src="/js/navigation.js"></script>
 </body>
+
 </html>

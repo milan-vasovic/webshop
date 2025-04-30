@@ -23,7 +23,7 @@ function throwConflictError(entity) {
 }
 
 function throwServerError(err) {
-    throw new AppError(`Greška na serveru! ${err.message || err}`, 500);
+    throw new AppError(`Greška na serveru! ${err.message || err}`, err.statusCode || 500);
 }
 
 function throwEmailError() {

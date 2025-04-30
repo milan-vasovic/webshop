@@ -1,11 +1,42 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="sr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= pageTitle %></title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title><%= pageTitle %></title>
+  <meta name="description" content="<%= pageDescription || 'Web prodavnica sa bogatom ponudom i sigurnom kupovinom.' %>" />
+  <meta name="keywords" content="<%= pageKeyWords || 'webshop, helanke, odeća, prodaja, TopHelanke, online prodavnica' %>" />
+  <meta name="author" content="Top Helanke" />
+  <% if (index) { %>
+    <meta name="robots" content="index, follow" />
+  <% } else { %>
+    <meta name="robots" content="noindex, nofollow" />
+  <% } %>
+  
+  <!-- Favicon -->
+  <link rel="icon" href="/images/favicon.ico" type="image/x-icon" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png" />
+  <link rel="manifest" href="/images/site.webmanifest" />
 
-    <link rel="stylesheet" href="/css/main.css">
-    <link rel="stylesheet" href="/css/header.css">
-    <link rel="stylesheet" href="/css/footer.css">
-    
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://tophelanke.com<%= path || '/' %>" />
+  <meta property="og:title" content="<%= pageTitle %>" />
+  <meta property="og:description" content="<%= pageDescription || 'Web prodavnica sa bogatom ponudom i sigurnom kupovinom.' %>" />
+  <meta property="og:image" content="https://mrznccbq-3000.euw.devtunnels.ms/images/<%= featureImage || 'tophelanke_hero.jpg' %>" />
+  <meta property="og:site_name" content="TopHelanke" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="<%= pageTitle %>" />
+  <meta name="twitter:description" content="<%= pageDescription || 'Web prodavnica sa bogatom ponudom i sigurnom kupovinom.' %>" />
+  <meta name="twitter:image" content="https://mrznccbq-3000.euw.devtunnels.ms/images/<%= featureImage || 'tophelanke_hero.jpg' %>" />
+  <meta name="twitter:site" content="@tophelanke" />
+  <meta name="twitter:creator" content="@milanvasovic" />
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />

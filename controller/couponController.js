@@ -8,23 +8,51 @@ import CouponService from '../service/couponService.js';
  */
 async function getCouponsPage(req, res, next) {
     try {
-        const search = sanitize(req.query.search);
-        let coupons;
-
-        if (search) {
-            coupons = await CouponService.findCoupons(search);
-        } else {
-            coupons = await CouponService.findCoupons();
-        }
+        const page = parseInt(req.query.page) || 1;
+        const limit = 10;
+        const coupons = await CouponService.findCoupons(limit, page);
+        const totalPages = Math.ceil(coupons.totalCount / limit);
 
         return res.render("admin/coupon/coupons", {
             path: '/admin/kuponi',
             pageTitle: "Svi Kuponi",
             pageDescription: "Prikaz svih kupona za administratora",
             pageKeyWords: "Admin, Kuponi, Pretraga, Detalji, Brisanje",
-            coupons: coupons
+            coupons: coupons,
+            currentPage: page,
+            totalPages: totalPages,
+            basePath: `/admin/kuponi`,
+            index: false,
+            featureImage: undefined,
         })
 
+    } catch (error) {
+        next(error);
+    }
+}
+
+async function getCouponBySearch(req, res, next) {
+    try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = 10;
+        const search = req.params.search ? req.params.search : "";
+        
+        const param = sanitize(search)
+        const coupons = await CouponService.findCouponsBySearch(param, limit, page);
+        const totalPages = Math.ceil(coupons.totalCount / limit);
+
+        return res.render("admin/coupon/coupons", {
+            path: '/admin/kuponi',
+            pageTitle: "Kuponi Pretraga: " + param,
+            pageDescription: "Prikaz svih kupona za administratora",
+            pageKeyWords: "Admin, Kuponi, Pretraga, Detalji, Brisanje",
+            coupons: coupons,
+            currentPage: page,
+            totalPages: totalPages,
+            basePath: `/admin/kuponi/pretraga/${param}`,
+            index: false,
+            featureImage: undefined,
+        })
     } catch (error) {
         next(error);
     }
@@ -44,7 +72,9 @@ async function getCouponDetailsPage(req, res, next) {
             pageTitle: coupon.Kod.value,
             pageDescription: "Prikaz detalja kupona",
             pageKeyWords: "Admin, Kupon, Detalji, Informacije",
-            coupon: coupon
+            coupon: coupon,
+            index: false,
+            featureImage: undefined,
         })
 
     } catch (error) {
@@ -58,13 +88,15 @@ async function getCouponDetailsPage(req, res, next) {
 async function getAddCouponPage(req, res, next) {
     try {
         return res.render("admin/coupon/add-coupon", {
-            path: '/admin/doajte-kupon',
+            path: '/admin/dodajte-kupon',
             pageTitle: "Dodavanje Kupona",
             pageDescription: "Prikaz forme za dodavanje novog kupona",
             pageKeyWords: "Admin, Kupon, Upravljanje, Dodavanje",
             editing: false,
             existingData: null,
             errorMessage: "",
+            index: false,
+            featureImage: undefined,
         })
 
     } catch (error) {
@@ -79,17 +111,41 @@ async function getEditCouponPage(req, res, next) {
     try {
         const cupnId = req.params.couponId;
 
-        const coupon = CouponService.findCouponById(cupnId);
+        const coupon = await CouponService.findCouponById(cupnId);
+        const datumPocetkaString = coupon["Datum Početka"]?.value;
+        const datumZavrsetkaString = coupon["Datum Završetka"]?.value;
 
+        let datumPocetka = null;
+        let datumZavrsetka = null;
+
+        if (datumPocetkaString && datumPocetkaString !== "Nema Datuma") {
+            const [d, m, y] = datumPocetkaString.split(".");
+            datumPocetka = new Date(`${y}-${m}-${d}T00:00`);
+        }
+
+        if (datumZavrsetkaString && datumZavrsetkaString !== "Nema Datuma") {
+            const [d, m, y] = datumZavrsetkaString.split(".");
+            datumZavrsetka = new Date(`${y}-${m}-${d}T00:00`);
+        }   
+        
         return res.render("admin/coupon/add-coupon", {
             path: '/admin/doajte-kupon',
             pageTitle: "Dodavanje Kupona",
             pageDescription: "Prikaz forme za dodavanje novog kupona",
             pageKeyWords: "Admin, Kupon, Upravljanje, Dodavanje",
-            editing: false,
-            existingData: null,
+            editing: true,
+            existingData: {
+                ID: { value: coupon.ID.value },
+                Status: { value: coupon.Status.value },
+                Popust: { value: coupon.Popust.value },
+                Količina: { value: coupon["Količina"].value },
+                "Datum Početka": { value: datumPocetka },
+                "Datum Završetka": { value: datumZavrsetka }
+            },
             errorMessage: "",
-            coupon: coupon
+            coupon: coupon,
+            index: false,
+            featureImage: undefined,
         })
 
     } catch (error) {
@@ -125,8 +181,10 @@ async function postNewCoupon(req, res, next) {
                     Popust: { value: discount },
                     Količina: { value: amount },
                     "Datum Početka": { value: startDate },
-                    "Datum Završetka": { value: endDate }
-                }
+                    "Datum Završetka": { value: endDate },
+                },
+                index: false,
+                featureImage: undefined,
             })
         }
         
@@ -141,15 +199,61 @@ async function postNewCoupon(req, res, next) {
 /**
  * Handles the search form submission for coupons.
  */
-function postSearchCoupon(req, res, next) {
+async function postSearchCoupon(req, res, next) {
     try {
         const search = sanitize(req.body.search);
         if (!search) {
             return res.redirect("/admin/kuponi");
         }
 
-        return res.redirect(`/admin/kuponi?search=${search}`);
+        return res.redirect(`/admin/kuponi/pretraga/${search}`);
 
+    } catch (error) {
+        next(error);
+    }
+}
+
+async function postEditCoupon(req, res, next) {
+    try {
+        const id = sanitize(req.body.couponId);
+        const status = sanitize(req.body.status);
+        const discount = sanitize(req.body.discount);
+        const amount = sanitize(req.body.amount) || 0;
+        const startDate = sanitize(req.body.startDate) || undefined;
+        const endDate = sanitize(req.body.endDate) || undefined;
+
+        const errors = validationResult(req);
+
+        if(!errors.isEmpty()) {
+            return res.render("admin/coupon/add-coupon", {
+                path: '/admin/doajte-kupon',
+                pageTitle: "Dodavanje Kupona",
+                pageDescription: "Prikaz forme za dodavanje novog kupona",
+                pageKeyWords: "Admin, Kupon, Upravljanje, Dodavanje",
+                editing: false,
+                errorMessage: errors.array()[0].msg,
+                existingData: {
+                    ID: { value: id },
+                    Status: { value: status },
+                    Popust: { value: discount },
+                    Količina: { value: amount },
+                    "Datum Početka": { value: startDate },
+                    "Datum Završetka": { value: endDate }
+                },
+                index: false,
+                featureImage: undefined,
+            })
+        }
+        
+        await CouponService.updateCoupon(id, {
+            status: status,
+            discount: discount,
+            amount: amount,
+            startDate: startDate,
+            endDate: endDate
+        });
+
+        return res.redirect('/admin/kuponi');
     } catch (error) {
         next(error);
     }
@@ -174,10 +278,12 @@ async function deleteCouponById(req, res, next) {
 
 export default {
     getCouponsPage,
+    getCouponBySearch,
     getCouponDetailsPage,
     getAddCouponPage,
     getEditCouponPage,
     postNewCoupon,
+    postEditCoupon,
     postSearchCoupon,
     deleteCouponById
 }

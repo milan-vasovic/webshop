@@ -17,9 +17,13 @@ async function getShopPage(req, res, next) {
 
         return res.render("shop/shop", {
             path: "/prodavnica",
-            pageTitle: "Prodavnica",
-            shop: shop,
-        })
+            pageTitle: "Prodavnica - TopHelanke Online Kupovina",
+            pageDescription: "Pregledajte našu prodavnicu sa najnovijim modelima helanki, sportske odeće i dodataka. Sigurna i brza online kupovina iz udobnosti vašeg doma.",
+            pageKeyWords: "prodavnica, helanke, sportska odeća, ženska odeća, online prodaja, TopHelanke, kupovina, sigurna kupovina, moda, novi modeli",
+            featureImage: undefined,
+            index: true,
+            shop: shop
+          });          
 
     } catch (error) {
         next(error);
@@ -35,14 +39,17 @@ async function getShopPageByCategory(req, res, next) {
         const shop = await ShopService.findItemsByCategory(category, page, limit);
         const totalPages = Math.ceil(shop.Ukupno / limit);
 
-        console.log(shop);
         return res.render("shop/shop", {
-            path: "/prodavnica",
-            pageTitle: `Prodavnica Kategorija: ${category}`,
+            path: `/prodavnica/kategorija/${category}`,
+            pageTitle: `Prodavnica - Kategorija: ${category}`,
+            pageDescription: `Istražite proizvode u kategoriji "${category}" u našoj online prodavnici. Kvalitetna ponuda helanki, sportske odeće i dodataka po pristupačnim cenama.`,
+            pageKeyWords: `${category}, helanke, sportska odeća, prodavnica, TopHelanke, online kupovina, sigurna kupovina, ženska odeća, ${category} modeli`,
+            featureImage: undefined,
+            index: true,
             shop: shop,
             currentPage: page,
             totalPages: totalPages,
-            basePath: `/prodavnica/kategorija/${category}`,
+            basePath: `/prodavnica/kategorija/${category}`
         })
 
     } catch (error) {
@@ -60,13 +67,18 @@ async function getShopPageByTag(req, res, next) {
         const totalPages = Math.ceil(shop.Ukupno / limit);
 
         return res.render("shop/shop", {
-            path: "/prodavnica",
-            pageTitle: `Prodavnica ${tag}`,
+            path: `/prodavnica/oznaka/${tag}`,
+            pageTitle: `Prodavnica - Oznaka: ${tag}`,
+            pageDescription: `Pregledajte proizvode označene sa "${tag}" u našoj online prodavnici. Otkrijte najtraženije artikle u kategoriji helanki i sportske odeće.`,
+            pageKeyWords: `${tag}, helanke, sportska odeća, online kupovina, oznaka, popularno, akcija, TopHelanke`,
+            featureImage: undefined,
+            index: true,
             shop: shop,
             currentPage: page,
             totalPages: totalPages,
             basePath: `/prodavnica/oznaka/${tag}`,
-        })
+          });
+          
 
     } catch (error) {
         next(error);
@@ -84,13 +96,17 @@ async function getShopPageBySearch(req, res, next) {
         const totalPages = Math.ceil(shop.Ukupno / limit);
 
         return res.render("shop/shop", {
-            path: "/prodavnica",
-            pageTitle: `Prodavnica ${search}`,
+            path: `/prodavnica/pretraga/${param}`,
+            pageTitle: `Rezultati pretrage za: ${search}`,
+            pageDescription: `Pronađite proizvode koji odgovaraju pojmu "${search}" u našoj prodavnici. Istražite bogatu ponudu helanki i sportske odeće.`,
+            pageKeyWords: `${search}, helanke, odeća, sportska oprema, TopHelanke, online kupovina, pretraga`,
+            featureImage: undefined,
+            index: true,
             shop: shop,
             currentPage: page,
             totalPages: totalPages,
             basePath: `/prodavnica/pretraga/${param}`,
-        })
+          });          
 
     } catch (error) {
         next(error);
@@ -105,13 +121,18 @@ async function getFeautredShopPage(req, res, next) {
         const totalPages = Math.ceil(shop.Ukupno / limit);
 
         return res.render("shop/shop", {
-            path: "/prodavnica",
-            pageTitle: "Prodavnica",
+            path: "/prodavnica/istaknuto",
+            pageTitle: "Istaknuti Proizvodi – Prodavnica",
+            pageDescription: "Pogledajte naše najtraženije i najprodavanije proizvode. Izaberite između pažljivo odabranih artikala iz naše ponude helanki i sportske odeće.",
+            pageKeyWords: "istaknuto, popularno, top proizvodi, helanke, odeća, prodaja, webshop, TopHelanke",
+            index: true,
+            featureImage: undefined,
             shop: shop,
             currentPage: page,
             totalPages: totalPages,
-            basePath: `/prodavnica/istaknuto}`,
-        })
+            basePath: `/prodavnica/istaknuto`,
+          });
+          
     } catch (error) {
         next(error);
     }
@@ -125,14 +146,17 @@ async function getActionedShopPage(req, res, next) {
         const totalPages = Math.ceil(shop.Ukupno / limit);
 
         return res.render("shop/shop", {
-            path: "/prodavnica",
-            pageTitle: "Prodavnica",
+            path: "/prodavnica/akcija",
+            pageTitle: "Akcija – Popusti i Sniženja | Prodavnica",
+            pageDescription: "Iskoristite najbolje popuste i sniženja u našoj prodavnici. Ograničena ponuda helanki i sportske odeće po sniženim cenama.",
+            pageKeyWords: "akcija, popusti, sniženje, helanke, sport, odeća, webshop, TopHelanke",
+            index: true,
+            featureImage: undefined,
             shop: shop,
             currentPage: page,
             totalPages: totalPages,
-            basePath: `/prodavnica/akcija}`,
-        })
-
+            basePath: `/prodavnica/akcija`,
+          });
     } catch (error) {
         next(error);
     }
@@ -152,13 +176,15 @@ async function getItemByName(req, res, next) {
         }
 
         return res.render('shop/item', {
-            path: '/item',
-            pageTitle: item.Naziv.value,
-            pageDescription: item["Kratak Opis"].value,
-            pageKeyWords: item["Ključne Reči"].value,
-            item: item,
+            path: `/prodavnica/artikal/${item.Naziv.value}`,
+            pageTitle: `${item.Naziv.value} | TopHelanke`,
+            pageDescription: item["Kratak Opis"]?.value || 'Detaljan prikaz proizvoda iz naše ponude.',
+            pageKeyWords: item["Ključne Reči"]?.value || 'helanke, sport, odeća, prodavnica',
+            featureImage: item.Slike["Istaknuta Slika"].URL || undefined,
+            index: true,
+            item,
             isWishlisted
-        })
+          });
     } catch (error) {
         next(error)
     }
@@ -185,14 +211,15 @@ async function getCartPage(req, res, next) {
             cart = await UserService.findUserCart(req.session.user._id);
         }
 
-
         return res.render('shop/cart', {
             path: "/prodavnica/korpa",
             pageTitle: "Vaša Korpa",
-            pageDescription: "Svi Vaši izabrani artikli na jednom mestu, prikaz vaše krope!",
-            pageKeyWords: "Korpa, Vaši Atikli",
-            cart: cart
-        })
+            pageDescription: "Svi Vaši izabrani artikli na jednom mestu, prikaz vaše korpe!",
+            pageKeyWords: "Korpa, Vaši Artikli, Online Kupovina",
+            cart: cart,
+            index: false,
+            featureImage: undefined,
+          });
     } catch (error) {
         next(error);
     }
@@ -221,13 +248,15 @@ async function getCheckOutPage(req, res, next) {
             return res.render("shop/checkout", {
                 path: "/poručivanje",
                 pageTitle: "Poručite",
-                pageDescription: "Poručite, napravite vašu porudžbinu brzo i lako",
-                pageKeyWords: "Poručivanje, Brzo, Lako, Jednostavno",
+                pageDescription: "Poručite, napravite vašu porudžbinu brzo i lako.",
+                pageKeyWords: "Poručivanje, Brzo, Lako, Jednostavno, Kupovina, Webshop",
                 cart: cart,
                 userInfo: userInfo,
                 errorMessage: "",
-                shipping: process.env.SHIPPING_PRICE
-            })
+                shipping: process.env.SHIPPING_PRICE,
+                index: false,
+                featureImage: undefined,
+            });     
         }
 
         return res.render("shop/checkout", {
@@ -238,9 +267,10 @@ async function getCheckOutPage(req, res, next) {
             cart: sessionCart,
             userInfo: undefined,
             errorMessage:"",
-            shipping: process.env.SHIPPING_PRICE
-        })
-
+            shipping: process.env.SHIPPING_PRICE,
+            index: false,
+            featureImage: undefined,
+        });
     } catch (error) {
         next(error);
     }
@@ -263,7 +293,9 @@ async function getConfirmOrder(req, res, next) {
             pageKeyWords: "",
             existingData: existingData,
             errorMessage: "",
-            token: token
+            token: token,
+            index: false,
+            featureImage: undefined,
         });
     } catch (error) {
         next(error);
@@ -475,7 +507,9 @@ async function postTemporaryOrder(req, res, next) {
                     Adrese: [address]
                 },
                 errorMessage: errors.array()[0].msg,
-                shipping: process.env.SHIPPING_PRICE
+                shipping: process.env.SHIPPING_PRICE,
+                index: false,
+                featureImage: undefined,
             })            
         }
 
@@ -497,7 +531,9 @@ async function postTemporaryOrder(req, res, next) {
                         Adrese: [address]
                     },
                     errorMessage: "Kupon nije Validan! " + coupon.msg,
-                    shipping: process.env.SHIPPING_PRICE
+                    shipping: process.env.SHIPPING_PRICE,
+                    index: false,
+                    featureImage: undefined,
                 })            
             }
         }
@@ -555,7 +591,9 @@ async function postTemporaryOrder(req, res, next) {
             pageTitle: "Uspešno Poručivanje",
             pageDescription: "Stranica koja informiše korisnika o uspešnom poručivanju",
             pageKeyWords: "Uspeh, Uspešno, Poručivanje",
-            message: message
+            message: message,
+            index: false,
+            featureImage: undefined,
         })
     } catch (error) {
         console.log(error);
@@ -589,6 +627,7 @@ async function postConfirmOrder(req, res, next) {
             // Create order for registered user
             const newOrder = await OrderService.createNewOrder(
                 { type: 'User', ref: userId, firstName: tempOrder.buyer.firstName, lastName: tempOrder.buyer.lastName },
+                tempOrder.email,
                 tempOrder.telephone,
                 tempOrder.address,
                 tempOrder.items,
@@ -617,6 +656,7 @@ async function postConfirmOrder(req, res, next) {
                     // When guest already have account as user, creating order for him
                     const newOrder = await OrderService.createNewOrder(
                         { type: 'User', ref: hasUserExist._id, firstName: tempOrder.buyer.firstName, lastName: tempOrder.buyer.lastName },
+                        tempOrder.email,
                         tempOrder.telephone,
                         tempOrder.address,
                         tempOrder.items,
@@ -637,10 +677,11 @@ async function postConfirmOrder(req, res, next) {
                     let newTelephoneUser, newAddressUser;
                     if (tempOrder.hasNewTelephone) newTelephoneUser = tempOrder.telephone;
                     if (tempOrder.hasNewAddress) newAddressUser = tempOrder.address;
-                    const newUser = await UserService.registerNewUser(tempOrder.email,"PodrazumevanaSifra123!", tempOrder.buyer.firstName, tempOrder.buyer.lastName, newTelephoneUser, newAddressUser, session);
+                    const newUser = await UserService.registerNewUser(tempOrder.email, process.env.DEFAULT_PASSWORD, tempOrder.buyer.firstName, tempOrder.buyer.lastName, newTelephoneUser, newAddressUser, session, true);
                     if (newUser) {
                         const newOrder = await OrderService.createNewOrder(
                             { type: 'User', ref: newUser._id, firstName: tempOrder.buyer.firstName, lastName: tempOrder.buyer.lastName },
+                            tempOrder.email,
                             tempOrder.telephone,
                             tempOrder.address,
                             tempOrder.items,
@@ -663,6 +704,7 @@ async function postConfirmOrder(req, res, next) {
                 if (hasUserExist) {
                     const newOrder = await OrderService.createNewOrder(
                         { type: 'User', ref: hasUserExist._id, firstName: tempOrder.buyer.firstName, lastName: tempOrder.buyer.lastName },
+                        tempOrder.email,
                         tempOrder.telephone,
                         tempOrder.address,
                         tempOrder.items,
@@ -686,6 +728,7 @@ async function postConfirmOrder(req, res, next) {
                     // Create order for guest user
                     const newOrder = await OrderService.createNewOrder(
                         buyer,
+                        tempOrder.email,
                         tempOrder.telephone,
                         tempOrder.address,
                         tempOrder.items,
@@ -717,7 +760,9 @@ async function postConfirmOrder(req, res, next) {
             pageTitle: "Uspešno Poručivanje",
             pageDescription: "Stranica koja informiše korisnika o uspešnom poručivanju",
             pageKeyWords: "Uspeh, Uspešno, Poručivanje",
-            message: message
+            message: message,
+            index: false,
+            featureImage: undefined,
         })
     } catch (error) {
         console.log(error);

@@ -1,41 +1,40 @@
-<link rel="stylesheet" href="/css/info.css">
-
-<div class="info-container">
+<div class="info__container">
     <% data.forEach((item) => { %>
-        <div class="info-item">
-            <% if (typeof item === 'object' && !Array.isArray(item)) { %>
-                <% Object.keys(item).forEach((key) => { %>
-                    <div class="info-key-value">
-                        <span class="info-key"><%= key %>:</span>
-                        <span class="info-value">
-                            <% if (typeof item[key] === 'object') { %>
-                                <% if (Array.isArray(item[key])) { %>
-                                    <ul class="info-list">
-                                        <% item[key].forEach((listItem) => { %>
-                                            <li><%= listItem %></li>
-                                        <% }); %>
-                                    </ul>
-                                <% } else { %>
-                                    <!-- Prikaz za ugnježden objekat -->
-                                    <ul class="info-list">
-                                        <% Object.keys(item[key]).forEach((nestedKey) => { %>
-                                            <li><%= nestedKey %>: <%= item[key][nestedKey] %></li>
-                                        <% }); %>
-                                    </ul>
-                                <% } %>
-                            <% } else { %>
-                                <%= item[key] %>
-                            <% } %>
-                        </span>
-                    </div>
-                <% }); %>
-            <% } else { %>
-                <!-- Prikaz za prost podatak -->
-                <div class="info-key-value">
-                    <span class="info-key">Vrednost:</span>
-                    <span class="info-value"><%= item %></span>
-                </div>
-            <% } %>
-        </div>
+      <div class="info__item">
+        <% if (typeof item === 'object' && !Array.isArray(item)) { %>
+          <% Object.keys(item).forEach((key) => { %>
+            <div class="info__row">
+              <span class="info__key"><%= key %>:</span>
+              <span class="info__value">
+                <% if (typeof item[key] === 'object') { %>
+                  <% if (item[key] instanceof Date) { %>
+                    <%= item[key].toLocaleString("sr-RS") %>
+                  <% } else if (Array.isArray(item[key])) { %>
+                    <ul class="info__list">
+                      <% item[key].forEach((listItem) => { %>
+                        <li><%= listItem %></li>
+                      <% }); %>
+                    </ul>
+                  <% } else { %>
+                    <ul class="info__list">
+                      <% Object.keys(item[key]).forEach((nestedKey) => { %>
+                        <li><%= nestedKey %>: <%= item[key][nestedKey] %></li>
+                      <% }); %>
+                    </ul>
+                  <% } %>
+                <% } else { %>
+                  <%= item[key] %>
+                <% } %>
+              </span>
+            </div>
+          <% }); %>
+        <% } else { %>
+          <div class="info__row">
+            <span class="info__key">Vrednost:</span>
+            <span class="info__value"><%= item %></span>
+          </div>
+        <% } %>
+      </div>
     <% }); %>
-</div>
+  </div>
+  

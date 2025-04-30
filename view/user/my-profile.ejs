@@ -1,16 +1,13 @@
 <%- include('../include/head.ejs') %>
-<link rel="stylesheet" href="/css/table.css">
-<link rel="stylesheet" href="/css/tabs.css">
-<link rel="stylesheet" href="/css/form.css">
 <%- include('../include/navigation.ejs') %>
 
 <!-- Glavni kontejner stranice -->
-<section class="flex flex-column main__container">
+<section class="container main__container">
   <h1 class="main__title"><%= pageTitle %></h1>
   <!-- Responsive kontejner: na mobilnim uređajima kolona, na desktopu red -->
   <div class="column-row__container">
     <!-- Lijeva kolona (20% na desktopu, 100% na mobilnim uređajima) – osnovne informacije -->
-    <div class="flex flex-column left__container-50">
+    <div class="flex flex-column left__container-30">
       <%- include('../include/info.ejs', {
         data: [
           { "Email": user.Email.value },
@@ -22,7 +19,7 @@
       }) %>
     </div>
     <!-- Desna kolona (80% na desktopu, 100% na mobilnim uređajima) – tabovi sa podacima -->
-    <div class="flex flex-column right__container-50">
+    <div class="flex flex-column right__container-70">
       <!-- Tabovi: Telefoni, Adrese, Partner (ako postoji) i Porudžbine -->
       <div class="tabs-header">
         <button class="tab-btn active" data-tab="Brojevi Telefona">Telefoni</button>
@@ -51,7 +48,7 @@
               actions: [{
                   type: 'form',
                   formAction: "/korisnik/izbrisite-broj",
-                  buttonName: 'Izbrišite'
+                  buttonName: 'Izbriši'
               }]
           }) %>
         </div>
@@ -73,7 +70,7 @@
               actions: [{
                   type: 'form',
                   formAction: "/korisnik/izbrisite-adresu",
-                  buttonName: 'Izbrišite'
+                  buttonName: 'Izbriši'
               }]
           }) %>
         </div>

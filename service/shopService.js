@@ -14,13 +14,13 @@ class ShopService {
 
             const tags = await ItemService.findAllTags();
 
-            const featuredItems = await ItemService.findFeaturedItems(null, null, 5);
+            const featuredItems = await ItemService.findFeaturedItems(null, null, 6);
 
-            const actionItems = await ItemService.findActionItems(null, null, 5);
+            const actionItems = await ItemService.findActionItems(null, null, 6);
 
             const itemsByCategory = await Promise.all(
                 categories.Kategorije.map(async (category) => {
-                    const items = await ItemService.findItemsByCategory(category, null, null, 5);
+                    const items = await ItemService.findItemsByCategory(category, null, null, 6);
 
                     return {
                         Kategorija: { value: category },
@@ -41,7 +41,7 @@ class ShopService {
 
             return result;
         } catch (error) {
-            ErrorHelper.throwValidationError(error);
+            ErrorHelper.throwServerError(error);
         }
     }
 
@@ -54,7 +54,6 @@ class ShopService {
     static async findItemsByCategory(category, page = 1, limit = 10) {
         try {
             const skip = (page - 1) * limit;
-            console.log("Preskociti: " +skip)
             const featuredCategoryItems = await ItemService.findFeaturedItems(category, null, limit, skip);
 
             const actionedCategoryItems = await ItemService.findActionItems(category, null, limit, skip);
@@ -74,7 +73,7 @@ class ShopService {
             return result;
 
         } catch (error) {
-            ErrorHelper.throwValidationError(error);
+            ErrorHelper.throwServerError(error);
         }
     }
 
@@ -90,7 +89,7 @@ class ShopService {
             const featuredTagItems = await ItemService.findFeaturedItems(null, tag, limit, skip);
 
             const actionedTagItems = await ItemService.findActionItems(null, tag, limit, skip);
-                
+            
             const otherTagItems = await ItemService.findItemsByTag(tag, null, ['featured', 'action'], limit, skip);
 
             const categories = await ItemService.findAllCategories(tag);
@@ -106,7 +105,7 @@ class ShopService {
             return result;
 
         } catch (error) {
-            ErrorHelper.throwValidationError(error);
+            ErrorHelper.throwServerError(error);
         }
     }
 
@@ -118,17 +117,7 @@ class ShopService {
     */
     static async findItemsBySearch(search, page = 1, limit = 10) {
         try {
-            const skip = (page - 1) * limit;
-            const filter = {
-                $or: [
-                    { title: { $regex: search, $options: "i" } },
-                    { categories: { $regex: search, $options: "i" } },
-                    { tags: { $regex: search, $options: "i" } },
-                    { keyWords: { $regex: search, $options: "i" } },
-                ],
-            };
-        
-            const items = await ItemService.findItemsBySearch(filter, limit, skip);
+            const items = await ItemService.findItemsBySearch(search, limit, page);
         
             const result = {
                 Artikli: items.items,
@@ -137,7 +126,7 @@ class ShopService {
 
             return result
         } catch (error) {
-            ErrorHelper.throwValidationError(error);
+            ErrorHelper.throwServerError(error);
         }  
     }
 

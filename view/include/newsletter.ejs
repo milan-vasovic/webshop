@@ -1,13 +1,14 @@
-<section style="text-align: center; margin-top: 0;">
-    <h1>Prijavite se na naš newsletter</h1>
-    <p>Kako biste dobijali najnovija obaveštenja i ponude!</p>
-    <form action="/newsletter-prijava" method="post">
-        <div class="main-form__group">
-            <input class="main-form__input" type="email" name="email" id="emailInp">
-        </div>
-        <input type="hidden" name="CSRFToken" value="<%= csrfToken %>">
-        <input name="honeypot" type="hidden">
-        <br>
-        <button class="btn-primary" type="submit">Prijavite Se</button>
+<section class="newsletter-cta">
+    <h1 class="newsletter-cta__title">Prijavite se na naš newsletter</h1>
+    <p class="newsletter-cta__text">Kako biste dobijali najnovija obaveštenja i ponude!</p>
+  
+    <form action="/newsletter-prijava" method="post" class="newsletter-cta__form">
+      <div class="main-form__group">
+        <input class="main-form__input" type="email" name="email" id="emailInp" placeholder="Unesite email">
+      </div>
+      <input type="hidden" name="CSRFToken" value="<%= csrfToken %>">
+      <input type="hidden" name="honeypot">
+      <button class="btn-primary" type="submit">Prijavite Se</button>
     </form>
-</section>
+  </section>
+  

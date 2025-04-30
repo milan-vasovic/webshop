@@ -1,11 +1,9 @@
 <%- include('../include/head.ejs') %>
-<link rel="stylesheet" href="/css/form.css">
-<link rel="stylesheet" href="/css/card.css">
 <%- include('../include/navigation.ejs') %>
 
-<section class="main__container">
+<section class="container main__container">
   <h1 class="main__title"><%= item.Naziv.value %></h1>
-  <div class="column-row__container">
+  <div class="column-row__container flex-column-normal-force">
     <div class="left__container-30">
       <%- include('../include/galery.ejs', {
             images: item.Slike.Slike,
@@ -15,25 +13,16 @@
     </div>
 
     <div class="right__container-70">
-      <div>
-        <p><%= item.Opis.value %></p>
-        <ul>
-          <% item.Kategorije.value.forEach(c => { %>
-            <li><%= c %></li>
-          <% }) %>
-        </ul>
-        <ul>
-          <% item.Tagovi.value.forEach(t => { %>
-            <li><%= t %></li>
-          <% }) %>
-        </ul>
-        <div>
-          <% if (item.Status.value && item.Status.value[0] === 'action') { %>
-            <h2><s><%= item.Cena.value %></s> <%= item["Akcijska Cena"].value %> RSD</h2>
-          <% } else { %>
-            <h2><%= item.Cena.value %> RSD</h2>
-          <% } %>
-        </div>
+      <!-- Cena -->
+      <div class="product__price-block">
+        <% if (item.Status.value && item.Status.value[0] === 'action') { %>
+          <h2 class="product__price">
+            <s><%= item.Cena.value %></s>
+            <span class="highlight"><%= item["Akcijska Cena"].value %> RSD</span>
+          </h2>
+        <% } else { %>
+          <h2 class="product__price"><%= item.Cena.value %> RSD</h2>
+        <% } %>
       </div>
 
       <div>
@@ -71,27 +60,45 @@
           </form>
         </div>
       <% } %>
-      <div>
-        <% if (item["CrossSell Artikli"].length > 0) { %>
-          <h2>Idealni Artikli uz Ovaj:</h2>
-          <div class="grid grid-3">
-            <% item["CrossSell Artikli"].forEach(i => { %>
-              <%- include('../include/card.ejs', {
-                item: i,
-                hasActions: true,
-                actions: [
-                    {
-                        type: 'link-name',
-                        link: "/prodavnica/artikal/",
-                        linkName: 'Pogledajte'
-                    }
-                ],
-                showId: false
-              }) %>
-            <% }) %>
-          <% } %>
+      
+      <div class="product__info-block">
+        <p class="product__description"><%= item.Opis.value %></p>
+    
+        <div class="product__meta flex flex-column align-center gap-medium">
+            <h3 class="product__meta-title">Kategorije:</h3>
+            <ul class="flex flex-row flex-wrap gap-small">
+              <% item.Kategorije.value.forEach(c => { %>
+                <li><a href="/prodavnica/kategorija/<%= c %>" class="card__badge"><%= c %></a></li>
+              <% }) %>
+            </ul>
+
+            <h3 class="product__meta-title">Tagovi:</h3>
+            <ul class="flex flex-row flex-wrap justify-center gap-small">
+              <% item.Tagovi.value.forEach(t => { %>
+                <li><a href="/prodavnica/oznaka/<%= t %>" class="card__badge"><%= t %></a></li>
+              <% }) %>
+            </ul>
         </div>
       </div>
+    
+      <div class="margin__normal flex flex-column align-center">
+        <h2>Idealni Artikli uz Ovaj:</h2>
+        <div class="grid grid-3">
+          <% item["CrossSell Artikli"].forEach(i => { %>
+            <%- include('../include/card.ejs', {
+              item: i,
+              hasActions: true,
+              actions: [
+                {
+                  type: 'link-name',
+                  link: "/prodavnica/artikal/",
+                  linkName: 'Pogledajte'
+                }
+              ],
+              showId: false
+            }) %>
+          <% }) %>
+        </div>    
     </div>
   </div>
 

@@ -1,10 +1,9 @@
 <%- include('../../include/head.ejs') %>
-<link rel="stylesheet" href="/css/table.css">
-<link rel="stylesheet" href="/css/tabs.css">
 <%- include('../../include/navigation.ejs') %>
-<section class="main__container">
+<section class="container main__container">
     <h1 class="main__title"><%= pageTitle %></h1>
     <div class="flex flex-column flex-between width-100 align-center">
+        <a href="/admin/izmenite-kupon/<%= coupon.ID.value %>" class="btn-secondary">Izmenite</a>
         <%- include('../../include/info.ejs', {
             data: [
                 { "Kod": coupon.Kod.value },

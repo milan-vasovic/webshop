@@ -12,7 +12,7 @@ const couponSchema = new Schema({
     status: [{
         type: String,
         required: true,
-        enum: ["acitve", "inactive", "single-use", "multiple-use","time-sensitive","amoun-sensitive"]
+        enum: ["active", "inactive", "single-use", "multiple-use", "time-sensitive", "amount-sensitive"]
     }],
 
     discount: {

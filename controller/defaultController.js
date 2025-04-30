@@ -16,20 +16,22 @@ import ForumService from '../service/forumService.js';
  */
 async function getHomePage(req, res, next) {
     try {
-        const featuredItems = await ItemService.findFeaturedItems(null,null, 5);
+        const featuredItems = await ItemService.findFeaturedItems(null,null, 4);
 
-        const actionItems = await ItemService.findActionItems(null,null, 5);
+        const actionItems = await ItemService.findActionItems(null,null, 4);
 
-        const forumPosts = await ForumService.findPosts(null,5);
+        const forumPosts = await ForumService.findPosts(4);
 
         return res.render("leanding/leanding-page", {
             path: "/",
-            pageTitle: "Pocetna",
-            pageKeyWords: "Pocetna, Naslovna, Početna, Glavna, Home",
+            pageTitle: "TopHelanke Početna Web Prodavnica",
+            pageKeyWords: "TopHelanke, Pocetna, Naslovna, Početna, Glavna, Home, Webshop, Online Prodavnica, Online Shop",
             pageDescription: "Najbolja online prodavnica, najveći izbor proizvoda, najbolje cene, najbolji kvalitet, najbolje usluge. Sve na jednom mestu, samo kod nas!",
             featuredItems: featuredItems,
             actionItems: actionItems,
-            forumPosts: forumPosts
+            forumPosts: forumPosts,
+            index: true,
+            featureImage: undefined,
         })
 
     } catch (error) {
@@ -47,6 +49,8 @@ async function getAboutPage(req, res, next) {
             pageTitle: "O Nama",
             pageDescription: "Saznajte više o nama, našoj misiji, viziji, ciljevima, timu i načinu rada. Upoznajte nas bolje i saznajte zašto smo najbolji izbor za vas!",
             pageKeyWords: "O Nama, Misija, Vizija, Ciljevi, Tim, Rad",
+            index: true,
+            featureImage: undefined,
         })
         
     } catch (error) {
@@ -64,6 +68,8 @@ async function getPrivacyPage(req, res, next) {
             pageTitle: "Politika Privatnosti",
             pageDescription: "Naša politika privatnosti, sve na jednom mestu, sve potrebne informacije šta i kako prikupljamo, u koju svrhu i vaša prava",
             pageKeyWords: "Politika Privatnosti, Informacije, Prava",
+            index: true,
+            featureImage: undefined,
         })
 
     } catch (error) {
@@ -81,6 +87,8 @@ async function getTermsPage(req, res, next) {
             pageTitle: "Uslovi Koriscenja",
             pageDescription: "Naši uslovi korišćenja, pravila, odgovornost, prihvatnaje, saglasnost, mere i ostale inforamcije.",
             pageKeyWords: "Uslovi Korišćenja, Pravila, Informacije, Mere, Obaveze",
+            index: true,
+            featureImage: undefined,
         })
 
     } catch (error) {
@@ -99,7 +107,9 @@ async function getContactPage(req, res, next) {
             pageDescription: "Kontaktirjate nas brzo, lako putem forme ili telefona. Tu smo za sve informacije, pitanja i nedoumice, slobodno nas kontaktirajte, a potrudićemo se da vam odgovorimo u najkraćem roku!",
             pageKeyWords: "Kontakt, Pitanja, Kontaktirajte Nas, Pozovite",
             errorMessage: "",
-            existingData: {}
+            existingData: {},
+            index: true,
+            featureImage: undefined,
         })
     } catch (error) {
         next(error);
@@ -113,8 +123,13 @@ async function getPartnershipPage(req, res, next) {
     try {
         return res.render("partnership/partnership", {
             path: "/partnerstvo",
-            pageTitle: "Postanite Partneri"
-        })
+            pageTitle: "Postanite Partneri",
+            pageDescription: "Započnite saradnju sa TopHelanke i postanite naš partner u distribuciji, promociji ili prodaji sportskih proizvoda.",
+            pageKeyWords: "Partnerstvo, Saradnja, Distribucija, Affiliate, TopHelanke, Postanite Partner, Online Prodaja",
+            featureImage: undefined,
+            index: true
+          });
+          
     } catch (error) {
         next(error);
     }
@@ -146,7 +161,9 @@ async function postContact(req, res, next) {
                     tilte: title,
                     phone: phone,
                     msg: msg,
-                }
+                },
+                index: false,
+                featureImage: undefined,
             })
         }
 
@@ -158,7 +175,9 @@ async function postContact(req, res, next) {
                 pageTitle: "Uspešno ste poslali poruku!",
                 pageDescription: "Stranica obaveštenja o uspešnom slanju kontakt forme",
                 pageKeyWords: "Useph, Kontakt",
-                message: "Hvala Vam na kontaktu, Vaša poruka je uspešno poslata. Odgovorićemo Vam u što kraćem roku!"
+                message: "Hvala Vam na kontaktu, Vaša poruka je uspešno poslata. Odgovorićemo Vam u što kraćem roku!",
+                index: false,
+                featureImage: undefined,
             });
         }
     } catch (error) {

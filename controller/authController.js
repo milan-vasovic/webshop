@@ -1,8 +1,8 @@
 import {validationResult} from 'express-validator';
 import sanitize from 'mongo-sanitize';
+import mongoose from 'mongoose';
 
 import UserService from '../service/userService.js';
-import CryptoService from '../service/cryptoService.js';
 
 /**
  * Renders the registration page.
@@ -14,9 +14,12 @@ async function getRegistrationPage(req, res, next) {
             pageTitle: "Registrujte Se",
             pageDescription: "Registrujte se na našu prodavnicu i olakšano pratite i poručujte",
             pageKeyWords: "Registracija, Webshop, Prodavnica, Odeća",
+            index: true,
+            featureImage: undefined,
             existingData: null,
             errorMessage: ""
-        })
+          });
+          
     } catch (error) {
         next(error);
     }
@@ -38,11 +41,14 @@ async function getLoginPage(req, res, next) {
             pageTitle: "Prijavite Se",
             pageDescription: "Prijavite se na našu prodavnicu i olakšano pratite i poručujte",
             pageKeyWords: "Prijava, Webshop, Prodavnica, Odeća",
+            index: true,
+            featureImage: undefined,
             existingData: null,
             errorMessage: "",
             redirectTo: redirectUrl,
             showRequestNewActivation: false
-        })
+          });
+          
     } catch (error) {
         next(error);
     }
@@ -64,9 +70,11 @@ async function getNewPasswordPage(req, res, next) {
             pageTitle: "Zatražite Novu Šifru",
             pageDescription: "Stranica za traženje nove šifre",
             pageKeyWords: "Zatražite Novu Šifru, Nova Šifra, Promena",
+            index: false,
+            featureImage: undefined,
             existingData: existingData,
             errorMessage: ""
-        })
+          });          
     } catch (error) {
         next(error);
     }
@@ -81,15 +89,17 @@ async function getSetNewPasswordPage(req, res, next) {
 
         const user = await UserService.validateResetToken(token);
 
-        return res.render('auth/set-new-password', {
+        return res.render("auth/set-new-password", {
             path: "/nova-sifra",
             pageTitle: "Postavite Novu Šifru",
-            pageDescription: "Stranica za postavljanje nove sifre",
-            pageKeyWords: "Nova Sifra, Postavljanje, Upravljanje",
+            pageDescription: "Stranica za postavljanje nove šifre",
+            pageKeyWords: "Nova Šifra, Postavljanje, Upravljanje",
+            index: false,
+            featureImage: undefined,
             errorMessage: "",
             userId: user._id.toString(),
             passwordToken: token
-        });
+          });          
     } catch (error) {
         next(error);
     }
@@ -104,10 +114,13 @@ async function getConfirmAccountPage(req, res, next) {
         return res.render("email/success", {
             path: "/auth/confirm",
             pageTitle: "Nalog potvrđen",
-            pageDescription: "Ptovrda Emaila",
-            pageKeyWords: "",
+            pageDescription: "Potvrda email adrese korisničkog naloga",
+            pageKeyWords: "Email potvrda, Aktivacija naloga, Potvrda registracije",
+            index: false,
+            featureImage: undefined,
             message: result.message
-        });
+          });
+          
     } catch (error) {
         next(error);
     }
@@ -124,11 +137,14 @@ async function getActivationAccount(req, res, next) {
         return res.render("auth/get-activation", {
             path: "/zatrazite-aktivaciju",
             pageTitle: "Zatražite Aktivaciju Naloga",
-            pageDescription: "Stranica za traženje nove aktivacije",
-            pageKeyWords: "Zatražite Novu Aktivaciju, Nova Aktivacija",
+            pageDescription: "Stranica za ponovno slanje aktivacionog linka korisnicima koji nisu aktivirali nalog.",
+            pageKeyWords: "Zatražite novu aktivaciju, Aktivacija naloga, Email aktivacija",
             existingData: existingData,
-            errorMessage: ""
-        })
+            errorMessage: "",
+            index: false,
+            featureImage: undefined
+          });
+          
     } catch (error) {
         next(error);
     }
@@ -149,15 +165,18 @@ async function postLogin(req, res, next) {
             return res.render("auth/login", {
                 path: "/prijava",
                 pageTitle: "Prijavite Se",
-                pageDescription: "Prijavite se na našu prodavnicu i olakšano pratite i poručujte",
-                pageKeyWords: "Prijava, Webshop, Prodavnica, Odeća",
+                pageDescription: "Prijavite se na našu prodavnicu i olakšano pratite i poručujte. Iskoristite sve pogodnosti korisničkog naloga.",
+                pageKeyWords: "Prijava, Webshop, Prodavnica, Odeća, TopHelanke, Online Kupovina",
                 existingData: {
-                    email: email
+                  email: email
                 },
                 errorMessage: errors.array()[0].msg,
                 redirectTo: redirectUrl,
-                showRequestNewActivation: false
-            })
+                showRequestNewActivation: false,
+                index: true,
+                featureImage: undefined
+              });
+              
         }
 
         const userExist = await UserService.validateUserInfo(email, password);
@@ -176,7 +195,9 @@ async function postLogin(req, res, next) {
                 },
                 errorMessage: userExist.message || "Nije moguće naći korisnika!",
                 showRequestNewActivation: showRequestNewActivation,
-                redirectTo: redirectUrl
+                redirectTo: redirectUrl,
+                index: true,
+                featureImage: undefined
             })
         }
 
@@ -203,46 +224,84 @@ async function postLogin(req, res, next) {
  * Handles the registration form submission.
  */
 async function postRegister(req, res, next) {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+  
     try {
-        const email = sanitize(req.body.email);
-        const password = sanitize(req.body.password);
-        const firstname = sanitize(req.body.firstname);
-        const lastname = sanitize(req.body.lastname);
+      const email = sanitize(req.body.email);
+      const password = sanitize(req.body.password);
+      const firstname = sanitize(req.body.firstname);
+      const lastname = sanitize(req.body.lastname);
+  
+      const errors = validationResult(req);
+  
+      if (!errors.isEmpty()) {
+        return res.render("auth/register", {
+          path: "/registracija",
+          pageTitle: "Registrujte Se",
+          pageDescription: "Registrujte se na našu prodavnicu i olakšano pratite i poručujte",
+          pageKeyWords: "Registracija, Webshop, Prodavnica, Odeća",
+          existingData: {
+            email: email,
+            firstname: firstname,
+            lastname: lastname,
+            acceptance: req.body.acceptance,
+          },
+          errorMessage: errors.array()[0].msg,
+          index: true,
+          featureImage: undefined
+        });
+      }
+  
+      const newUser = await UserService.registerNewUser(
+        email,
+        password,
+        firstname,
+        lastname,
+        null,
+        null,
+        session
+      );
+  
+      if (newUser.status === false) {
+        return res.render("auth/register", {
+            path: "/registracija",
+            pageTitle: "Registrujte Se",
+            pageDescription: "Registrujte se na našu prodavnicu i olakšano pratite i poručujte",
+            pageKeyWords: "Registracija, Webshop, Prodavnica, Odeća",
+            existingData: {
+              email: email,
+              firstname: firstname,
+              lastname: lastname,
+              acceptance: req.body.acceptance,
+            },
+            errorMessage: newUser.message || "Greška prilikom registracije!",
+            index: true,
+            featureImage: undefined
+          });
+      }
 
-        const errors = validationResult(req);
-
-        if(!errors.isEmpty()) {
-            return res.render("auth/register", {
-                path: "/registracija",
-                path: "/registracija",
-                pageTitle: "Registrujte Se",
-                pageDescription: "Registrujte se na našu prodavnicu i olakšano pratite i poručujte",
-                pageKeyWords: "Registracija, Webshop, Prodavnica, Odeća",
-                existingData: {
-                    email: email,
-                    firstname: firstname,
-                    lastname: lastname,
-                    acceptance: acceptance
-                },
-                errorMessage: errors.array()[0].msg,
-            })
-        }
-
-        const newUser = await UserService.registerNewUser(email, password, firstname, lastname);
-
-        if (newUser) {
-            return res.render("email/success", {
-                path: "/uspesna-registracija",
-                pageTitle: "Uspešno Završena Registracija",
-                pageDescription: "Stranica koja informiše korisnika o uspešno zatraženoj registraciji",
-                pageKeyWords: "Uspeh, Uspešno, Registracija Naloga",
-                message: "Uspešno ste završili registraciju Vašeg naloga, pogledajte Vaš email za AKTIVACIJU naloga i dalja uputstva!"
-            });
-        }
+      await session.commitTransaction();
+  
+      return res.render("email/success", {
+        path: "/uspesna-registracija",
+        pageTitle: "Uspešno Završena Registracija",
+        pageDescription: "Stranica koja informiše korisnika o uspešno zatraženoj registraciji",
+        pageKeyWords: "Uspeh, Uspešno, Registracija Naloga",
+        message:
+          "Uspešno ste završili registraciju Vašeg naloga, pogledajte Vaš email za AKTIVACIJU naloga i dalja uputstva!",
+        index: false,
+        featureImage: undefined
+      });
     } catch (error) {
-        next(error)
+        console.log(error);
+      await session.abortTransaction();
+      return next(error);
+    } finally {
+      session.endSession();
     }
-}
+  }
+  
 
 /**
  * Handles the request for a new password.
@@ -260,7 +319,9 @@ async function postRequestNewPassword(req, res, next) {
                 pageDescription: "Stranica za traženje nove šifre",
                 pageKeyWords: "Zatražite Novu Šifru, Nova Šifra, Promena",
                 existingData: { email: email },
-                errorMessage: errors.array()[0].msg
+                errorMessage: errors.array()[0].msg,
+                index: false,
+                featureImage: undefined
             });
         }
 
@@ -273,7 +334,9 @@ async function postRequestNewPassword(req, res, next) {
                 pageDescription: "Stranica za traženje nove šifre",
                 pageKeyWords: "Zatražite Novu Šifru, Nova Šifra, Promena",
                 existingData: { email: email },
-                errorMessage: result.msg || "Došlo je do greške!"
+                errorMessage: result.msg || "Došlo je do greške!",
+                index: false,
+                featureImage: undefined
             });
         }
 
@@ -282,7 +345,9 @@ async function postRequestNewPassword(req, res, next) {
             pageTitle: "Uspešno Zatražena Nova Šifra",
             pageDescription: "Stranica koja informiše korisnika o uspešno zatraženoj novoj lozinci",
             pageKeyWords: "Uspeh, Uspešno, Promena Šifre",
-            message: "Uspešno ste zatražili promenu Vaše lozinke, pogledajte Vaš email za dalja uputstva!"
+            message: "Uspešno ste zatražili promenu Vaše lozinke, pogledajte Vaš email za dalja uputstva!",
+            index: false,
+            featureImage: undefined
         });
     } catch (error) {
         next(error);
@@ -301,7 +366,9 @@ async function postRequestActivation(req, res, next) {
                 pageDescription: "Stranica za traženje nove aktivacije",
                 pageKeyWords: "Zatražite Novu Aktivaciju, Nova Aktivacija",
                 existingData: { email: email },
-                errorMessage: errors.array()[0].msg
+                errorMessage: errors.array()[0].msg,
+                index: false,
+                featureImage: undefined
             });
         }
 
@@ -314,7 +381,9 @@ async function postRequestActivation(req, res, next) {
                 pageDescription: "Stranica za traženje nove aktivacije",
                 pageKeyWords: "Zatražite Novu Aktivaciju, Nova Aktivacija",
                 existingData: { email: email },
-                errorMessage: result.message || "Došlo je do greške!"
+                errorMessage: result.message || "Došlo je do greške!",
+                index: false,
+                featureImage: undefined
             });
         }
 
@@ -323,7 +392,9 @@ async function postRequestActivation(req, res, next) {
             pageTitle: "Uspešno Zatražena Aktivacija",
             pageDescription: "Stranica koja informiše korisnika o uspešno zatraženoj aktivaciji",
             pageKeyWords: "Uspeh, Uspešno, Aktivacija Naloga",
-            message: "Uspešno ste zatražili aktivaciju Vašeg naloga, pogledajte Vaš email za dalja uputstva!"
+            message: "Uspešno ste zatražili aktivaciju Vašeg naloga, pogledajte Vaš email za dalja uputstva!",
+            index: false,
+            featureImage: undefined
         });
     } catch (error) {
         next(error);
@@ -346,7 +417,9 @@ async function postSetNewPassword(req, res, next) {
                 pageKeyWords: "Nova Sifra, Postavljanje, Upravljanje",
                 errorMessage: errors.array()[0].msg,
                 userId: userId,
-                passwordToken: passwordToken
+                passwordToken: passwordToken,
+                index: false,
+                featureImage: undefined
             });
         }
 
@@ -361,7 +434,9 @@ async function postSetNewPassword(req, res, next) {
                 email: email,
             },
             errorMessage: "",
-            redirectTo: ""
+            redirectTo: "",
+            index: true,
+            featureImage: undefined
         })
     } catch (error) {
         next(error)

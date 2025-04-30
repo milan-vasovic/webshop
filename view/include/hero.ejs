@@ -1,5 +1,4 @@
 
-<link rel="stylesheet" href="/css/hero.css">
 <% /*
   Parametri koje ova hero sekcija prima (mogu biti definisani u kontroleru ili u glavnom EJS fajlu):
   - orientation: string – "left-right", "right-left", "top-bottom", "bottom-top"
@@ -11,28 +10,22 @@
   - imageSrc: string
   - imageAlt: string
 */ %>
-
-<div class="hero-container hero-<%= orientation %>">
-  <div class="hero-content">
-    <% if (title) { %>
-      <h1><%= title %></h1>
-    <% } %>
-    <% if (subtitle) { %>
-      <h2><%= subtitle %></h2>
-    <% } %>
-
-    <% if (paragraphs && paragraphs.length > 0) { %>
+<div class="hero hero--<%= orientation %>">
+  <div class="hero__content">
+    <% if (title) { %><h1 class="hero__title"><%= title %></h1><% } %>
+    <% if (subtitle) { %><h2 class="hero__subtitle"><%= subtitle %></h2><% } %>
+    <% if (paragraphs?.length) { %>
       <% paragraphs.forEach(par => { %>
-        <p><%= par %></p>
+        <p class="hero__paragraph"><%= par %></p>
       <% }) %>
     <% } %>
-
     <% if (ctaLink && ctaText) { %>
-      <a href="<%= ctaLink %>" class="btn-primary hero-cta"><%= ctaText %></a>
+      <a href="<%= ctaLink %>" class="btn-primary hero__cta"><%= ctaText %></a>
     <% } %>
   </div>
 
-  <div class="hero-image">
+  <div class="hero__image">
     <img src="<%= imageSrc %>" alt="<%= imageAlt %>">
   </div>
 </div>
+
