@@ -6,6 +6,7 @@
     
     <div class="column-row__container">
         <div class="left__container-80">
+            <%- include('../include/breadcrumbs', { breadcrumbs }) %>
             <!-- Search -->
             <div class="main-form__container">
                 <form class="width-100 flex flex-row" action="/prodavnica/pretraga" method="post">
@@ -18,7 +19,7 @@
                     <button type="submit" class="btn-secondary">Pretraga</button>
                 </form>
             </div>
-
+            
             <!-- Featured Items -->
             <div class="shop-featured">
                 <h1><a href="/prodavnica/istaknuto">Istaknuto:</a></h1>
@@ -146,7 +147,7 @@
                         <ul class="grid grid-2">
                             <% shop.Tagovi.value.forEach(t => { %>
                                 <li>
-                                    <a href="/prodavnica/oznaka/<%= t %>"><%= t %></a>
+                                    <a href="/prodavnica/oznaka/<%= encodeURIComponent(t) %>"><%= t %></a>
                                 </li>
                             <% }) %>
                         </ul>

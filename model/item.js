@@ -11,9 +11,17 @@ const itemSchema = new Schema({
     sku: {
         type: String,
         required: true,
-        unique: true
+        unique: true,
+        index: true
     },
 
+    slug: {
+        type: String,
+        required: true,
+        unique: true,
+        index: true
+    },
+      
     shortDescription: {
         type: String,
         required: true

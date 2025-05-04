@@ -1,19 +1,40 @@
 import sanitize from 'mongo-sanitize';
 import sanitizeHtml from 'sanitize-html';
 import { validationResult } from 'express-validator';
+import { generateBreadcrumbJsonLd } from "../helper/breadcrumbsSchema.js";
+import { buildBreadcrumbs } from "../helper/buildBreadcrumbs.js";
 
 import ForumService from '../service/forumService.js';
+
+const allowedTags = [
+    "h1", "h2", "h3", "h4", "h5", "h6",
+    "p", "strong", "em", "ul", "ol", "li",
+    "a", "br", "span"
+];
+  
+const allowedAttributes = {
+    a: ["href", "name", "target", "class"],
+    p: ["class"],
+    h1: ["class"], h2: ["class"], h3: ["class"], h4: ["class"], h5: ["class"], h6: ["class"],
+    span: ["class"],
+    strong: ["class"],
+    em: ["class"]
+};
 
 async function getForumPage(req, res, next) {
     try {
         const page = parseInt(req.query.page) || 1;
-        const limit = 5;
+        const limit = 10;
 
         const posts = await ForumService.findPosts(limit, page);
         const totalPages = Math.ceil(posts.totalPosts / limit);
 
         const categories = await ForumService.findPostsCategires();
         const tags = await ForumService.findPostsTags();
+
+        const breadcrumbs = buildBreadcrumbs({
+            type: "post"
+        });
 
         return res.render('forum/forum', {
             path: "/forum",
@@ -28,6 +49,8 @@ async function getForumPage(req, res, next) {
             basePath: `/forum`,
             index: true,
             featureImage: undefined,
+            breadcrumbs,
+            breadcrumbJsonLd: generateBreadcrumbJsonLd(breadcrumbs)
         });
 
     } catch (error) {
@@ -45,6 +68,12 @@ async function getForumPageByCategory(req, res, next) {
         const totalPages = Math.ceil(posts.totalPosts / limit);
         const tags = await ForumService.findPostsTags(category);
 
+        const breadcrumbs = buildBreadcrumbs({
+            mode: "category",
+            category: category,
+            type: "post"
+        });
+
         return res.render('forum/forum', {
             path: `/forum/kategorija/${category}`,
             pageTitle: "Forum Kategorija: " + category,
@@ -58,6 +87,8 @@ async function getForumPageByCategory(req, res, next) {
             basePath: `/forum/kategorija/${category}`,
             index: true,
             featureImage: undefined,
+            breadcrumbs,
+            breadcrumbJsonLd: generateBreadcrumbJsonLd(breadcrumbs)
         });
     } catch (error) {
         next(error);
@@ -75,6 +106,11 @@ async function getForumPageByTags(req, res, next) {
         const totalPages = Math.ceil(posts.totalPosts / limit);
         const categories = await ForumService.findPostsCategires(tag);
 
+        const breadcrumbs = buildBreadcrumbs({
+            mode: "tag",
+            tag: tag,
+            type: "post"
+        });
 
         return res.render('forum/forum', {
             path: `/forum/oznaka/${tag}`,
@@ -89,6 +125,8 @@ async function getForumPageByTags(req, res, next) {
             basePath: `/forum/oznaka/${tag}`,
             index: true,
             featureImage: undefined,
+            breadcrumbs,
+            breadcrumbJsonLd: generateBreadcrumbJsonLd(breadcrumbs)
         });
     } catch (error) {
         next(error);
@@ -104,6 +142,12 @@ async function getSearchForumsPage(req, res, next) {
         const posts = await ForumService.findPostsBySearch(searchSanitized, limit, page);
         const totalPages = Math.ceil(posts.totalPosts / limit);
 
+        const breadcrumbs = buildBreadcrumbs({
+            mode: "search",
+            search: searchSanitized,
+            type: "post"
+        });
+
         return res.render('forum/forum', {
             path: `/forum/pretraga/${search}`,
             pageTitle: "Forum Pretraga: " + search,
@@ -117,6 +161,8 @@ async function getSearchForumsPage(req, res, next) {
             basePath: `/forum/pretraga/${search}`,
             index: true,
             featureImage: undefined,
+            breadcrumbs,
+            breadcrumbJsonLd: generateBreadcrumbJsonLd(breadcrumbs)
         });
     } catch (error) {
         next(error)
@@ -125,8 +171,13 @@ async function getSearchForumsPage(req, res, next) {
 
 async function getForumPostDetailsPage(req, res, next) {
     try {
-        const postTitle = req.params.postTitle;
-        const post = await ForumService.findPostByName(postTitle);
+        const postSlug = req.params.postSlug;
+        const post = await ForumService.findPostBySlug(postSlug);
+
+        const breadcrumbs = buildBreadcrumbs({
+            post: post,
+            type: "post"
+        });
 
         return res.render('forum/post', {
             path: `/forum/objava/${post.Naziv.value}`,
@@ -136,6 +187,8 @@ async function getForumPostDetailsPage(req, res, next) {
             post: post,
             index: true,
             featureImage: post["Slika"].value,
+            breadcrumbs,
+            breadcrumbJsonLd: generateBreadcrumbJsonLd(breadcrumbs)
         });
     } catch (error) {
         next(error);
@@ -145,7 +198,7 @@ async function getForumPostDetailsPage(req, res, next) {
 async function getAdminForumPage(req, res, next) {
     try {
         const page = parseInt(req.query.page) || 1;
-        const limit = 5;
+        const limit = 10;
 
         const posts = await ForumService.findPosts(limit, page);
         const totalPages = Math.ceil(posts.totalPosts / limit);
@@ -240,7 +293,10 @@ async function postAddPost(req, res, next) {
         const categories = sanitize(req.body.categories);
         const tags = sanitize(req.body.tags);
         const description = sanitizeHtml(req.body.description)
-        const content = req.body.content.map((content) => sanitizeHtml(content));
+        const content = req.body.content.map((content) => sanitizeHtml(content, {allowedTags,
+            allowedAttributes,
+            allowedSchemes: ['http', 'https', 'mailto'],
+            allowedSchemesAppliedToAttributes: ['href']}));
         const files = req.files;
         const errors = validationResult(req);
         if (!errors.isEmpty()) {

@@ -1,5 +1,6 @@
 import { ObjectId } from "mongodb";
 import sanitize from "mongo-sanitize";
+import { generateSlug } from "../helper/slugHelper.js";
 
 import ItemModel from "../model/item.js";
 
@@ -164,7 +165,7 @@ class ItemService {
     const items = await ItemModel.find()
       .sort({ soldCount: -1, _id: 1  })
       .select(
-        "title shortDescription price actionPrice categories tags featureImage status"
+        "title slug shortDescription price actionPrice categories tags featureImage status"
       )
       .skip(skip)
       .limit(limit)
@@ -201,7 +202,7 @@ class ItemService {
     const items = await ItemModel.find(filter)
       .sort({ soldCount: -1, _id: 1  })
       .select(
-        "title shortDescription price actionPrice featureImage status"
+        "title slug shortDescription price actionPrice featureImage status"
       )
       .skip(skip)
       .limit(limit)
@@ -238,7 +239,7 @@ class ItemService {
     const items = await ItemModel.find(filter)
       .sort({ soldCount: -1, _id: 1  })
       .select(
-        "title shortDescription price actionPrice featureImage status"
+        "title slug shortDescription price actionPrice featureImage status"
       )
       .skip(skip)
       .limit(limit)
@@ -288,7 +289,7 @@ class ItemService {
     const [items, itemCount] = await Promise.all([
       ItemModel.find(filter)
         .sort({ soldCount: -1, _id: 1 })
-        .select("title shortDescription price actionPrice featureImage status")
+        .select("title slug shortDescription price actionPrice featureImage status")
         .skip(skip)
         .limit(limit)
         .lean(),
@@ -340,7 +341,7 @@ class ItemService {
     const [items, itemCount] = await Promise.all([
       ItemModel.find(filter)
         .sort({ soldCount: -1, _id: 1 })
-        .select("title shortDescription price actionPrice featureImage status")
+        .select("title slug shortDescription price actionPrice featureImage status")
         .skip(skip)
         .limit(limit)
         .lean(),
@@ -375,6 +376,7 @@ class ItemService {
       const searchNumber = parseFloat(search);
       const conditions = [
         { title: { $regex: search, $options: "i" } },
+        { slug: { $regex: search, $options: "i" } },
         { sku: { $regex: search, $options: "i" } },
         { categories: { $regex: search, $options: "i" } },
         { tags: { $regex: search, $options: "i" } },
@@ -397,7 +399,7 @@ class ItemService {
     const [items, itemCount] = await Promise.all([
       ItemModel.find(filter)
         .sort({ soldCount: -1, _id: 1 })
-        .select("title shortDescription price actionPrice status categories tags keyWords featureImage")
+        .select("title slug shortDescription price actionPrice status categories tags keyWords featureImage")
         .skip(skip)
         .limit(limit)
         .lean(),
@@ -420,10 +422,10 @@ class ItemService {
    * @param {string} idOrName - The ID or name of the item to find.
    * @returns {Promise<Object>} - A promise that resolves to the item details.
    */
-  static async findItemDetailsByIdOrName(id, itemName = null) {
-    if (itemName) {
-      const item = await ItemModel.findOne({ title: itemName }).select(
-        "title keyWords shortDescription price actionPrice description categories tags featureImage video status backorder variations upSellItems crossSellItems wishlist"
+  static async findItemDetailsByIdOrSlug(id, itemSlug = null) {
+    if (itemSlug) {
+      const item = await ItemModel.findOne({ slug: itemSlug }).select(
+        "title slug keyWords shortDescription price actionPrice description categories tags featureImage video status backorder variations upSellItems crossSellItems wishlist"
       );
 
       if (!item) {
@@ -434,7 +436,7 @@ class ItemService {
     }
 
     const item = await ItemModel.findById(id).select(
-      "title keyWords shortDescription price actionPrice description categories tags featureImage video status backorder variations upSellItems crossSellItems"
+      "title slug keyWords shortDescription price actionPrice description categories tags featureImage video status backorder variations upSellItems crossSellItems"
     );
 
     if (!item) {
@@ -455,7 +457,7 @@ class ItemService {
     const items = await ItemModel.find()
       .sort({ soldCount: -1, _id: 1 })
       .select(
-        "title shortDescription price actionPrice categories tags status sku featureImage"
+        "title slug shortDescription price actionPrice categories tags status sku featureImage"
       )
       .skip(skip)
       .limit(limit)
@@ -547,7 +549,7 @@ class ItemService {
   static async findItemDetailsForUpCrossSell(itemId) {
     try {
       const item = await ItemModel.findById(itemId).select(
-        "title shortDescription featureImage"
+        "title slug shortDescription featureImage"
       );
 
       if (!item) {
@@ -648,6 +650,7 @@ class ItemService {
         imgDesc: sanitize(body.featureImageDesc || ""),
     };
 
+    const slug = generateSlug(body.title);
     // Variations
     const variationImages = files.filter(file => file.fieldname.startsWith('variationImage'));
     const variations = [];
@@ -711,6 +714,7 @@ class ItemService {
 
     const newItemData = {
       title: sanitize(body.title),
+      slug: slug,
       sku: sanitize(body.sku),
       price: sanitize(body.price),
       actionPrice: sanitize(body.actionPrice),
@@ -1068,6 +1072,7 @@ class ItemService {
     return items.map((item) => ({
       ID: { value: item._id },
       Naziv: { value: item.title },
+      Link: { value: item.slug },
       Opis: { value: item.shortDescription },
       Status: { value: item.status.join(", ") },
       Slika: {
@@ -1083,6 +1088,7 @@ class ItemService {
     return items.map((item) => ({
       ID: { value: item._id },
       Naziv: { value: item.title },
+      Link: { value: item.slug },
       Opis: { value: item.shortDescription },
       Status: { value: item.status.join(", ") },
       Kategorije: { value: item.categories },
@@ -1099,6 +1105,7 @@ class ItemService {
   static mapItemsForCardForAdmin(items) {
     return items.map((item) => ({
       ID: { value: item._id },
+      Link: { value: item.slug },
       SKU: { value: item.sku },
       Naziv: { value: item.title },
       Opis: { value: item.shortDescription },
@@ -1127,6 +1134,7 @@ class ItemService {
     return {
       ID: { value: item._id },
       Naziv: { value: item.title },
+      Link: { value: item.slug },
       "Kratak Opis": { value: item.shortDescription },
       "Ključne Reči": { value: item.keyWords.join(", ") },
       Opis: { value: item.description },
@@ -1182,6 +1190,7 @@ class ItemService {
     return {
       ID: { value: item._id },
       Naziv: { value: item.title },
+      Link: { value: item.slug },
       SKU: { value: item.sku },
       "Kratak Opis": { value: item.shortDescription },
       "Ključne Reči": { value: item.keyWords.join(", ") },

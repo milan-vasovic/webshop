@@ -12,7 +12,7 @@ router.get("/forum/oznaka/:tag", ForumController.getForumPageByTags);
 
 router.get("/forum/pretraga/:search", ForumController.getSearchForumsPage);
 
-router.get("/objava/:postTitle", ForumController.getForumPostDetailsPage);
+router.get("/objava/:postSlug", ForumController.getForumPostDetailsPage);
 
 router.post("/forum/pretraga", ForumController.postSearchPost);
 

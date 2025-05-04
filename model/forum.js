@@ -7,6 +7,12 @@ const forumSchema = new Schema({
         type: String,
         required: true
     },
+    slug: {
+        type: String,
+        required: true,
+        unique: true,
+        index: true
+    },
     shortDescription: {
         type: String,
         required: true

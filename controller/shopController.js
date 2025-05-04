@@ -2,6 +2,8 @@ import sanitizeHtml from 'sanitize-html';
 import sanitize from 'mongo-sanitize';
 import mongoose from 'mongoose';
 import {validationResult} from 'express-validator';
+import { generateBreadcrumbJsonLd } from "../helper/breadcrumbsSchema.js";
+import { buildBreadcrumbs } from "../helper/buildBreadcrumbs.js";
 
 import ShopService from "../service/shopService.js";
 import ItemService from "../service/itemService.js";
@@ -15,6 +17,10 @@ async function getShopPage(req, res, next) {
     try {
         const shop = await ShopService.findItemsForShop();
 
+        const breadcrumbs = buildBreadcrumbs({
+            type: "item"
+          });
+
         return res.render("shop/shop", {
             path: "/prodavnica",
             pageTitle: "Prodavnica - TopHelanke Online Kupovina",
@@ -22,7 +28,9 @@ async function getShopPage(req, res, next) {
             pageKeyWords: "prodavnica, helanke, sportska odeća, ženska odeća, online prodaja, TopHelanke, kupovina, sigurna kupovina, moda, novi modeli",
             featureImage: undefined,
             index: true,
-            shop: shop
+            shop: shop,
+            breadcrumbs,
+            breadcrumbJsonLd: generateBreadcrumbJsonLd(breadcrumbs)
           });          
 
     } catch (error) {
@@ -39,6 +47,12 @@ async function getShopPageByCategory(req, res, next) {
         const shop = await ShopService.findItemsByCategory(category, page, limit);
         const totalPages = Math.ceil(shop.Ukupno / limit);
 
+        const breadcrumbs = buildBreadcrumbs({
+            mode: "category",
+            category: category,
+            type: "item"
+          });
+
         return res.render("shop/shop", {
             path: `/prodavnica/kategorija/${category}`,
             pageTitle: `Prodavnica - Kategorija: ${category}`,
@@ -49,7 +63,9 @@ async function getShopPageByCategory(req, res, next) {
             shop: shop,
             currentPage: page,
             totalPages: totalPages,
-            basePath: `/prodavnica/kategorija/${category}`
+            basePath: `/prodavnica/kategorija/${category}`,
+            breadcrumbs,
+            breadcrumbJsonLd: generateBreadcrumbJsonLd(breadcrumbs)
         })
 
     } catch (error) {
@@ -66,6 +82,12 @@ async function getShopPageByTag(req, res, next) {
         const shop = await ShopService.findItemsByTags(tag, page, limit);
         const totalPages = Math.ceil(shop.Ukupno / limit);
 
+        const breadcrumbs = buildBreadcrumbs({
+            mode: "tag",
+            tag: tag,
+            type: "item"
+        });
+
         return res.render("shop/shop", {
             path: `/prodavnica/oznaka/${tag}`,
             pageTitle: `Prodavnica - Oznaka: ${tag}`,
@@ -77,9 +99,9 @@ async function getShopPageByTag(req, res, next) {
             currentPage: page,
             totalPages: totalPages,
             basePath: `/prodavnica/oznaka/${tag}`,
+            breadcrumbs,
+            breadcrumbJsonLd: generateBreadcrumbJsonLd(breadcrumbs)
           });
-          
-
     } catch (error) {
         next(error);
     }
@@ -95,6 +117,12 @@ async function getShopPageBySearch(req, res, next) {
         const shop = await ShopService.findItemsBySearch(param, page, limit);
         const totalPages = Math.ceil(shop.Ukupno / limit);
 
+        const breadcrumbs = buildBreadcrumbs({
+            mode: "search",
+            search: search,
+            type: "item"
+        });
+
         return res.render("shop/shop", {
             path: `/prodavnica/pretraga/${param}`,
             pageTitle: `Rezultati pretrage za: ${search}`,
@@ -106,6 +134,8 @@ async function getShopPageBySearch(req, res, next) {
             currentPage: page,
             totalPages: totalPages,
             basePath: `/prodavnica/pretraga/${param}`,
+            breadcrumbs,
+            breadcrumbJsonLd: generateBreadcrumbJsonLd(breadcrumbs)
           });          
 
     } catch (error) {
@@ -162,11 +192,11 @@ async function getActionedShopPage(req, res, next) {
     }
 }
 
-async function getItemByName(req, res, next) {
+async function getItemBySlug(req, res, next) {
     try {
-        const itemName = req.params.itemName;
+        const itemSlug = req.params.itemSlug;
 
-        const item = await ShopService.findItemByName(itemName);
+        const item = await ShopService.findItemBySlug(itemSlug);
 
         const userId = req.session.user?._id;
 
@@ -174,6 +204,11 @@ async function getItemByName(req, res, next) {
         if (userId) {
             isWishlisted = item["Lista Želja"].some(wish => wish.userId.toString() === userId.toString());
         }
+
+        const breadcrumbs = buildBreadcrumbs({
+            item: item,
+            type: "item"
+        });
 
         return res.render('shop/item', {
             path: `/prodavnica/artikal/${item.Naziv.value}`,
@@ -183,7 +218,9 @@ async function getItemByName(req, res, next) {
             featureImage: item.Slike["Istaknuta Slika"].URL || undefined,
             index: true,
             item,
-            isWishlisted
+            isWishlisted,
+            breadcrumbs,
+            breadcrumbJsonLd: generateBreadcrumbJsonLd(breadcrumbs)
           });
     } catch (error) {
         next(error)
@@ -789,7 +826,7 @@ export default {
     getActionedShopPage,
     getCartPage,
     getCheckOutPage,
-    getItemByName,
+    getItemBySlug,
     getConfirmOrder,
     postShopSearch,
     postAddItemToCart,

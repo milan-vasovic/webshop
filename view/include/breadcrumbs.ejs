@@ -1,0 +1,16 @@
+<!-- views/partials/breadcrumbs.ejs -->
+<% if (breadcrumbs && breadcrumbs.length) { %>
+    <nav class="breadcrumbs">
+        <% breadcrumbs.forEach((crumb, index)=> { %>
+          <% if (index < breadcrumbs.length - 1) { %>
+            <a href="<%= crumb.href %>"><%= crumb.label %></a> &gt;
+          <% } else { %>
+            <span><%= crumb.label %></span>
+          <% } %>
+        <% }) %>
+      </nav>
+<% } %>
+<script type="application/ld+json">
+    <%= JSON.stringify(breadcrumbJsonLd) %>
+</script>
+  

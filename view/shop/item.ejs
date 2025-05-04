@@ -13,6 +13,7 @@
     </div>
 
     <div class="right__container-70">
+      <%- include('../include/breadcrumbs', { breadcrumbs }) %>
       <!-- Cena -->
       <div class="product__price-block">
         <% if (item.Status.value && item.Status.value[0] === 'action') { %>

@@ -18,6 +18,7 @@ import mongoSanitize from 'express-mongo-sanitize';
 import methodOverride from 'method-override';
 import ItemModel from "./model/item.js";
 
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -143,6 +144,12 @@ app.use("/admin", adminRoutes);
 //   );
 //   next()
 // });
+
+app.use((req, res, next) => {
+  const error = new Error('Stranica nije pronađena');
+  error.statusCode = 404;
+  next(error);
+});
 
 app.use(ErrorMiddleware);
 

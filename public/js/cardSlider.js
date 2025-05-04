@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
   
     const isMobile = window.innerWidth < 768;
     const gap = isMobile ? 20 : (containerWidth - (badgeCount * badgeWidth)) / badgeCount;
-    const speed = 0.5; // px po frame-u
+    const speed = 0.75; // px po frame-u
   
     let positions = [];
     let currentLeft = 0;
@@ -23,14 +23,14 @@ document.addEventListener('DOMContentLoaded', () => {
           currentLeft = (i - (badgeCount - 4)) * (badgeWidth + gap); 
         }
         badges[i].style.transform = `translateX(${currentLeft}px)`;
-        badges[i].style.transition = 'transform 0.3s linear';
+        badges[i].style.transition = 'transform linear';
         positions[i] = currentLeft;
       }
     } else {
       // === Desktop ponašanje kao do sada ===
       badges.forEach(badge => {
         badge.style.transform = `translateX(${currentLeft}px)`;
-        badge.style.transition = 'transform 0.3s linear';
+        badge.style.transition = 'transform linear';
         positions.push(currentLeft);
         currentLeft += badge.offsetWidth + gap;
       });

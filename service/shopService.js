@@ -136,9 +136,9 @@ class ShopService {
     * @param {string} name - The name of the item to find.
     * @returns {Promise<Object>} - A promise that resolves to the item details.
     */
-    static async findItemByName(itemName) {
+    static async findItemBySlug(itemSlug) {
         try {
-            const item = await ItemService.findItemDetailsByIdOrName(null,itemName);
+            const item = await ItemService.findItemDetailsByIdOrSlug(null,itemSlug);
 
             return item;
         } catch (error) {

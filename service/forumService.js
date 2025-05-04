@@ -1,4 +1,5 @@
 import ForumModel from '../model/forum.js';
+import { generateSlug } from "../helper/slugHelper.js";
 
 import ErrorHelper from '../helper/errorHelper.js';
 
@@ -38,9 +39,9 @@ class ForumService {
         }
     }
 
-    static async findPostByName(name) {
+    static async findPostBySlug(slug) {
         try {
-            const post = await ForumModel.findOne({ title: name });
+            const post = await ForumModel.findOne({ slug: slug });
 
             if (!post) {
                 ErrorHelper.throwNotFoundError('Objava');
@@ -114,6 +115,7 @@ class ForumService {
             if (search) {
                 let conditions = [
                     { title: { $regex: search, $options: "i" } },
+                    { slug: { $regex: search, $options: "i" } },
                     { categories: { $regex: search, $options: "i" } },
                     { tags: { $regex: search, $options: "i" } },
                     { keyWords: { $regex: search, $options: "i" } },
@@ -183,14 +185,15 @@ class ForumService {
 
     static async createPost(title, shortDescription, keyWords, featureImageDescription, categories, tags, description, content, files, author) {
         try {
-            console.log(files)
             const featureImage = {
                 img: files[0].originalname,
                 imgDesc: featureImageDescription
             }
-            
+            const slug = generateSlug(title);
+
             const post = new ForumModel({
                 title,
+                slug,
                 shortDescription,
                 keyWords,
                 featureImage,
@@ -226,6 +229,7 @@ class ForumService {
         return posts.map((post) => ({
             ID: { value: post._id },
             Naziv: { value: post.title },
+            Link: { value: post.slug },
             "Kratak Opis": { value: post.shortDescription },
             Slika: { 
                 value: post.featureImage.img,
@@ -238,6 +242,7 @@ class ForumService {
         return {
             ID: { value: post._id },
             Naziv: { value: post.title },
+            Link: { value: post.slug },
             Autor: { value: post.author },
             Datum: { value: post.date.toLocaleDateString("sr-RS", {
                 day: "2-digit",

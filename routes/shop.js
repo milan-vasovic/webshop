@@ -17,7 +17,7 @@ router.get('/istaknuto', ShopController.getFeautredShopPage);
 
 router.get('/akcija', ShopController.getActionedShopPage);
 
-router.get("/artikal/:itemName", ShopController.getItemByName);
+router.get("/artikal/:itemSlug", ShopController.getItemBySlug);
 
 router.get('/korpa', ShopController.getCartPage);
 

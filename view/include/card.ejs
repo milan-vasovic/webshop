@@ -61,7 +61,7 @@
             <button class="btn-primary" type="submit"><%= action.buttonName %></button>
           </form>
         <% } else if (action.type === 'link-name') { %>
-          <a class="btn-primary" href="<%= action.link + (item.Naziv?.value || '') %>"><%= action.linkName %></a>
+          <a class="btn-primary" href="<%= action.link + (item.Link?.value || '') %>"><%= action.linkName %></a>
         <% } else { %>
           <a class="btn-primary" href="<%= action.link + (item.ID?.value || item._id) %>"><%= action.linkName %></a>
         <% } %>
