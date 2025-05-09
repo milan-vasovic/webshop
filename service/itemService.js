@@ -266,24 +266,26 @@ class ItemService {
     skip = 0
   ) {
     const filter = {
-      categories: category,
-      $and: []
+      categories: category
     };
   
+    // Uvek isključi not-published
+    const excluded = new Set();
+    if (excludeStatus) {
+      const excl = Array.isArray(excludeStatus) ? excludeStatus : [excludeStatus];
+      excl.forEach(e => excluded.add(e));
+    }
+    excluded.add("not-published");
+  
+    // Ako postoji status, koristi $in i $nin zajedno
     if (status) {
       const statuses = Array.isArray(status) ? status : [status];
-      filter.$and.push({ status: { $in: statuses } });
-    }
-  
-    if (excludeStatus || !status) {
-      const excluded = Array.isArray(excludeStatus)
-        ? excludeStatus
-        : [excludeStatus || "not-published"];
-      filter.$and.push({ status: { $nin: excluded } });
-    }
-  
-    if (filter.$and.length === 0) {
-      delete filter.$and;
+      filter.status = {
+        $in: statuses,
+        $nin: Array.from(excluded)
+      };
+    } else {
+      filter.status = { $nin: Array.from(excluded) };
     }
   
     const [items, itemCount] = await Promise.all([
@@ -505,20 +507,20 @@ class ItemService {
         ErrorHelper.throwNotFoundError("Artikal");
       }
 
-      let itemPrice;
-
-      if (item.status && item.status.includes("action")) {
-        itemPrice = item.actionPrice;
-      } else {
-        itemPrice = item.price;
-      }
-
       const variation = item.variations.find(
         (v) => v._id.toString() === variationId.toString()
       );
 
       if (!variation) {
         ErrorHelper.throwNotFoundError("Varijacija");
+      }
+
+      let itemPrice;
+
+      if (item.status?.includes("action") && variation.onAction) {
+        itemPrice = item.actionPrice;
+      } else {
+        itemPrice = item.price;
       }
 
       const result = {
@@ -649,7 +651,7 @@ class ItemService {
         img: featureImageFile ? featureImageFile.originalname : null,
         imgDesc: sanitize(body.featureImageDesc || ""),
     };
-
+    console.log("featureImage", featureImage);
     const slug = generateSlug(body.title);
     // Variations
     const variationImages = files.filter(file => file.fieldname.startsWith('variationImage'));
@@ -666,6 +668,7 @@ class ItemService {
                     img: variationImageFile ? variationImageFile.originalname : null,
                     imgDesc: sanitize(variation.imgDesc || ""),
                 },
+                onAction: sanitize(variation.onAction) || false,
             });
         });
     }
@@ -765,21 +768,26 @@ class ItemService {
       if (!existingItem) {
         ErrorHelper.throwNotFoundError("Artikal");
       }
+      const slug = generateSlug(body.title);
 
       // Obrada featureImage – ako je upload-ovana nova slika, ažuriraj, inače zadrži staru
-      if (files && files.featureImage) {
+      const featureImageFile = files.find(file => file.fieldname === 'featureImage');
+      if (files && featureImageFile) {
         existingItem.featureImage = {
-          img: files.featureImage[0].path,
-          imgDesc: body.featureImageDesc || existingItem.featureImage.imgDesc,
+          img: featureImageFile ? featureImageFile.originalname : null,
+          imgDesc: sanitize(body.featureImageDesc || ""),
         };
       }
 
-      // Obrada videa – slično
-      if (files && files.video) {
-        existingItem.video = {
-          vid: files.video[0].path,
-          vidDesc: body.videoDesc || existingItem.video.vidDesc,
+      const videoFile = files.find(file => file.fieldname === 'video');
+      let video;
+      if (videoFile) {
+        video = {
+            vid: videoFile.originalname,
+            vidDesc: sanitize(body.videoDesc || null),
         };
+
+        existingItem.video = video;
       }
 
       // Obrada varijacija
@@ -805,7 +813,8 @@ class ItemService {
             image: {
               img: file ? file.originalname : (existingVar && existingVar.image && existingVar.image.img) || "",
               imgDesc: variation.imgDesc || (existingVar && existingVar.image && existingVar.image.imgDesc) || ""
-            }
+            },
+            onAction: variation.onAction || (existingVar ? existingVar.onAction : false),
           };
       
           if (!isNew) {
@@ -821,6 +830,7 @@ class ItemService {
 
       // Ažuriraj ostale podatke
       existingItem.title = body.title || existingItem.title;
+      existingItem.slug = slug || existingItem.slug;
       existingItem.sku = body.sku || existingItem.sku;
       existingItem.shortDescription =
         body.shortDescription || existingItem.shortDescription;
@@ -1168,6 +1178,7 @@ class ItemService {
           URL: variation.image.img,
           Opis: variation.image.imgDesc,
         },
+        Akcija: variation.onAction,
       })),
       "UpSell Artikli": item.upSellItems.map((upsell) => ({
         ID: { value: upsell.itemId },
@@ -1185,7 +1196,6 @@ class ItemService {
     };
   }
   
-
   static mapItemDetailsForAdmin(item) {
     return {
       ID: { value: item._id },
@@ -1232,6 +1242,7 @@ class ItemService {
           value: variation.image.img,
           Opis: variation.image.imgDesc,
         },
+        Akcija: variation.onAction,
       })),
       "UpSell Artikli": item.upSellItems.map((upsell) => ({
         ID: upsell.itemId,

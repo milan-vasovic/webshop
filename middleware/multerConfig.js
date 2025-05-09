@@ -22,7 +22,8 @@ const fileFilter = (req, file, cb) => {
     'image/jpeg',
     'video/mp4',
     'video/mkv',
-    'video/webm'
+    'video/webm',
+    'video/mov',
   ];
 
   if (allowedMimeTypes.includes(file.mimetype)) {

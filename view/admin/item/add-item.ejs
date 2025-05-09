@@ -240,6 +240,12 @@
               <label for="variationImageDesc<%= index %>" class="main-form__label">Opis slike:</label>
               <input type="text" id="variationImageDesc<%= index %>" name="variations[<%= index %>][imgDesc]" class="main-form__input" value="<%= variation.Slika.Opis %>" required>
         
+              <label for="variationAction<%= index %>" class="main-form__label">Na Akciji:</label>
+              <select id="variationAction<%= index %>" name="variations[<%= index %>][onAction]" class="main-form__select" required>
+                <option value="true" <%= true === variation.Akcija ? "selected" : "" %>>Da</option>
+                <option value="false" <%= false === variation.Akcija ? "selected" : "" %>>Ne</option>
+              </select>
+
               <!-- Skriveno polje za ID varijacije -->
               <input type="hidden" name="variations[<%= index %>][variationId]" value="<%= variation.ID %>">
         
@@ -268,6 +274,12 @@
             <label for="variationImageDesc0" class="main-form__label">Opis slike:</label>
             <input type="text" id="variationImageDesc0" name="variations[0][imgDesc]" class="main-form__input" required>
         
+            <label for="variationAction0" class="main-form__label">Na Akciji:</label>
+            <select id="variationAction0" name="variations[0][onAction]" class="main-form__select" required>
+              <option value="true">Da</option>
+              <option value="false">Ne</option>
+            </select>
+
             <!-- Skriveno polje za privremeni ID varijacije -->
             <input type="hidden" name="variations[0][variationId]" value="new-0">
         

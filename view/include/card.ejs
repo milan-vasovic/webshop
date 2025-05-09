@@ -15,7 +15,7 @@
          const lowerKey = key.toLowerCase();
          if (
            (index === 0 && key === "ID" && showId === false) ||
-           ["naziv", "slika", "status", "akcijska cena", "autor"].includes(lowerKey)
+           ["naziv", "slika", "status", "akcijska cena", "autor", "link", "slug"].includes(lowerKey)
          ) return;
     %>
       <div class="card__field

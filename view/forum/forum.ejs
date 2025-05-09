@@ -42,7 +42,7 @@
     <!-- Desna kolona: Sidebar s kategorijama i tagovima -->
     <div class="right__container-20">
       <% if (!isAuthenticated) { %>
-        <%- include('../include/newsletter.ejs') %>
+        <%- include('../include/newsletter.ejs', {from: path }) %>
       <% } %>
       <% if (categories && categories.length > 0) { %>
         <div style="margin-bottom: var(--margin-big);">

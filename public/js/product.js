@@ -4,6 +4,11 @@ document.addEventListener('DOMContentLoaded', function() {
   const variations = JSON.parse(itemDataEl.getAttribute('data-variations'));
   const backorderAllowed = itemDataEl.getAttribute('data-backorder') === 'true';
   const defaultImage = itemDataEl.getAttribute('data-default-image'); // naziv fajla bez putanje (npr. "default.jpg")
+  const itemStatusAttr = itemDataEl.getAttribute('data-status');
+  const itemStatus = itemStatusAttr ? itemStatusAttr.split(',').map(s => s.trim()) : [];
+  const basePrice = parseFloat(itemDataEl.getAttribute('data-price'));
+  const actionPrice = parseFloat(itemDataEl.getAttribute('data-action-price'));
+  const priceDisplay = document.getElementById('productPriceDisplay');
 
   // Ostali DOM selektori (forma, input polja, itd.)
   const variationsSelect = document.getElementById('variationsSelect');
@@ -13,9 +18,21 @@ document.addEventListener('DOMContentLoaded', function() {
   const formSubmitContainer = document.getElementById('formSubmitContainer');
   const quantityContainer = document.getElementById('amountInput'); // novi kontejner
 
+  function updatePriceDisplay(isAction) {
+    if (!priceDisplay) return;
+  
+    if (isAction && !isNaN(actionPrice)) {
+      priceDisplay.innerHTML = `<s>${basePrice} RSD</s> <span class="highlight">${actionPrice} RSD</span>`;
+    } else {
+      priceDisplay.innerHTML = `${basePrice} RSD`;
+    }
+  }
+
+  
   function updateVariation(index) {
     const variation = variations[index];
-
+    const isOnAction = variation.Akcija && itemStatus.includes("action");
+    updatePriceDisplay(isOnAction);
     // Ažuriranje glavnog medija
     if (variation.Slika && variation.Slika.URL) {
       selectMedia("image", variation.Slika.URL, variation.Slika.Opis || '');

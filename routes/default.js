@@ -60,4 +60,31 @@ router.post('/kontaktiranje', [
         })
 ], DefaultController.postContact);
 
+router.post('/newsletter', [
+    body("name")
+    .trim()
+    .notEmpty().withMessage("Ime je obavezno.")
+    .isLength({ min: 2, max: 50 }).withMessage("Ime mora imati između 2 i 50 karaktera.")
+    .escape(),
+    body("email")
+        .trim()
+        .notEmpty().withMessage("Email je obavezan.")
+        .isEmail().withMessage("Unesite validan email.")
+        .normalizeEmail(),
+        body('acceptance')
+        .custom((value) => {
+        if (!value) {
+            throw new Error('Morate prihvatiti uslove.');
+        }
+        return true;
+        }),
+    body("honeypot")
+        .custom((value) => {
+        if (value) {
+            throw new Error("Spam detektovan.");
+        }
+        return true;
+        })
+], DefaultController.postNewsletter);
+
 export default router;

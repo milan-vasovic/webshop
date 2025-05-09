@@ -144,7 +144,12 @@ const itemSchema = new Schema({
             imgDesc: {
                 type: String,
             }
-        }
+        },
+        onAction: {
+            type: Boolean,
+            default: false,
+            required: true
+        },
     }],
 
     upSellItems: [{

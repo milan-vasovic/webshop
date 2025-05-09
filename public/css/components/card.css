@@ -38,7 +38,6 @@
   gap: var(--grid-gap-small);
   padding: var(--padding-small);
   position: relative;
-  font-family: Georgia, "Times New Roman", Times, serif;
 }
 
 /* Featured badge */
@@ -76,7 +75,7 @@
 /* Card title */
 .card__title {
   width: 100%;
-  margin-top: 1.5rem;
+  margin-top: 2rem;
   text-align: center;
   font-size: var(--font-size-large);
   font-weight: var(--font-weight-bold);
@@ -173,6 +172,7 @@
 
 /* Price-specific field */
 .card__field--price {
+  font-family: "Lobster Two", sans-serif;
   font-size: var(--font-size-large);
   color: var(--title-color);
 }

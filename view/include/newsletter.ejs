@@ -1,14 +1,25 @@
 <section class="newsletter-cta">
-    <h1 class="newsletter-cta__title">Prijavite se na naš newsletter</h1>
-    <p class="newsletter-cta__text">Kako biste dobijali najnovija obaveštenja i ponude!</p>
-  
-    <form action="/newsletter-prijava" method="post" class="newsletter-cta__form">
-      <div class="main-form__group">
-        <input class="main-form__input" type="email" name="email" id="emailInp" placeholder="Unesite email">
-      </div>
-      <input type="hidden" name="CSRFToken" value="<%= csrfToken %>">
-      <input type="hidden" name="honeypot">
-      <button class="btn-primary" type="submit">Prijavite Se</button>
-    </form>
-  </section>
-  
+  <h1 class="newsletter-cta__title">Prijavite se na naš newsletter</h1>
+  <p class="newsletter-cta__text">Kako biste dobijali najnovija obaveštenja i ponude!</p>
+
+  <form action="/newsletter-prijava" method="post" class="newsletter-cta__form" id="newsletterForm">
+    <div class="main-form__group">
+      <label class="main-form__label" for="nameInp">Ime:</label>
+      <input class="main-form__input" type="text" name="name" id="nameInp" placeholder="Unesite ime" required>
+      <label class="main-form__label" for="emailInp">Email:</label>
+      <input class="main-form__input" type="email" name="email" id="emailInp" placeholder="Unesite email" required>
+      <label class="main-form__label" for="acceptance">Saglasnost:</label>
+      <p>
+        Prihvatate <a class="main__link" href="/uslovi-koriscenja">Uslove Korišćenja</a> i <a class="main__link" href="/politika-privatnosti">Politiku Privatnosti</a>
+      </p>
+      <input class="main-form__input" id="acceptance" name="acceptance" type="checkbox" required>
+    </div>
+    <input type="hidden" name="CSRFToken" value="<%= csrfToken %>">
+    <input type="hidden" name="from" value="<%= from %>">
+    <input type="hidden" name="honeypot">
+    <button class="btn-primary" type="submit">Prijavite Se</button>
+  </form>
+  <div id="newsletterMessage"></div>
+</section>
+
+<script src="/js/newsletter.js"></script>

@@ -50,6 +50,10 @@ app.use(
               "default-src": ["'self'"],
               "script-src": ["'self'", "https://www.instagram.com/"], 
               "style-src": ["'self'", "'unsafe-inline'","https://fonts.googleapis.com"],
+              "font-src": [
+                "'self'",
+                "https://fonts.gstatic.com"
+              ],
               frameSrc: ["'self'", "https://www.google.com", "https://maps.google.com", "https://www.instagram.com/"],
           },
       },
@@ -101,7 +105,7 @@ app.use(async (req, res, next) => {
       req.session.cart = [];
     }
     req.session.cart = req.session.cart;
-    req.session.cartItemCount = req.session.cart.length;
+    req.session.cartItemCount = req.session.cart.length || 0;
     req.session.user = null;
     return next();
   }
@@ -132,17 +136,49 @@ app.use(forumRoutes)
 app.use("/prodavnica", shopRoutes);
 app.use(userRoutes);
 app.use("/admin", adminRoutes);
-
 // app.use(async (req, res, next) => {
 //   await ItemModel.updateMany(
-//     { status: { $in: ["not-published"] } },
-//     { $pull: { status: "not-published" } }
+//     { "variations.onAction": { $exists: false } },
+//     {
+//       $set: { "variations.$[].onAction": false }
+//     }
 //   );
-//   await ItemModel.updateMany(
-//     { status: { $nin: ["normal"] } }, // Samo ako "normal" nije već tu
-//     { $addToSet: { status: "normal" } }
-//   );
-//   next()
+//   next();
+// })
+// app.use(async (req, res, next) => {
+//   try {
+//     // 1. Ukloni sve vrednosti iz status koje nisu "not-published"
+//     await ItemModel.updateMany(
+//       { status: { $ne: ["not-published"] } },
+//       { $set: { status: [] } }
+//     );
+
+//     // 2. Dodaj "not-published" svima koji ga nemaju
+//     await ItemModel.updateMany(
+//       { status: { $ne: "not-published" } },
+//       { $addToSet: { status: "not-published" } }
+//     );
+//   } catch (error) {
+//     console.error("Greška prilikom postavljanja not-published statusa:", error);
+//   }
+
+//   next();
+// });
+// app.use(async (req, res, next) => {
+//   try {
+//     const unwantedCategories = ["odeca", "odeća", "zensko", "žensko", "Odeca", "Odeća", "Zensko", "Žensko"];
+
+//     await ItemModel.updateMany(
+//       { categories: { $in: unwantedCategories } },
+//       { $pull: { categories: { $in: unwantedCategories } } }
+//     );
+
+//     console.log("Neželjene kategorije uklonjene iz artikala.");
+//   } catch (error) {
+//     console.error("Greška prilikom uklanjanja kategorija:", error);
+//   }
+
+//   next();
 // });
 
 app.use((req, res, next) => {

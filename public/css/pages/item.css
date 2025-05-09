@@ -39,3 +39,9 @@
 .product__cross-sell {
   margin-top: var(--margin-big);
 }
+
+.variation-on-sale {
+  font-weight: bold;
+  color: var(--accent-color);
+  background-color: var(--neutral-color-light);
+}

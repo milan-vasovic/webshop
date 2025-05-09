@@ -4,7 +4,7 @@
     <thead>
       <tr>
         <% Object.keys(items[0]).forEach((key, index) => { %>
-          <% if (!(index === 0 && (key === "ID" || key === "_id") && showId === false)) { %>
+          <% if (!((index === 0 && (key === "ID" || key === "_id") && showId === false) || key === "Link" || key === "slug")) { %>
             <th><%= key %></th>
           <% } %>
         <% }); %>
@@ -17,7 +17,7 @@
       <% items.forEach(item => { %>
         <tr>
           <% Object.entries(item).forEach(([key, field], index) => { %>
-            <% if (!(index === 0 && (key === "ID" || key === "_id") && showId === false)) { %>
+            <% if (!((index === 0 && (key === "ID" || key === "_id") && showId === false) || key === "Link" || key === "slug")) { %>
               <td data-label="<%= key %>">
                 <% if (key === "Slika" && field) { %>
                   <img class="table__image" src="/images/<%= field.value || field.img %>" alt="<%= field.value %>">
@@ -40,10 +40,18 @@
                       <input type="hidden" name="itemId" value="<%= item._id || item.ID?.value || item.ID %>">
                       <input name="honeypot" type="hidden">
                       <input type="hidden" name="CSRFToken" value="<%= csrfToken %>">
-                      <button class="btn-danger" type="submit"><%= action.buttonName %></button>
+                      <button class="btn-danger" type="submit">
+                        <span class="material-symbols-outlined">
+                          <%= action.buttonName %>
+                        </span>
+                      </button>
                     </form>
                   <% } else if (action.type === 'link') { %>
-                    <a class="btn-primary" href="<%= action.link %><%= item.ID?.value || item._id %>"><%= action.linkName %></a>
+                    <a class="btn-primary" href="<%= action.link %><%= item.ID?.value || item._id %>">
+                      <span class="material-symbols-outlined">
+                        <%= action.linkName %>
+                      </span>
+                    </a>
                   <% } %>
                 <% }); %>
               </div>

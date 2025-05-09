@@ -368,14 +368,14 @@ async function postAddItemToCart(req, res, next) {
                 req.session.cart = [];
             }
             req.session.cart.push(itemForCart);
-            req.session.cartItemCount = req.session.cart.length;
+            req.session.cartItemCount = req.session.cart.length || 0;
             return res.redirect('/prodavnica')
         }
 
         const userId = req.session.user._id;
         await UserService.addItemToUserCart(userId, itemForCart);
         req.session.user.cart.push(itemForCart);
-        req.session.cartItemCount = req.session.user.cart.length;
+        req.session.cartItemCount = req.session.user.cart.length || 0;
         return res.redirect('/prodavnica');
     } catch (error) {
         next(error);
@@ -410,7 +410,7 @@ async function postRemoveItemFromCart(req, res, next) {
             if (index !== -1) {
                 cart.splice(index, 1);
                 req.session.cart = cart;
-                req.session.cartItemCount = req.session.cart.length;
+                req.session.cartItemCount = req.session.cart.length || 0;
             }
 
             return res.redirect('/prodavnica/korpa');
@@ -420,7 +420,7 @@ async function postRemoveItemFromCart(req, res, next) {
 
         await UserService.removeItemFromCart(userId, cartItemId);
         req.session.user.cart = req.session.user.cart.filter(item => item.itemId.toString() !== cartItemId.toString());
-        req.session.cartItemCount = req.session.user.cart.length;
+        req.session.cartItemCount = req.session.user.cart.length || 0;
 
         res.redirect('/prodavnica/korpa');
     } catch (error) {
@@ -440,7 +440,7 @@ async function postRemoveItemsFromCart(req, res, next) {
 
         await UserService.removeItemsFromCart(userId);
         req.session.user.cart = [];
-        req.session.cartItemCount = req.session.user.cart.length;
+        req.session.cartItemCount = req.session.user.cart.length || 0;
         res.redirect('/prodavnica/korpa');
     } catch (error) {
         next(error);

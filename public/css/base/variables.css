@@ -26,11 +26,11 @@
   --border-radius-large: 12px;
 
   /* === Typography === */
-  --font-family: "Verdana", Helvetica, Arial, sans-serif;
+  --font-family: "Unna", serif;
   --font-size-extra-small: 0.75rem;
   --font-size-small: 0.875rem;
-  --font-size-base: 1rem;
-  --font-size-large: 1.25rem;
+  --font-size-base: 1.15rem;
+  --font-size-large: 1.35rem;
   --font-size-extra-large: 2rem;
   --font-weight-regular: 400;
   --font-weight-bold: 700;
@@ -60,11 +60,11 @@
   --breakpoint-lg: 992px;
   --breakpoint-xl: 1200px;
 
-  --z-footer: 100;          /* najniži, uvek u pozadini */
-  --z-header: 900;          /* sticky header */
-  --z-dropdown: 1000;       /* padajući meni iz headera */
-  --z-backdrop: 1100;       /* pozadina za mobilni meni, modale itd. */
-  --z-mobile-nav: 1200;     /* mobilni meni – mora biti iznad backdrop-a */
-  --z-modal: 1300;          /* modal dijalozi */
-  --z-overlay: 1400;        /* globalni overlay, npr. zoom slike */
+  --z-footer: 100;
+  --z-header: 900;
+  --z-dropdown: 1000;
+  --z-backdrop: 1100;
+  --z-mobile-nav: 1200;
+  --z-modal: 1300;
+  --z-overlay: 1400;
 }

@@ -5,6 +5,7 @@ import sanitize from 'mongo-sanitize';
 import ContactService from '../service/contactService.js';
 import ItemService from '../service/itemService.js';
 import ForumService from '../service/forumService.js';
+import NewsletterService from '../service/newsletterService.js';
 
 /**
  * Renders the home page.
@@ -16,11 +17,11 @@ import ForumService from '../service/forumService.js';
  */
 async function getHomePage(req, res, next) {
     try {
-        const featuredItems = await ItemService.findFeaturedItems(null,null, 4);
+        const featuredItems = await ItemService.findFeaturedItems(null,null, 3);
 
-        const actionItems = await ItemService.findActionItems(null,null, 4);
+        const actionItems = await ItemService.findActionItems(null,null, 3);
 
-        const forumPosts = await ForumService.findPosts(4);
+        const forumPosts = await ForumService.findPosts(3);
 
         return res.render("leanding/leanding-page", {
             path: "/",
@@ -184,6 +185,34 @@ async function postContact(req, res, next) {
         next(error);
     }
 }
+
+async function postNewsletter(req, res, next) {
+  try {
+    const name = sanitize(req.body.name);
+    const email = sanitize(req.body.email);
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: errors.array()[0].msg,
+      });
+    }
+
+    const result = await NewsletterService.createNewsletter(name, email);
+
+    if (!result.success) {
+      return res.status(400).json(result);
+    }
+
+    return res.status(201).json(result);
+
+  } catch (error) {
+    next(error);
+  }
+}
+
+
 export default {
     getHomePage,
     getAboutPage,
@@ -191,5 +220,6 @@ export default {
     getTermsPage,
     getContactPage,
     getPartnershipPage,
-    postContact
+    postContact,
+    postNewsletter
 }

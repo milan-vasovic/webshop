@@ -16,23 +16,22 @@
       <%- include('../include/breadcrumbs', { breadcrumbs }) %>
       <!-- Cena -->
       <div class="product__price-block">
-        <% if (item.Status.value && item.Status.value[0] === 'action') { %>
-          <h2 class="product__price">
-            <s><%= item.Cena.value %></s>
-            <span class="highlight"><%= item["Akcijska Cena"].value %> RSD</span>
-          </h2>
-        <% } else { %>
-          <h2 class="product__price"><%= item.Cena.value %> RSD</h2>
-        <% } %>
+        <h2 class="product__price" id="productPriceDisplay">
+          <% if (item.Status.value.includes('action') && item.Varijacije.some(v => v.Akcija)) { %>
+            <s><%= item.Cena.value %> RSD</s> <span class="highlight"><%= item["Akcijska Cena"].value %> RSD</span>
+          <% } else { %>
+            <%= item.Cena.value %> RSD
+          <% } %>
+        </h2>
       </div>
-
+            
       <div>
         <form id="productForm" action="/prodavnica/korpa-dodavanje" method="post">
           <div>
             <label class="main-form__label" for="variationsSelect">Izaberite:</label>
             <select class="main-form__input" name="variationsSelect" id="variationsSelect">
               <% item.Varijacije.forEach((v, index) => { %>
-                <option value="<%= index %>"><%= v.Veličina %> <%= v.Boja %></option>
+                <option value="<%= index %>" class="<%= v.Akcija ? 'variation-on-sale' : '' %>"><%= v.Veličina %> <%= v.Boja %></option>
               <% }) %>
             </select>
           </div>
@@ -104,11 +103,15 @@
   </div>
 
   <div id="item-data"
-       data-variations='<%- JSON.stringify(item.Varijacije) %>'
-       data-backorder='<%= item.Backorder.Dozvoljeno %>'
-       data-default-image='<%= item.Slike["Istaknuta Slika"].URL %>'
-       style="display: none;">
+    data-variations='<%- JSON.stringify(item.Varijacije) %>'
+    data-backorder='<%= item.Backorder.Dozvoljeno %>'
+    data-default-image='<%= item.Slike["Istaknuta Slika"].URL %>'
+    data-status="<%= item.Status?.value?.map(s => s.trim()).join(',') %>"
+    data-price="<%= item.Cena.value %>"
+    data-action-price="<%= item['Akcijska Cena'].value %>"
+    style="display: none;">
   </div>
+
 </section>
 
 <script src="/js/product.js"></script>

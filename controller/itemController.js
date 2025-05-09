@@ -201,7 +201,6 @@ async function postAddItem(req, res, next) {
     const files = req.files;
 
     const errors = validationResult(req);
-
     if (!errors.isEmpty()) {
       const allUpsellItems = await ItemService.findAllAdminAddItems(
         body.categories,
@@ -244,6 +243,7 @@ async function postAddItem(req, res, next) {
             Slika: {
               Opis: variation.imgDesc,
             },
+            Akcija: variation.onAction,
           })),
           "UpSell Artikli": { value: body.upSellItems },
           "CrossSell Artikli": { value: body.crossSellItems },
