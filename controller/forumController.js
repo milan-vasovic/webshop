@@ -24,7 +24,7 @@ const allowedAttributes = {
 async function getForumPage(req, res, next) {
     try {
         const page = parseInt(req.query.page) || 1;
-        const limit = 10;
+        const limit = 9;
 
         const posts = await ForumService.findPosts(limit, page);
         const totalPages = Math.ceil(posts.totalPosts / limit);
@@ -61,7 +61,7 @@ async function getForumPage(req, res, next) {
 async function getForumPageByCategory(req, res, next) {
     try {
         const page = parseInt(req.query.page) || 1;
-        const limit = 5;
+        const limit = 9;
         const category = req.params.category ? req.params.category : "";
 
         const posts = await ForumService.findPostsByCategory(category, limit, page);
@@ -99,7 +99,7 @@ async function getForumPageByCategory(req, res, next) {
 async function getForumPageByTags(req, res, next) {
     try {
         const page = parseInt(req.query.page) || 1;
-        const limit = 5;
+        const limit = 9;
         const tag = req.params.tag ? req.params.tag : "";
 
         const posts = await ForumService.findPostsByTags(tag, limit, page);
@@ -136,7 +136,7 @@ async function getForumPageByTags(req, res, next) {
 async function getSearchForumsPage(req, res, next) {
     try {
         const page = parseInt(req.query.page) || 1;
-        const limit = 5;
+        const limit = 9;
         const search = req.params.search ? req.params.search : "";
         const searchSanitized = sanitize(search);
         const posts = await ForumService.findPostsBySearch(searchSanitized, limit, page);
@@ -223,7 +223,7 @@ async function getAdminForumPage(req, res, next) {
 async function getAdminSearchForumsPage(req, res, next) {
     try {
         const page = parseInt(req.query.page) || 1;
-        const limit = 5;
+        const limit = 10;
         const search = req.params.search ? req.params.search : "";
         const searchSanitized = sanitize(search);
         const posts = await ForumService.findPostsBySearch(searchSanitized, limit, page);

@@ -15,7 +15,7 @@
          const lowerKey = key.toLowerCase();
          if (
            (index === 0 && key === "ID" && showId === false) ||
-           ["naziv", "slika", "status", "akcijska cena", "autor", "link", "slug"].includes(lowerKey)
+           ["naziv", "slika", "status", "akcijska cena", "autor", "link", "slug", "kategorije", "tagovi"].includes(lowerKey)
          ) return;
     %>
       <div class="card__field
@@ -23,7 +23,7 @@
         <% if (['kategorija', 'kategorije', 'tag', 'tagovi'].includes(lowerKey)) { %> card__field--badges <% } %>
       ">
         <% if (lowerKey === "cena" || lowerKey === "price") { %>
-          <% if (item.Status?.value?.toLowerCase() === "action" && item["Akcijska Cena"]) { %>
+          <% if (item.Status.value.includes("action") && item["Akcijska Cena"]) { %>
             <strong><%= item["Akcijska Cena"].value %> RSD</strong> <s><%= field.value %> RSD</s>
           <% } else { %>
             <strong><%= field.value %> RSD</strong>

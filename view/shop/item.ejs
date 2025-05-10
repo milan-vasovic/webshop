@@ -59,6 +59,7 @@
             <button type="submit" class="btn-primary"><% if (!isWishlisted) { %>Ubacite u Listu Želja &#9829;<% } else { %>Izbacite iz Liste Želja &#9825;<% } %></button>
           </form>
         </div>
+        <br>
       <% } %>
       
       <div class="product__info-block">
@@ -81,25 +82,27 @@
         </div>
       </div>
     
-      <div class="margin__normal flex flex-column align-center">
-        <h2>Idealni Artikli uz Ovaj:</h2>
-        <div class="grid grid-3">
-          <% item["CrossSell Artikli"].forEach(i => { %>
-            <%- include('../include/card.ejs', {
-              item: i,
-              hasActions: true,
-              actions: [
-                {
-                  type: 'link-name',
-                  link: "/prodavnica/artikal/",
-                  linkName: 'Pogledajte'
-                }
-              ],
-              showId: false
-            }) %>
-          <% }) %>
-        </div>    
-    </div>
+      <% if (item["CrossSell Artikli"].length > 0) { %>
+        <div class="margin__normal flex flex-column align-center">
+          <h2>Idealni Artikli uz Ovaj:</h2>
+          <div class="grid grid-3">
+            <% item["CrossSell Artikli"].forEach(i => { %>
+              <%- include('../include/card.ejs', {
+                item: i,
+                hasActions: true,
+                actions: [
+                  {
+                    type: 'link-name',
+                    link: "/prodavnica/artikal/",
+                    linkName: 'Pogledajte'
+                  }
+                ],
+                showId: false
+              }) %>
+            <% }) %>
+          </div>    
+        </div>
+      <% } %>
   </div>
 
   <div id="item-data"

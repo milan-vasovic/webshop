@@ -20,7 +20,7 @@ class ShopService {
 
             const itemsByCategory = await Promise.all(
                 categories.Kategorije.map(async (category) => {
-                    const items = await ItemService.findItemsByCategory(category, null, null, 6);
+                    const items = await ItemService.findItemsByCategory(category, null, ['action','featured'], 6);
 
                     return {
                         Kategorija: { value: category },
@@ -155,21 +155,21 @@ class ShopService {
                 ErrorHelper.throwNotFoundError("Artikli");
             }
 
-            const uniqueCategories = new Set();
-            const uniqueTags = new Set();
+            const uniqueCategories = [];
+            const uniqueTags = [];
 
             items.forEach(item => {
-                if (item.Kategorije && Array.isArray(item.Kategorije.value)) {
-                    item.Kategorije.value.forEach(cat => {
-                    if (cat) uniqueCategories.add(cat);
-                    });
-                }
-                
-                if (item.Tagovi && Array.isArray(item.Tagovi.value)) {
-                    item.Tagovi.value.forEach(tag => {
-                    if (tag) uniqueTags.add(tag);
-                    });
-                }
+                item.Kategorije.value.forEach(cat => {
+                    if (cat && !uniqueCategories.includes(cat)) {
+                      uniqueCategories.push(cat);
+                    }
+                  });
+                  
+                  item.Tagovi.value.forEach(tag => {
+                    if (tag && !uniqueTags.includes(tag)) {
+                      uniqueTags.push(tag);
+                    }
+                  });
             });
 
             return {
@@ -194,21 +194,21 @@ class ShopService {
                 ErrorHelper.throwNotFoundError("Artikli");
             }
 
-            const uniqueCategories = new Set();
-            const uniqueTags = new Set();
+            const uniqueCategories = [];
+            const uniqueTags = [];
 
             items.forEach(item => {
-                if (item.Kategorije && Array.isArray(item.Kategorije.value)) {
-                    item.Kategorije.value.forEach(cat => {
-                    if (cat) uniqueCategories.add(cat);
-                    });
-                }
-                
-                if (item.Tagovi && Array.isArray(item.Tagovi.value)) {
-                    item.Tagovi.value.forEach(tag => {
-                    if (tag) uniqueTags.add(tag);
-                    });
-                }
+                item.Kategorije.value.forEach(cat => {
+                    if (cat && !uniqueCategories.includes(cat)) {
+                      uniqueCategories.push(cat);
+                    }
+                  });
+                  
+                  item.Tagovi.value.forEach(tag => {
+                    if (tag && !uniqueTags.includes(tag)) {
+                      uniqueTags.push(tag);
+                    }
+                  });
             });
 
             return {

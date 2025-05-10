@@ -11,10 +11,24 @@ export function buildBreadcrumbs({
     const breadcrumbs = [
       { label: "Početna", href: "/" }
     ];
-  
+
     if (type === "item") {
       breadcrumbs.push({ label: "Prodavnica", href: "/prodavnica" });
   
+      if (mode === "action") {
+        breadcrumbs.push({
+          label: 'Artikli Na Akciji',
+          href: `/prodavnica/akcija}`
+        });
+      }
+  
+      if (mode === "featured") {
+        breadcrumbs.push({
+          label: 'Istaknuti Artikli',
+          href: `/prodavnica/istaknuto}`
+        });
+      }
+      
       if (mode === "category" && category) {
         breadcrumbs.push({
           label: category,

@@ -41,7 +41,7 @@ async function getShopPage(req, res, next) {
 async function getShopPageByCategory(req, res, next) {
     try {
         const page = parseInt(req.query.page) || 1;
-        const limit = 3;
+        const limit = 9;
         const category = req.params.category ? req.params.category : "";
 
         const shop = await ShopService.findItemsByCategory(category, page, limit);
@@ -76,7 +76,7 @@ async function getShopPageByCategory(req, res, next) {
 async function getShopPageByTag(req, res, next) {
     try {
         const page = parseInt(req.query.page) || 1;
-        const limit = 10;
+        const limit = 9;
         const tag = req.params.tag ? req.params.tag : "";
 
         const shop = await ShopService.findItemsByTags(tag, page, limit);
@@ -110,7 +110,7 @@ async function getShopPageByTag(req, res, next) {
 async function getShopPageBySearch(req, res, next) {
     try {
         const page = parseInt(req.query.page) || 1;
-        const limit = 10;
+        const limit = 9;
         const search = req.params.search ? req.params.search : "";
 
         const param = sanitize(search)
@@ -146,9 +146,14 @@ async function getShopPageBySearch(req, res, next) {
 async function getFeautredShopPage(req, res, next) {
     try {
         const page = parseInt(req.query.page) || 1;
-        const limit = 10;
+        const limit = 9;
         const shop = await ShopService.findFeaturedItems(page, limit);
         const totalPages = Math.ceil(shop.Ukupno / limit);
+     
+        const breadcrumbs = buildBreadcrumbs({
+            mode: "featured",
+            type: "item"
+          });
 
         return res.render("shop/shop", {
             path: "/prodavnica/istaknuto",
@@ -161,6 +166,8 @@ async function getFeautredShopPage(req, res, next) {
             currentPage: page,
             totalPages: totalPages,
             basePath: `/prodavnica/istaknuto`,
+            breadcrumbs,
+            breadcrumbJsonLd: generateBreadcrumbJsonLd(breadcrumbs)
           });
           
     } catch (error) {
@@ -171,9 +178,15 @@ async function getFeautredShopPage(req, res, next) {
 async function getActionedShopPage(req, res, next) {
     try {
         const page = parseInt(req.query.page) || 1;
-        const limit = 10;
+        const limit = 9;
         const shop = await ShopService.findActionedItems(page, limit);
         const totalPages = Math.ceil(shop.Ukupno / limit);
+
+        const breadcrumbs = buildBreadcrumbs({
+            mode: "action",
+            
+            type: "item"
+        });
 
         return res.render("shop/shop", {
             path: "/prodavnica/akcija",
@@ -186,6 +199,8 @@ async function getActionedShopPage(req, res, next) {
             currentPage: page,
             totalPages: totalPages,
             basePath: `/prodavnica/akcija`,
+            breadcrumbs,
+            breadcrumbJsonLd: generateBreadcrumbJsonLd(breadcrumbs)
           });
     } catch (error) {
         next(error);

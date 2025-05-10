@@ -8,13 +8,13 @@
             <div class="feature-image">
                 <img src="/images/<%= post.Slika.value %>" alt="<%= post.Slika.Opis.value %>">
             </div>
+            <div class="section__block">
+                <p><%= post.Opis.value %></p>
+            </div>
             <div class="section__block blog__content-container">
                 <% post.Sadržaj.value.forEach(content => { %>
                     <%- content %>
                 <% }) %>
-            </div>
-            <div class="section__block">
-                <p><%= post.Opis.value %></p>
             </div>
         </div>
         <div class="right__container-30">

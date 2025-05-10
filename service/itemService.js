@@ -202,14 +202,14 @@ class ItemService {
     const items = await ItemModel.find(filter)
       .sort({ soldCount: -1, _id: 1  })
       .select(
-        "title slug shortDescription price actionPrice featureImage status"
+        "title slug shortDescription categories tags price actionPrice featureImage status"
       )
       .skip(skip)
       .limit(limit)
       .lean();
 
     if (!items) {
-      ErrorHelper.throwNotFoundError("Istaknuti Artikli");
+      return []
     }
 
     return ItemService.mapItemsForShop(items);
@@ -239,7 +239,7 @@ class ItemService {
     const items = await ItemModel.find(filter)
       .sort({ soldCount: -1, _id: 1  })
       .select(
-        "title slug shortDescription price actionPrice featureImage status"
+        "title slug shortDescription categories tags price actionPrice featureImage status"
       )
       .skip(skip)
       .limit(limit)
@@ -380,6 +380,7 @@ class ItemService {
         { title: { $regex: search, $options: "i" } },
         { slug: { $regex: search, $options: "i" } },
         { sku: { $regex: search, $options: "i" } },
+        { status: { $elemMatch: { $regex: search, $options: "i" } } },
         { categories: { $regex: search, $options: "i" } },
         { tags: { $regex: search, $options: "i" } },
         { keyWords: { $regex: search, $options: "i" } }
@@ -1085,6 +1086,8 @@ class ItemService {
       Link: { value: item.slug },
       Opis: { value: item.shortDescription },
       Status: { value: item.status.join(", ") },
+      Kategorije: { value: item.categories },
+      Tagovi: { value: item.tags },
       Slika: {
         value: item.featureImage.img,
         Opis: item.featureImage.imgDesc,
