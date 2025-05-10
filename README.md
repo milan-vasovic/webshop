@@ -33,5 +33,35 @@ Tophelanke is a full-stack web application designed to unify the client's busine
 
 This project aims to enhance **business operations**, **customer engagement**, and **sales** by offering a modern, and user-friendly online shopping experience.
 
+## 📈 Project Phases
+### Phase 1: Core Features for End Users
+- Landing page, product catalog, order flow
+- Basic inventory flow
+- User registration and login
+- Cart and wishlist functionality
+- Email confirmation and PDF generation
+  
+✅ **Completed on: 10.05.2025**
+
+### Phase 2: Administrative Dashboard & Automation
+- Sales statistics and reports
+- Cron jobs for daily/monthly actions
+- Inventory and order flow monitoring
+- Scheduled emails and notifications
+  
+🔄 **In progress**
+
+### Phase 3: Affiliate Expansion
+- Partner onboarding and dashboard
+- Personalized shop links
+- Earnings tracking and share logic
+- Referral tracking
+
+### Phase 4: Advanced Functionality
+- Mobile application (hybrid or native)
+- AI integration (e.g., personalized offers, smart suggestions)
+- Extended analytics and recommendation engine
+  
 ### 🚀 Work in Progress!
-### Start Date: 10/01/2025 | End Date:
+### Start Date: 10/01/2025
+### Phase I completed: 10/05/2025
