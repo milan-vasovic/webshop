@@ -14,6 +14,11 @@ Allow: /partnerstvo
 Disallow: /auth
 Disallow: /admin
 Disallow: /korinsik
+Disallow: /wp-content/
+Disallow: /wp-admin/
+Disallow: /category/
+Disallow: /tag/
+Disallow: /blog/
 
 # Link ka sitemap-u
 Sitemap: https://tophelanke.com/sitemap.xml
