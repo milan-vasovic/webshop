@@ -6,7 +6,7 @@ export function generateBreadcrumbJsonLd(breadcrumbs = []) {
       "@type": "ListItem",
       position: index + 1,
       name: crumb.label,
-      item: crumb.href
+      item: process.env.BASE_URL +  crumb.href
     }))
   };
 }

@@ -50,7 +50,7 @@ async function getForumPage(req, res, next) {
             index: true,
             featureImage: undefined,
             breadcrumbs,
-            breadcrumbJsonLd: generateBreadcrumbJsonLd(breadcrumbs)
+            breadcrumbJsonLd: JSON.stringify(generateBreadcrumbJsonLd(breadcrumbs))
         });
 
     } catch (error) {
@@ -88,7 +88,7 @@ async function getForumPageByCategory(req, res, next) {
             index: true,
             featureImage: undefined,
             breadcrumbs,
-            breadcrumbJsonLd: generateBreadcrumbJsonLd(breadcrumbs)
+            breadcrumbJsonLd: JSON.stringify(generateBreadcrumbJsonLd(breadcrumbs))
         });
     } catch (error) {
         next(error);
@@ -126,7 +126,7 @@ async function getForumPageByTags(req, res, next) {
             index: true,
             featureImage: undefined,
             breadcrumbs,
-            breadcrumbJsonLd: generateBreadcrumbJsonLd(breadcrumbs)
+            breadcrumbJsonLd: JSON.stringify(generateBreadcrumbJsonLd(breadcrumbs))
         });
     } catch (error) {
         next(error);
@@ -162,7 +162,7 @@ async function getSearchForumsPage(req, res, next) {
             index: true,
             featureImage: undefined,
             breadcrumbs,
-            breadcrumbJsonLd: generateBreadcrumbJsonLd(breadcrumbs)
+            breadcrumbJsonLd: JSON.stringify(generateBreadcrumbJsonLd(breadcrumbs))
         });
     } catch (error) {
         next(error)
@@ -188,7 +188,7 @@ async function getForumPostDetailsPage(req, res, next) {
             index: true,
             featureImage: post["Slika"].value,
             breadcrumbs,
-            breadcrumbJsonLd: generateBreadcrumbJsonLd(breadcrumbs)
+            breadcrumbJsonLd: JSON.stringify(generateBreadcrumbJsonLd(breadcrumbs))
         });
     } catch (error) {
         next(error);

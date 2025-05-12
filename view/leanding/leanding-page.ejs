@@ -113,7 +113,7 @@
   </div>
 
   <div class="shop-featured">
-    <h1 class="main__title"><a href="/prodavnica/akcija" >Na Akciji</a></h1>
+    <h1 class="main__title"><a href="/prodavnica/akcija">Na Akciji</a></h1>
     <div class="cards__container">
       <% actionItems.forEach(item => { %>
           <%- include('../include/card.ejs', {
@@ -134,7 +134,7 @@
 
   <!-- Blog sekcija -->
   <div class="blog-section">
-    <h1 class="main__title">Najnovije sa Foruma</h1>
+    <h1 class="main__title"><a href="/forum">Najnovije sa Foruma</a></h1>
     <div class="cards__container">
       <% forumPosts.posts.forEach(item => { %>
         <%- include('../include/card.ejs', {

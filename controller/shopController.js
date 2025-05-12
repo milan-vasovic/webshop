@@ -30,7 +30,7 @@ async function getShopPage(req, res, next) {
             index: true,
             shop: shop,
             breadcrumbs,
-            breadcrumbJsonLd: generateBreadcrumbJsonLd(breadcrumbs)
+            breadcrumbJsonLd: JSON.stringify(generateBreadcrumbJsonLd(breadcrumbs))
           });          
 
     } catch (error) {
@@ -65,7 +65,7 @@ async function getShopPageByCategory(req, res, next) {
             totalPages: totalPages,
             basePath: `/prodavnica/kategorija/${category}`,
             breadcrumbs,
-            breadcrumbJsonLd: generateBreadcrumbJsonLd(breadcrumbs)
+            breadcrumbJsonLd: JSON.stringify(generateBreadcrumbJsonLd(breadcrumbs))
         })
 
     } catch (error) {
@@ -100,7 +100,7 @@ async function getShopPageByTag(req, res, next) {
             totalPages: totalPages,
             basePath: `/prodavnica/oznaka/${tag}`,
             breadcrumbs,
-            breadcrumbJsonLd: generateBreadcrumbJsonLd(breadcrumbs)
+            breadcrumbJsonLd: JSON.stringify(generateBreadcrumbJsonLd(breadcrumbs))
           });
     } catch (error) {
         next(error);
@@ -135,7 +135,7 @@ async function getShopPageBySearch(req, res, next) {
             totalPages: totalPages,
             basePath: `/prodavnica/pretraga/${param}`,
             breadcrumbs,
-            breadcrumbJsonLd: generateBreadcrumbJsonLd(breadcrumbs)
+            breadcrumbJsonLd: JSON.stringify(generateBreadcrumbJsonLd(breadcrumbs))
           });          
 
     } catch (error) {
@@ -167,7 +167,7 @@ async function getFeautredShopPage(req, res, next) {
             totalPages: totalPages,
             basePath: `/prodavnica/istaknuto`,
             breadcrumbs,
-            breadcrumbJsonLd: generateBreadcrumbJsonLd(breadcrumbs)
+            breadcrumbJsonLd: JSON.stringify(generateBreadcrumbJsonLd(breadcrumbs))
           });
           
     } catch (error) {
@@ -200,7 +200,7 @@ async function getActionedShopPage(req, res, next) {
             totalPages: totalPages,
             basePath: `/prodavnica/akcija`,
             breadcrumbs,
-            breadcrumbJsonLd: generateBreadcrumbJsonLd(breadcrumbs)
+            breadcrumbJsonLd: JSON.stringify(generateBreadcrumbJsonLd(breadcrumbs))
           });
     } catch (error) {
         next(error);
@@ -235,7 +235,7 @@ async function getItemBySlug(req, res, next) {
             item,
             isWishlisted,
             breadcrumbs,
-            breadcrumbJsonLd: generateBreadcrumbJsonLd(breadcrumbs)
+            breadcrumbJsonLd: JSON.stringify(generateBreadcrumbJsonLd(breadcrumbs))
           });
     } catch (error) {
         next(error)

@@ -59,7 +59,7 @@ class EmailService {
                     <p style="color: ${  styles.textColor }; font-size: ${  styles.textFontSize }; margin-bottom: ${  styles.textMarginBottom };">
                         Prijavite se u administraciju kako biste pregledali upit.
                     </p>
-                    <a href="${ process.env.BASE_URL}${ process.env.PORT }/admin/kontakt-detalji/${ contactId }" 
+                    <a href="${ process.env.BASE_URL}/admin/kontakt-detalji/${ contactId }" 
                         style="display: inline-block; padding: ${  styles.buttonPadding }; background-color: ${  styles.buttonBackground }; color: ${  styles.buttonTextColor }; text-decoration: none; border-radius: ${  styles.buttonBorderRadius }; font-size: ${  styles.buttonFontSize }; transition: ${  styles.buttonTransition };">
                         Pogledajte upit
                     </a>
