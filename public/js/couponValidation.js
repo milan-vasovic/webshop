@@ -85,7 +85,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
     } catch (error) {
-      console.error("Greška:", error);
       if (feedbackContainer) {
         feedbackContainer.textContent = "Došlo je do greške. Pokušajte ponovo.";
       }

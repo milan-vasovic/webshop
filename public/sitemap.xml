@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="https://www.sitemaps.org/schemas/sitemap/0.9">
 
   <!-- Pronađi -->
   <url>
-    <loc>https://tophelanke.com/</loc>
+    <loc>https://www.tophelanke.com/</loc>
     <lastmod>2024-09-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
@@ -11,7 +11,7 @@
 
   <!-- Forum -->
   <url>
-    <loc>https://tophelanke.com/forum</loc>
+    <loc>https://www.tophelanke.com/forum</loc>
     <lastmod>2024-09-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
@@ -19,7 +19,7 @@
   
     <!-- Prodavnica -->
   <url>
-    <loc>https://tophelanke.com/prodavnica</loc>
+    <loc>https://www.tophelanke.com/prodavnica</loc>
     <lastmod>2024-09-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
@@ -27,21 +27,21 @@
 
   <!-- O nama stranica -->
   <url>
-    <loc>https://tophelanke.com/o-nama</loc>
+    <loc>https://www.tophelanke.com/o-nama</loc>
     <lastmod>2024-09-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://tophelanke.com/kontakt</loc>
+    <loc>https://www.tophelanke.com/kontakt</loc>
     <lastmod>2024-09-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
 
     <url>
-    <loc>https://tophelanke.com/partnerstvo</loc>
+    <loc>https://www.tophelanke.com/partnerstvo</loc>
     <lastmod>2024-09-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
@@ -49,7 +49,7 @@
 
   <!-- Uslovi Korišćenja -->
   <url>
-    <loc>https://tophelanke.com/uslovi-koriscenja</loc>
+    <loc>https://www.tophelanke.com/uslovi-koriscenja</loc>
     <lastmod>2024-09-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
@@ -57,7 +57,7 @@
 
   <!-- Politika privatnosti -->
     <url>
-    <loc>https://tophelanke.com/politika-privatnosti</loc>
+    <loc>https://www.tophelanke.com/politika-privatnosti</loc>
     <lastmod>2024-09-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>

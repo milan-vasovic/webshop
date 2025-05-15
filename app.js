@@ -16,7 +16,6 @@ import helmet from 'helmet';
 import crypto from "crypto";
 import mongoSanitize from 'express-mongo-sanitize';
 import methodOverride from 'method-override';
-import ItemModel from "./model/item.js";
 
 
 const __filename = fileURLToPath(import.meta.url);
@@ -25,6 +24,16 @@ const __dirname = path.dirname(__filename);
 const MONGODB_URI = `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@odeca.coqqp.mongodb.net/${process.env.MONGO_DEFAULT_DB}`;
 
 const app = express();
+
+app.set('trust proxy', 1);
+
+app.use((req, res, next) => {
+  if (process.env.NODE_ENV === "production" && req.headers['x-forwarded-proto'] !== 'https') {
+    return res.redirect('https://' + req.headers.host + req.url);
+  }
+  next();
+});
+
 const store = new MongoDbStore({
   uri: MONGODB_URI,
   collection: "sessions",
@@ -39,7 +48,7 @@ app.set("views", path.join(__dirname, "view"));
 
 app.use(mongoSanitize());
 app.use((req, res, next) => {
-  res.locals.cspNonce = crypto.randomBytes(16).toString("base64"); // Generiše nonce
+  res.locals.cspNonce = crypto.randomBytes(16).toString("base64");
   next();
 });
 
@@ -122,7 +131,6 @@ app.use(async (req, res, next) => {
       req.session.cartItemCount = user.cart.length;
     }
   } catch (error) {
-    console.error("Greška pri dobavljanju korisnika:", error);
     req.session.guest = true;
     req.session.user = null;
   }
@@ -136,50 +144,6 @@ app.use(forumRoutes)
 app.use("/prodavnica", shopRoutes);
 app.use(userRoutes);
 app.use("/admin", adminRoutes);
-// app.use(async (req, res, next) => {
-//   await ItemModel.updateMany(
-//     { "variations.onAction": { $exists: false } },
-//     {
-//       $set: { "variations.$[].onAction": false }
-//     }
-//   );
-//   next();
-// })
-// app.use(async (req, res, next) => {
-//   try {
-//     // 1. Ukloni sve vrednosti iz status koje nisu "not-published"
-//     await ItemModel.updateMany(
-//       { status: { $ne: ["not-published"] } },
-//       { $set: { status: [] } }
-//     );
-
-//     // 2. Dodaj "not-published" svima koji ga nemaju
-//     await ItemModel.updateMany(
-//       { status: { $ne: "not-published" } },
-//       { $addToSet: { status: "not-published" } }
-//     );
-//   } catch (error) {
-//     console.error("Greška prilikom postavljanja not-published statusa:", error);
-//   }
-
-//   next();
-// });
-// app.use(async (req, res, next) => {
-//   try {
-//     const unwantedCategories = ["odeca", "odeća", "zensko", "žensko", "Odeca", "Odeća", "Zensko", "Žensko"];
-
-//     await ItemModel.updateMany(
-//       { categories: { $in: unwantedCategories } },
-//       { $pull: { categories: { $in: unwantedCategories } } }
-//     );
-
-//     console.log("Neželjene kategorije uklonjene iz artikala.");
-//   } catch (error) {
-//     console.error("Greška prilikom uklanjanja kategorija:", error);
-//   }
-
-//   next();
-// });
 
 app.use((req, res, next) => {
   const error = new Error('Stranica nije pronađena');

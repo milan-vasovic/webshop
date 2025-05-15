@@ -73,7 +73,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const addCategoryField = () => {
     // Provera: Da li možemo da dodamo novu kategoriju?
     if (selectedCategories.length >= availableCategories.length - 1) {
-      console.warn("Nema više dostupnih kategorija za dodavanje.");
       alert("Ne možete dodati više kategorija. Dostigli ste maksimalan broj!");
       return;
     }
@@ -578,7 +577,6 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!response.ok) throw new Error(`Error fetching ${type} items`);
       return await response.json();
     } catch (error) {
-      console.error(error);
       return [];
     }
   };
