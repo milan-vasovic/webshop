@@ -6,7 +6,7 @@ import OrderService from "../service/orderService.js";
 
 async function getOrdersPage(req, res, next) {
   try {
-    const page = parseInt(req.query.page) || 1;
+    const page = parseInt(sanitize(req.query.page)) || 1;
     const limit = 10;
 
     const orders = await OrderService.findOrders(limit, page);
@@ -32,7 +32,7 @@ async function getOrdersPage(req, res, next) {
 
 async function getSearchOrdersPage(req, res, next) {
   try {
-    const page = parseInt(req.query.page) || 1;
+    const page = parseInt(sanitize(req.query.page)) || 1;
     const limit = 10;
     const search = req.params.search ? req.params.search : "";
     

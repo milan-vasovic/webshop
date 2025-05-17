@@ -1,5 +1,9 @@
 import { Router } from "express";
 
+import {
+  searchLimiter
+} from '../middleware/rateLimiter.js';
+
 import ForumController from '../controller/forumController.js';
 
 const router = Router();
@@ -14,6 +18,6 @@ router.get("/forum/pretraga/:search", ForumController.getSearchForumsPage);
 
 router.get("/objava/:postSlug", ForumController.getForumPostDetailsPage);
 
-router.post("/forum/pretraga", ForumController.postSearchPost);
+router.post("/forum/pretraga", searchLimiter, ForumController.postSearchPost);
 
 export default router;

@@ -12,7 +12,7 @@ import CustomerService from '../service/customerService.js';
  */
 async function getCustomersPage(req, res, next) {
     try {
-        const page = parseInt(req.query.page) || 1;
+        const page = parseInt(sanitize(req.query.page)) || 1;
         const limit = 10;
 
         const customers = await CustomerService.findCustomers(limit, page);
@@ -39,7 +39,7 @@ async function getCustomersPage(req, res, next) {
 async function getCustomersBySearchPage(req, res, next) {
     try {
         const search = req.params.search;
-        const page = parseInt(req.query.page) || 1;
+        const page = parseInt(sanitize(req.query.page)) || 1;
         const limit = 10;
 
         const customers = await CustomerService.findCustomersBySearch(search, limit, page);

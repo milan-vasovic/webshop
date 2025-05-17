@@ -17,7 +17,7 @@ import UserService from "../service/userService.js";
  */
 async function getItemsPage(req, res, next) {
   try {
-    const page = parseInt(req.query.page) || 1;
+    const page = parseInt(sanitize(req.query.page)) || 1;
     const limit = 10;
 
     const items = await ItemService.findAdminItems(limit, page);
@@ -42,7 +42,7 @@ async function getItemsPage(req, res, next) {
 
 async function getSearchItemsPage(req, res, next) {
   try {
-    const page = parseInt(req.query.page) || 1;
+    const page = parseInt(sanitize(req.query.page)) || 1;
     const limit = 10;
     const search = req.params.search ? req.params.search : "";
     

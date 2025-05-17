@@ -3,7 +3,7 @@
 
 <section class="container main__container">
     <h1 class="main__title"><%= pageTitle %></h1>
-    <div class="flex flex-column width-100" style="gap: var(--grid-gap-medium);">
+    <div class="flex flex-column width-100">
         <% if (cart.length > 0) { %>
             <div class="flex flex-row  width-100" >
                 <a class="btn-primary" href="/prodavnica/porudzbina">Nastavite Sa Poručivanjem</a>
@@ -25,7 +25,7 @@
                 {
                     type: 'form',
                     formAction: "/prodavnica/korpa-izbacivanje",
-                    buttonName: 'Izbacite'
+                    buttonName: 'delete'
                 }
             ]
         }) %>

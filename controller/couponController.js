@@ -8,7 +8,7 @@ import CouponService from '../service/couponService.js';
  */
 async function getCouponsPage(req, res, next) {
     try {
-        const page = parseInt(req.query.page) || 1;
+        const page = parseInt(sanitize(req.query.page)) || 1;
         const limit = 10;
         const coupons = await CouponService.findCoupons(limit, page);
         const totalPages = Math.ceil(coupons.totalCount / limit);
@@ -33,7 +33,7 @@ async function getCouponsPage(req, res, next) {
 
 async function getCouponBySearch(req, res, next) {
     try {
-        const page = parseInt(req.query.page) || 1;
+        const page = parseInt(sanitize(req.query.page)) || 1;
         const limit = 10;
         const search = req.params.search ? req.params.search : "";
         

@@ -8,7 +8,7 @@ async function getUsersPage(req, res, next) {
         // Getting user _id from logged user so i don't show him
         const userId = req.session.user._id;
 
-        const page = parseInt(req.query.page) || 1;
+        const page = parseInt(sanitize(req.query.page)) || 1;
         const limit = 10;
 
         const users = await UserService.findUsers(userId, limit, page);
@@ -41,7 +41,7 @@ async function getUserBySearchPage(req, res, next) {
             return res.redirect("/admin/korisnici");
         }
 
-        const page = parseInt(req.query.page) || 1;
+        const page = parseInt(sanitize(req.query.page)) || 1;
         const limit = 10;
 
         const users = await UserService.findUsersBySearch(userId, search, limit, page);

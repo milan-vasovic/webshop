@@ -1,5 +1,13 @@
 import { Router } from "express";
 import { body } from 'express-validator';
+import sanitizeHtml from 'sanitize-html';
+import sanitize from 'mongo-sanitize';
+
+import {
+  cartLimiter,
+  searchLimiter
+} from '../middleware/rateLimiter.js';
+
 
 import ShopController from '../controller/shopController.js';
 
@@ -25,11 +33,48 @@ router.get('/porudzbina', ShopController.getCheckOutPage);
 
 router.get('/potvrdite-porudzbinu', ShopController.getConfirmOrder)
 
-router.post("/pretraga", ShopController.postShopSearch);
+router.post("/pretraga", searchLimiter, ShopController.postShopSearch);
 
 router.post('/backorder-dodavanje', ShopController.postAddItemToBackorder);
 
-router.post('/korpa-dodavanje', ShopController.postAddItemToCart);
+router.post('/korpa-dodavanje', cartLimiter, [
+  // Item ID
+  body('itemId')
+    .exists().withMessage('Item ID je obavezan.')
+    .customSanitizer((value) => sanitizeHtml(sanitize(value)))
+    .custom((value) => {
+      if (!mongoose.Types.ObjectId.isValid(value)) {
+        throw new Error('Nevažeći ID artikla.');
+      }
+      return true;
+    }),
+
+  // Variation ID
+  body('variationId')
+    .exists().withMessage('Variation ID je obavezan.')
+    .customSanitizer((value) => sanitizeHtml(sanitize(value)))
+    .custom((value) => {
+      if (!mongoose.Types.ObjectId.isValid(value)) {
+        throw new Error('Nevažeći ID varijacije.');
+      }
+      return true;
+    }),
+
+  // Amount
+  body('amount')
+    .exists().withMessage('Količina je obavezna.')
+    .isInt({ min: 1, max: 50 }).withMessage('Količina mora biti broj između 1 i 50.')
+    .toInt(),
+
+  // Honeypot
+  body('honeypot')
+    .custom((value) => {
+      if (value && value.trim() !== '') {
+        throw new Error('Sumnjiv pokušaj – honeypot polje nije prazno.');
+      }
+      return true;
+    })
+], ShopController.postAddItemToCart);
 
 router.post("/provera-kupona", ShopController.postCouponValidation);
 

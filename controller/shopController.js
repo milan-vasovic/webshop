@@ -40,9 +40,9 @@ async function getShopPage(req, res, next) {
 
 async function getShopPageByCategory(req, res, next) {
     try {
-        const page = parseInt(req.query.page) || 1;
+        const page = parseInt(sanitize(req.query.page)) || 1;
         const limit = 9;
-        const category = req.params.category ? req.params.category : "";
+        const category = req.params.category ? sanitizeHtml(sanitize(req.params.category)) : "";
 
         const shop = await ShopService.findItemsByCategory(category, page, limit);
         const totalPages = Math.ceil(shop.Ukupno / limit);
@@ -75,9 +75,9 @@ async function getShopPageByCategory(req, res, next) {
 
 async function getShopPageByTag(req, res, next) {
     try {
-        const page = parseInt(req.query.page) || 1;
+        const page = parseInt(sanitize(req.query.page)) || 1;
         const limit = 9;
-        const tag = req.params.tag ? req.params.tag : "";
+        const tag = req.params.tag ? sanitizeHtml(sanitize(req.params.tag)) : "";
 
         const shop = await ShopService.findItemsByTags(tag, page, limit);
         const totalPages = Math.ceil(shop.Ukupno / limit);
@@ -109,9 +109,9 @@ async function getShopPageByTag(req, res, next) {
 
 async function getShopPageBySearch(req, res, next) {
     try {
-        const page = parseInt(req.query.page) || 1;
+        const page = parseInt(sanitize(req.query.page)) || 1;
         const limit = 9;
-        const search = req.params.search ? req.params.search : "";
+        const search = req.params.search ? sanitizeHtml(sanitize(req.params.search )): "";
 
         const param = sanitize(search)
         const shop = await ShopService.findItemsBySearch(param, page, limit);
@@ -145,7 +145,7 @@ async function getShopPageBySearch(req, res, next) {
 
 async function getFeautredShopPage(req, res, next) {
     try {
-        const page = parseInt(req.query.page) || 1;
+        const page = parseInt(sanitize(req.query.page)) || 1;
         const limit = 9;
         const shop = await ShopService.findFeaturedItems(page, limit);
         const totalPages = Math.ceil(shop.Ukupno / limit);
@@ -177,7 +177,7 @@ async function getFeautredShopPage(req, res, next) {
 
 async function getActionedShopPage(req, res, next) {
     try {
-        const page = parseInt(req.query.page) || 1;
+        const page = parseInt(sanitize(req.query.page)) || 1;
         const limit = 9;
         const shop = await ShopService.findActionedItems(page, limit);
         const totalPages = Math.ceil(shop.Ukupno / limit);
@@ -209,7 +209,7 @@ async function getActionedShopPage(req, res, next) {
 
 async function getItemBySlug(req, res, next) {
     try {
-        const itemSlug = req.params.itemSlug;
+        const itemSlug = sanitizeHtml(sanitize(req.params.itemSlug));
 
         const item = await ShopService.findItemBySlug(itemSlug);
 

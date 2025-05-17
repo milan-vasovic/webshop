@@ -12,7 +12,7 @@ import ContactService from '../service/contactService.js';
  */
 async function getContactsPage(req, res, next) {
     try {
-        const page = parseInt(req.query.page) || 1;
+        const page = parseInt(sanitize(req.query.page)) || 1;
         const limit = 5;
 
         const contacts = await ContactService.findAllContacts(limit, page);
@@ -38,7 +38,7 @@ async function getContactsPage(req, res, next) {
 
 async function getContactsSearchPage(req, res, next) {
     try {
-        const page = parseInt(req.query.page) || 1;
+        const page = parseInt(sanitize(req.query.page)) || 1;
         const limit = 5;
         const search = req.params.search ? req.params.search : "";
         

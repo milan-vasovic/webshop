@@ -17,7 +17,7 @@
         </form>
       </div>
       <!-- Lista objava -->
-      <div class="cards__container" style="margin-top: var(--margin-big);">
+      <div class="cards__container">
         <% posts.posts.forEach(item => { %>
           <%- include('../include/card.ejs', {
               item: item,
@@ -45,7 +45,7 @@
         <%- include('../include/newsletter.ejs', {from: path }) %>
       <% } %>
       <% if (categories && categories.length > 0) { %>
-        <div style="margin-bottom: var(--margin-big);">
+        <div>
           <h1>Kategorije:</h1>
           <ul class="grid grid-3">
             <% categories.forEach(c => { %>

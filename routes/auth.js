@@ -1,6 +1,11 @@
 import { Router } from "express";
 import { body } from 'express-validator'; //  param, query, validationResult 
 
+import {
+  loginLimiter,
+  resetPasswordLimiter,
+} from '../middleware/rateLimiter.js';
+
 import AuthController from '../controller/authController.js';
 import authController from "../controller/authController.js";
 
@@ -10,18 +15,20 @@ router.get("/prijava", AuthController.getLoginPage);
 
 router.get("/registracija", AuthController.getRegistrationPage);
 
-router.get("/zatrazite-novu-sifru", AuthController.getNewPasswordPage);
+router.get("/zatrazite-novu-sifru", resetPasswordLimiter, AuthController.getNewPasswordPage);
 
-router.get("/zatrazite-aktivaciju", AuthController.getActivationAccount);
+router.get("/zatrazite-aktivaciju",  resetPasswordLimiter, AuthController.getActivationAccount);
 
 router.get("/napravite-novu-sifru/:token", AuthController.getSetNewPasswordPage);
 
 router.get('/auth/confirm', authController.getConfirmAccountPage);
 
-router.post('/prijava', [
+router.post('/prijava', loginLimiter, [
     body("email")
-        .notEmpty()
-        .withMessage("Email adresa je obavezna."),
+        .trim()
+        .notEmpty().withMessage("Email adresa je obavezna.")
+        .isEmail().withMessage("Email adresa nije validna.")
+        .normalizeEmail(),
 
     body("password")
         .notEmpty()
@@ -36,10 +43,12 @@ router.post('/prijava', [
         })
 ], authController.postLogin);
 
-router.post('/registracija', [
+router.post('/registracija', loginLimiter, [
     body("email")
-    .notEmpty()
-    .withMessage("Email adresa je obavezna."),
+        .trim()
+        .notEmpty().withMessage("Email adresa je obavezna.")
+        .isEmail().withMessage("Email adresa nije validna.")
+        .normalizeEmail(),
 
     body("password")
         .notEmpty()
@@ -74,19 +83,23 @@ router.post('/registracija', [
         })
 ], authController.postRegister);
 
-router.post("/zatrazite-novu-sifru", [
+router.post("/zatrazite-novu-sifru", resetPasswordLimiter, [
     body("email")
-    .notEmpty()
-    .withMessage("Email adresa je obavezna."),
+        .trim()
+        .notEmpty().withMessage("Email adresa je obavezna.")
+        .isEmail().withMessage("Email adresa nije validna.")
+        .normalizeEmail(),
 ], AuthController.postRequestNewPassword);
 
-router.post("/zatrazite-aktivaciju", [
+router.post("/zatrazite-aktivaciju", resetPasswordLimiter, [
     body("email")
-    .notEmpty()
-    .withMessage("Email adresa je obavezna."),
+        .trim()
+        .notEmpty().withMessage("Email adresa je obavezna.")
+        .isEmail().withMessage("Email adresa nije validna.")
+        .normalizeEmail(),
 ], AuthController.postRequestActivation);
 
-router.post("/napravite-novu-sifru", [ 
+router.post("/napravite-novu-sifru", resetPasswordLimiter, [ 
     body("password")
         .notEmpty()
         .withMessage("Šifra je obavezna."),

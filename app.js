@@ -12,6 +12,7 @@ import { csrfSync } from "csrf-sync";
 import { connect } from "mongoose";
 import ErrorMiddleware from './middleware/error.js';
 import multerConfig from "./middleware/multerConfig.js";
+import { globalGetLimiter } from './middleware/rateLimiter.js';
 import helmet from 'helmet';
 import crypto from "crypto";
 import mongoSanitize from 'express-mongo-sanitize';
@@ -37,6 +38,7 @@ app.use((req, res, next) => {
 const store = new MongoDbStore({
   uri: MONGODB_URI,
   collection: "sessions",
+  expires: 1000 * 60 * 60 * 24
 });
 
 const { csrfSynchronisedProtection } = csrfSync({
@@ -47,6 +49,8 @@ app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "view"));
 
 app.use(mongoSanitize());
+
+app.use(globalGetLimiter);
 app.use((req, res, next) => {
   res.locals.cspNonce = crypto.randomBytes(16).toString("base64");
   next();
@@ -54,20 +58,25 @@ app.use((req, res, next) => {
 
 app.use(
   helmet({
-      contentSecurityPolicy: {
-          directives: {
-              "default-src": ["'self'"],
-              "script-src": ["'self'", "https://www.instagram.com/"], 
-              "style-src": ["'self'", "'unsafe-inline'","https://fonts.googleapis.com"],
-              "font-src": [
-                "'self'",
-                "https://fonts.gstatic.com"
-              ],
-              frameSrc: ["'self'", "https://www.google.com", "https://maps.google.com", "https://www.instagram.com/"],
-          },
-      },
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "https://www.instagram.com"],
+        styleSrc: ["'self'", "https://fonts.googleapis.com"],
+        fontSrc: ["'self'", "https://fonts.gstatic.com"],
+        frameSrc: ["'self'", "https://www.google.com", "https://maps.google.com", "https://www.instagram.com"],
+        imgSrc: ["'self'", "data:"],
+        connectSrc: ["'self'"],
+        objectSrc: ["'none'"],
+        baseUri: ["'self'"],
+        formAction: ["'self'"],
+        frameAncestors: ["'self'"],
+        upgradeInsecureRequests: []
+      }
+    }
   })
 );
+
 app.use(methodOverride('_method'));
 
 import authRoutes from "./routes/auth.js";
@@ -89,12 +98,17 @@ app.use('/images', express.static(join(__dirname, 'data', 'images')));
 app.use('/videos', express.static(join(__dirname, 'data', 'videos')));
 
 app.use(
-    session({
-      secret: process.env.SESSION_SECRET,
-      resave: false,
-      saveUninitialized: false,
-      store: store,
-    })
+  session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    store: store,
+    cookie: {
+      httpOnly: true,
+      sameSite: 'strict',
+      secure: process.env.NODE_ENV === 'production',
+    }
+  })
 );
   
 app.use(csrfSynchronisedProtection);
@@ -128,7 +142,7 @@ app.use(async (req, res, next) => {
     } else {
       req.session.guest = false;
       req.session.user = user;
-      req.session.cartItemCount = user.cart.length;
+      req.session.cartItemCount = user.cart.length || 0;
     }
   } catch (error) {
     req.session.guest = true;

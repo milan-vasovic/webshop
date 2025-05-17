@@ -1,6 +1,10 @@
 import { Router } from "express";
 import { body } from 'express-validator';
 import sanitizeHtml from 'sanitize-html';
+import {
+  contactLimiter,
+} from '../middleware/rateLimiter.js';
+
 
 import DefaultController from '../controller/defaultController.js';
 
@@ -18,7 +22,7 @@ router.get("/o-nama", DefaultController.getAboutPage);
 
 router.get("/partnerstvo", DefaultController.getPartnershipPage);
 
-router.post('/kontaktiranje', [
+router.post('/kontaktiranje',  contactLimiter, [
     body("name")
         .trim()
         .notEmpty().withMessage("Ime je obavezno.")
@@ -60,7 +64,7 @@ router.post('/kontaktiranje', [
         })
 ], DefaultController.postContact);
 
-router.post('/newsletter', [
+router.post('/newsletter', contactLimiter, [
     body("name")
     .trim()
     .notEmpty().withMessage("Ime je obavezno.")
