@@ -1,0 +1,142 @@
+/* ===============================
+   🧱 Base Button Style
+   =============================== */
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--font-size-md);
+  font-family: var(--primary-font-family);
+  font-weight: 600;
+  line-height: var(--line-height-normal);
+  letter-spacing: var(--letter-spacing-normal);
+
+  border-radius: var(--radius-md);
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease, transform 0.1s ease;
+
+  text-align: center;
+  text-decoration: none;
+
+  background-color: var(--neutral-color);
+  color: var(--on-neutral-text-color, #ffffff); /* fallback na belo */
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--primary-hover-color);
+  outline-offset: 2px;
+}
+
+.button:active {
+  transform: scale(0.98);
+}
+
+/* ===============================
+   🌈 Button Variants
+   =============================== */
+
+/* ✅ Primary */
+.button--primary {
+  background-color: var(--primary-color);
+  color: var(--on-primary-text-color, #ffffff);
+}
+.button--primary:hover {
+  background-color: var(--primary-hover-color);
+}
+
+/* ✅ Secondary */
+.button--secondary {
+  background-color: var(--secondary-color);
+  color: var(--on-secondary-text-color, #ffffff);
+}
+.button--secondary:hover {
+  background-color: var(--secondary-hover-color);
+}
+
+/* ✅ Neutral */
+.button--neutral {
+  background-color: var(--neutral-color);
+  color: var(--on-neutral-text-color, #ffffff);
+}
+.button--neutral:hover {
+  background-color: var(--neutral-hover-color);
+}
+
+/* ✅ Info */
+.button--info {
+  background-color: var(--info-color);
+  color: var(--on-info-text-color, #ffffff);
+}
+.button--info:hover {
+  background-color: var(--primary-color);
+}
+
+/* ✅ Warning */
+.button--warning {
+  background-color: var(--warning-color);
+  color: var(--on-warning-text-color, #ffffff);
+}
+.button--warning:hover {
+  background-color: var(--accent-hover-color);
+}
+
+/* ✅ Danger */
+.button--danger {
+  background-color: var(--danger-color);
+  color: var(--on-danger-text-color, #ffffff);
+}
+.button--danger:hover {
+  background-color: var(--accent-hover-color);
+}
+
+/* ✅ Success */
+.button--success {
+  background-color: var(--success-color);
+  color: var(--on-success-text-color, #ffffff);
+}
+.button--success:hover {
+  background-color: var(--secondary-hover-color);
+}
+
+/* ✅ Accent */
+.button--accent {
+  background-color: var(--accent-color);
+  color: var(--on-accent-text-color, #ffffff);
+}
+.button--accent:hover {
+  background-color: var(--accent-hover-color);
+}
+
+/* ===============================
+   🧱 Outline Variant
+   =============================== */
+.button--outline {
+  background-color: transparent;
+  border: var(--border-medium) solid var(--primary-color);
+  color: var(--primary-color);
+}
+.button--outline:hover {
+  background-color: var(--primary-color);
+  color: var(--on-primary-text-color, #ffffff);
+}
+
+/* ===============================
+   🧱 Small and Large Sizes
+   =============================== */
+.button--sm {
+  padding: var(--space-1) var(--space-3);
+  font-size: var(--font-size-sm);
+}
+
+.button--lg {
+  padding: var(--space-3) var(--space-6);
+  font-size: var(--font-size-lg);
+}

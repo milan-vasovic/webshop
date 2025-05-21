@@ -1,121 +1,130 @@
 <%- include('../include/head.ejs') %>
 <%- include('../include/navigation.ejs') %>
 
-<section class="container main__container">
+<section class="container main__container mb-6">
   <h1 class="main__title"><%= pageTitle %></h1>
-  <!-- Responsive kontejner: na mobilu kolona, na desktopu red -->
-  <div class="column-row__container">
-    <!-- Lijeva kolona: Checkout forma -->
-    <div class="left__container-50">
-      <form class="main-form width-100" action="/prodavnica/porucivanje" method="post">
+
+  <!-- ✅ Responsive layout -->
+  <div class="checkout__layout">
+    <!-- ✅ Leva kolona: forma za podatke korisnika (DRUGO NA MOBILU) -->
+    <div class="checkout__left">
+      <form class="form" action="/prodavnica/porucivanje" method="post">
         <% if(errorMessage) { %>
-          <div class="user-message--error"><%= errorMessage %></div>
+          <div class="form__error"><%= errorMessage %></div>
         <% } %>
-        <div class="main-form__group">
-          <label class="main-form__label" for="firstNameInput">Ime:</label>
-          <input id="firstNameInput" name="firstName" class="main-form__input" type="text" value="<% if (userInfo && userInfo.Ime) { %><%= userInfo.Ime %><% } %>" required>
+
+        <div class="form__group">
+          <label class="form__label" for="firstNameInput">Ime:</label>
+          <input id="firstNameInput" name="firstName" class="form__input" type="text" value="<%= userInfo?.Ime || '' %>" required>
         </div>
-        <div class="main-form__group">
-          <label class="main-form__label" for="lastNameInput">Prezime:</label>
-          <input id="lastNameInput" name="lastName" class="main-form__input" type="text" value="<% if (userInfo && userInfo.Prezime) { %><%= userInfo.Prezime %><% } %>" required>
+
+        <div class="form__group">
+          <label class="form__label" for="lastNameInput">Prezime:</label>
+          <input id="lastNameInput" name="lastName" class="form__input" type="text" value="<%= userInfo?.Prezime || '' %>" required>
         </div>
-        <div class="main-form__group">
-          <label class="main-form__label" for="emailInput">Email:</label>
-          <input id="emailInput" name="email" class="main-form__input" type="email" value="<% if (userInfo && userInfo.Email) { %><%= userInfo.Email %><% } %>" required>
+
+        <div class="form__group">
+          <label class="form__label" for="emailInput">Email:</label>
+          <input id="emailInput" name="email" class="form__input" type="email" value="<%= userInfo?.Email || '' %>" required>
         </div>
-        <div class="main-form__group">
-          <label class="main-form__label" for="telephoneInput">Broj Telefona:</label>
-          <% if (userInfo && userInfo.Telefoni && userInfo.Telefoni.length > 0) { %>
-            <select class="main-form__select" name="telephone" id="telephoneInput">
+
+        <div class="form__group">
+          <label class="form__label" for="telephoneInput">Broj Telefona:</label>
+          <% if (userInfo?.Telefoni?.length > 0) { %>
+            <select class="form__select" name="telephone" id="telephoneInput">
               <% userInfo.Telefoni.forEach(tel => { %>
                 <option value="<%= tel.Broj %>"><%= tel.Broj %></option>
               <% }) %>
             </select>
-            <button id="addNewTelephoneBtn" class="btn-secondary" type="button">Novi Broj</button>
+            <button id="addNewTelephoneBtn" class="button button--secondary" type="button">Novi Broj</button>
             <div id="newNumber"></div>
           <% } else { %>
-            <input id="telephoneInput" name="newTelephone" class="main-form__input" type="text">
+            <input id="telephoneInput" name="newTelephone" class="form__input" type="text">
             <input type="hidden" name="isNewTelephone" value="true">
           <% } %>
         </div>
-        <% if (userInfo && userInfo.Adrese && userInfo.Adrese.length > 0) { %>
-          <div class="main-form__group">
-            <label class="main-form__label" for="addressInput">Adrese:</label>
-            <select class="main-form__select" name="address" id="addressInput">
+
+        <% if (userInfo?.Adrese?.length > 0) { %>
+          <div class="form__group">
+            <label class="form__label" for="addressInput">Adrese:</label>
+            <select class="form__select" name="address" id="addressInput">
               <% userInfo.Adrese.forEach(add => { %>
                 <option value="<%= add.Adresa.Grad %>,<%= add.Adresa.Ulica %>,<%= add.Adresa.Broj %>,<%= add.Adresa['Poštanski Broj'] %>">
                   <%= add.Adresa.Grad %>, <%= add.Adresa.Ulica %>, <%= add.Adresa.Broj %>, <%= add.Adresa["Poštanski Broj"] %>
                 </option>
               <% }) %>
             </select>
-            <button id="addNewAddressBtn" class="btn-secondary" type="button">Nova Adresa</button>
+            <button id="addNewAddressBtn" class="button button--secondary" type="button">Nova Adresa</button>
             <div id="newAddress"></div>
           </div>
         <% } else { %>
-          <div class="grid grid-2 width-100">
-            <div class="main-form__group">
-              <label class="main-form__label" for="cityInput">Grad:</label>
-              <input id="cityInput" name="newCity" class="main-form__input" type="text" required>
+          <div class="form__grid-2">
+            <div class="form__group">
+              <label class="form__label" for="cityInput">Grad:</label>
+              <input id="cityInput" name="newCity" class="form__input" type="text" required>
             </div>
-            <div class="main-form__group">
-              <label class="main-form__label" for="streetInput">Ulica:</label>
-              <input id="streetInput" name="newStreet" class="main-form__input" type="text" required>
+            <div class="form__group">
+              <label class="form__label" for="streetInput">Ulica:</label>
+              <input id="streetInput" name="newStreet" class="form__input" type="text" required>
             </div>
-            <div class="main-form__group">
-              <label class="main-form__label" for="numberInput">Broj Ulice:</label>
-              <input id="numberInput" name="newAddressNumber" class="main-form__input" type="text" required>
+            <div class="form__group">
+              <label class="form__label" for="numberInput">Broj Ulice:</label>
+              <input id="numberInput" name="newAddressNumber" class="form__input" type="text" required>
             </div>
-            <div class="main-form__group">
-              <label class="main-form__label" for="postalCodeInput">Poštanski Broj:</label>
-              <input id="postalCodeInput" name="newPostalCode" class="main-form__input" type="text">
+            <div class="form__group">
+              <label class="form__label" for="postalCodeInput">Poštanski Broj:</label>
+              <input id="postalCodeInput" name="newPostalCode" class="form__input" type="text">
             </div>
           </div>
           <input type="hidden" name="isNewAddress" value="true">
         <% } %>
-        <div class="main-form__group">
-          <label class="main-form__label" for="noteInp">Napomena:</label>
-          <textarea class="main-form__textarea" name="note" id="noteInp"></textarea>
+
+        <div class="form__group">
+          <label class="form__label" for="noteInp">Napomena:</label>
+          <textarea class="form__textarea" name="note" id="noteInp"></textarea>
         </div>
-        <div class="main-form__group">
-          <label class="main-form__label" for="acceptance">Saglasnost:</label>
+
+        <div class="form__group">
+          <label class="form__label" for="acceptance">Saglasnost:</label>
           <div class="flex flex-row flex-wrap">
-            Prihvatate <a class="main__link" href="/uslovi-koriscenja">Uslove Korišćenja</a> i <a class="main__link" href="/politika-privatnosti">Politiku Privatnosti</a>
-            <input id="acceptance" name="acceptance" type="checkbox" required>
+            <input id="acceptance" name="acceptance" type="checkbox" required> Prihvatate <a class="main__link" href="/uslovi-koriscenja">Uslove Korišćenja</a> i <a class="main__link" href="/politika-privatnosti">Politiku Privatnosti</a>
           </div>
         </div>
+
         <% if (!isAuthenticated) { %>
-          <div class="main-form__group">
-            <label class="main-form__label" for="createAccount">Napravite nalog:</label>
+          <div class="form__group">
+            <label class="form__label" for="createAccount">Napravite nalog:</label>
             <div class="flex flex-row flex-wrap">
-              Prihvatate da Vam se nalog automatski napravi.
               <input id="createAccount" name="createAccount" type="checkbox">
+              Prihvatate da Vam se nalog automatski napravi.
             </div>
           </div>
         <% } %>
+
         <input name="honeypot" type="hidden">
-        <input class="main-form__input" type="hidden" name="CSRFToken" value="<%= csrfToken %>" required>
-        <button class="btn-primary" type="submit">Poručite</button>
+        <input class="form__input" type="hidden" name="CSRFToken" value="<%= csrfToken %>" required>
+        <button class="button button--primary" type="submit">Poručite</button>
       </form>
     </div>
-    <!-- Desna kolona: Kupon i pregled korpe -->
-    <div class="right__container-50">
+        <!-- ✅ Desna kolona: kupon + pregled korpe (PRVO NA MOBILU) -->
+    <div class="checkout__right">
       <% if (!userInfo) { %>
         <h3>Imate Kupon?</h3>
         <p>Da biste upotrebili kupon morate se prijaviti!</p>
-        <p>Kliknite na link ispod.</p>
         <a class="main__link" href="/prijava?redirectTo=/prodavnica/porudzbina">Prijavite Se</a>
       <% } else { %>
-        <form class="main-form">
-          <div>
-            <label class="main-form__label" for="couponInput">Kupon:</label>
-            <input class="main-form__input" type="text" name="coupon" id="couponInput" placeholder="Unesite Kupon">
+        <form class="form">
+          <div class="form__group">
+            <label class="form__label" for="couponInput">Kupon:</label>
+            <input class="form__input" type="text" name="coupon" id="couponInput" placeholder="Unesite Kupon">
             <input name="honeypot" type="hidden">
-            <input class="main-form__input" type="hidden" name="CSRFToken" value="<%= csrfToken %>" required>
-            <button id="activateCouponBtn" class="btn-secondary" type="button">Aktivirajte Kupon</button>
+            <input class="form__input" type="hidden" name="CSRFToken" value="<%= csrfToken %>" required>
+            <button id="activateCouponBtn" class="button button--secondary" type="button">Aktivirajte Kupon</button>
           </div>
         </form>
         <div id="couponFeedback"></div>
       <% } %>
+
       <br>
       <%- include('../include/table.ejs', {
           items: cart,
@@ -126,6 +135,7 @@
           totals: true,
           actions: []
       }) %>
+
       <div>
         <% let total = 0;
            cart.forEach(i => {

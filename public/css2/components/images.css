@@ -1,0 +1,79 @@
+/* ===============================
+   🖼️ Image Component Styles
+   =============================== */
+
+/* 🔹 Hero Image */
+.image--hero {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+
+/* 🔸 Card Image */
+.card__image,
+.image--card {
+  width: 100%;
+  height: 220px;
+  object-fit: contain;
+  border-radius: var(--radius-md);
+  background-color: var(--neutral-background-color);
+}
+
+/* ⭐ Testimonial Avatar */
+.image--testimonial {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: var(--radius-full);
+  border: var(--border-thin) solid var(--secondary-color);
+}
+
+/* 📄 Detail Image (Product / Blog view) */
+.image--detail {
+  width: 100%;
+  max-width: 600px;
+  height: auto;
+  object-fit: contain;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: var(--space-4);
+}
+
+/* 🖼️ Thumbnail Gallery Image */
+.image--thumb {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: outline 0.2s ease;
+}
+
+.image--thumb:hover {
+  outline: 2px solid var(--primary-color);
+}
+
+/* ✅ Chosen Image (highlighted thumbnail) */
+.image--chosen {
+  outline: 3px solid var(--accent-color);
+  border-radius: var(--radius-md);
+}
+
+/* 📊 Table Image */
+.image--table {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-xs);
+}
+
+/* 📱 Responsive override */
+@media (max-width: 768px) {
+  .card__image,
+  .image--card {
+    height: 180px;
+  }
+}

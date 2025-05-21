@@ -1,44 +1,51 @@
 <%- include('../include/head.ejs') %>
 <%- include('../include/navigation.ejs') %>
-<section class=" container main__container">
-    <h1 class="main__title"><%= pageTitle %></h1>
-    <div class="column-row__container">
-        <div class="left__container-70">
-            <%- include('../include/breadcrumbs', { breadcrumbs }) %>
-            <div class="feature-image">
-                <img src="/images/<%= post.Slika.value %>" alt="<%= post.Slika.Opis.value %>">
-            </div>
-            <div class="section__block">
-                <p><%= post.Opis.value %></p>
-            </div>
-            <div class="section__block blog__content-container">
-                <% post.Sadržaj.value.forEach(content => { %>
-                    <%- content %>
-                <% }) %>
-            </div>
-        </div>
-        <div class="right__container-30">
-            <div>
-                <h1>Kategorije:</h1>
-                <ul>
-                    <% post.Kategorije.value.forEach(c => { %>
-                        <li>
-                            <a href="/forum/kategorija/<%= c %>"><%= c %></a>
-                        </li>
-                    <% }) %>
-                </ul>
-            </div>
-            <div>
-                <h1>Tagovi:</h1>
-                <ul>
-                    <% post.Tagovi.value.forEach(t => { %>
-                        <li>
-                            <a href="/forum/oznaka/<%= t %>"><%= t %></a>
-                        </li>
-                    <% }) %>
-                </ul>
-            </div>
-        </div>
+
+<section class="container main__container">
+  <h1 class="main__title"><%= pageTitle %></h1>
+
+  <!-- Responsive grid: 3/4 - 1/4 on desktop, stacked on mobile -->
+  <div class="grid grid-cols-main-sidebar">
+    
+    <!-- Leva kolona (glavni sadržaj) -->
+    <div class="w-full">
+      <%- include('../include/breadcrumbs', { breadcrumbs }) %>
+
+      <div class="feature-image">
+        <img src="/images/<%= post.Slika.value %>" alt="<%= post.Slika.Opis.value %>">
+      </div>
+
+      <div class="section__block">
+        <p><%= post.Opis.value %></p>
+      </div>
+
+      <div class="section__block blog__content-container">
+        <% post.Sadržaj.value.forEach(content => { %>
+          <%- content %>
+        <% }) %>
+      </div>
     </div>
+
+    <!-- Desna kolona (kategorije i tagovi) -->
+    <aside class="w-full">
+      <div class="blog__sidebar">
+        <h2 class="blog__subtitle">Kategorije:</h2>
+        <ul class="blog__list">
+          <% post.Kategorije.value.forEach(c => { %>
+            <li><a class="blog__list-link" href="/forum/kategorija/<%= c %>"><%= c %></a></li>
+          <% }) %>
+        </ul>
+
+        <h2 class="blog__subtitle">Tagovi:</h2>
+        <ul class="blog__list">
+          <% post.Tagovi.value.forEach(t => { %>
+            <li><a class="blog__list-link" href="/forum/oznaka/<%= t %>"><%= t %></a></li>
+          <% }) %>
+        </ul>
+      </div>
+    </aside>
+
+  </div>
 </section>
+
 <%- include('../include/end.ejs') %>

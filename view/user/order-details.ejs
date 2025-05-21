@@ -1,44 +1,67 @@
 <%- include('../include/head.ejs') %>
 <%- include('../include/navigation.ejs') %>
-<section class="main__container">
-    <h1 class="main__title"><%= pageTitle %></h1>
-    <div class="column-row__container">
-        <div class="left__container-30">
-            <% if (order.Status.value === 'processing') { %>
-                <div>
-                    <form action="/korisnik/otkazivanje-porudzbine" method="post">
-                        <input type="hidden" name="orderId" value="<%= order.ID.value %>" required>
-                        <input name="honeypot" type="hidden">
-                        <input type="hidden" name="CSRFToken" value="<%= csrfToken %>" required>
-                        <button type="submit" class="btn-primary">Otkažite</button>
-                    </form>
-                </div>
-            <% } %>
-            <h2>Broj Porudžbine: <%= order.ID.value %></h2>
-            <h3>Datum: <%= order.Datum.value %></h3>
-            <h3>Status: <%= order.Status.value %></h3>
-            <hr><br>
-            <h3>Kupac: <%= order.Kupac.Ime.value %></h3>
-            <p>Broj Telefona: <%= order.Telefon.value %></p>
-            <p>Adresa: <%= order.Adresa.Grad.value %>, <%= order.Adresa.Ulica.value %>, <%= order.Adresa.Broj.value %>, <%= order.Adresa["Poštanski Broj"].value %></p>
-            <p>Napomena: <%= order.Napomena.value %></p>
-            <br><hr><br>
-            <h3>Kupon: </h3> 
-            <p>Kod: <strong><%= order.Kupon.Kod.value || "nema" %></strong> Popust: <strong><% if (order.Kupon.Popust.value !== 'undefined %') { %><%= order.Kupon.Popust.value %><% } else { %>nema<% } %></strong></p>
-            <p>Poštarina: <strong><%= order.Poštarina.value %> RSD</strong></p>
-            <h2>Ukupna Cena: <%= order['Ukupna Cena'].value %></h2>
-        </div>
-        <div class="right__container-70">
-            <%- include('../include/table.ejs', {
-                items: order.Artikli,
-                showId: false,
-                caption: 'Artikli',
-                hasActions: false,
-                hasFooter: false,
-                totals: false,
-                actions: []
-            }) %>
-        </div>
+
+<section class="container section">
+  <h1 class="heading-lg mb-6"><%= pageTitle %></h1>
+
+  <div class="flex flex-column flex-lg:row gap-6">
+    <!-- Leva kolona: detalji porudžbine -->
+    <div class="w-full w-lg-1/3">
+      <div class="card p-4">
+        <% if (order.Status.value === 'processing') { %>
+          <form action="/korisnik/otkazivanje-porudzbine" method="post" class="mb-4">
+            <input type="hidden" name="orderId" value="<%= order.ID.value %>" required>
+            <input name="honeypot" type="hidden">
+            <input type="hidden" name="CSRFToken" value="<%= csrfToken %>" required>
+            <button type="submit" class="button button--primary">Otkažite</button>
+          </form>
+        <% } %>
+
+        <h2 class="heading-md mb-2">Broj Porudžbine: <%= order.ID.value %></h2>
+        <p><strong>Datum:</strong> <%= order.Datum.value %></p>
+        <p><strong>Status:</strong> <%= order.Status.value %></p>
+
+        <hr class="my-4" />
+
+        <h3 class="heading-sm mb-2">Kupac</h3>
+        <p><strong>Ime:</strong> <%= order.Kupac.Ime.value %></p>
+        <p><strong>Telefon:</strong> <%= order.Telefon.value %></p>
+        <p><strong>Adresa:</strong> <%= order.Adresa.Grad.value %>, <%= order.Adresa.Ulica.value %>, <%= order.Adresa.Broj.value %>, <%= order.Adresa["Poštanski Broj"].value %></p>
+        <% if (order.Napomena.value) { %>
+          <p><strong>Napomena:</strong> <%= order.Napomena.value %></p>
+        <% } %>
+
+        <hr class="my-4" />
+
+        <h3 class="heading-sm mb-2">Kupon</h3>
+        <p><strong>Kod:</strong> <%= order.Kupon.Kod.value || "nema" %></p>
+        <p><strong>Popust:</strong> 
+          <% if (typeof order.Kupon.Popust.value !== 'undefined') { %>
+            <%= order.Kupon.Popust.value %>
+          <% } else { %>
+            nema
+          <% } %>
+        </p>
+
+        <p><strong>Poštarina:</strong> <%= order.Poštarina.value %> RSD</p>
+
+        <h2 class="heading-md mt-4">Ukupna Cena: <%= order['Ukupna Cena'].value %> RSD</h2>
+      </div>
     </div>
+
+    <!-- Desna kolona: artikli u porudžbini -->
+    <div class="w-full w-lg-2/3">
+      <%- include('../include/table.ejs', {
+          items: order.Artikli,
+          showId: false,
+          caption: 'Artikli',
+          hasActions: false,
+          hasFooter: false,
+          totals: false,
+          actions: []
+      }) %>
+    </div>
+  </div>
 </section>
+
 <%- include('../include/end.ejs') %>

@@ -1,140 +1,92 @@
 <%- include('../include/head.ejs') %>
 <%- include('../include/navigation.ejs') %>
 
-<section class="container main__container">
-  <!-- Hero sekcija -->
-  <%- include('../include/hero.ejs', {
-    orientation: "left-right",
-    title: "Dobrodošli u Tophelanke",
-    subtitle: "Vaša destinacija za savremenu žensku garderobu",
-    paragraphs: [
-      "Otkrijte ogroman asortiman helanki, trenerki, fitness kompleta, kupaćih, majica, šorceva, haljina, kardigana, jakni i još mnogo toga!",
-      "Pažljivo odabrani artikli kako bi svaka žena pronašla svoj savršen stil.",
-      "Sa veličinama od XS do 4XL, garantujemo izuzetan kvalitet i moderno rešenje za svaku priliku i godišnje doba."
-    ],
-    ctaLink: "/prodavnica",
-    ctaText: "Posetite prodavnicu",
-    imageSrc: "/images/tophelanke_hero.jpg",
-    imageAlt: "tophelanke hero helanke prodavnica"
-  }) %>
-  
-  <!-- Policies sekcija (kratki info o garanciji, dostavi, sl. ) -->
-  <div class="circular-badges-container">
-    <div class="circular-badges-slider">
-      <div class="circular-badges-track">
-        <%- include('../include/circularBadge.ejs', {
-          title: "Brza Dostava",
-          text: "Post Express",
-          icon: "local_shipping"
-        }) %>
-        <%- include('../include/circularBadge.ejs', {
-          title: "Garancija Zamene",
-          text: "U roku od 14 dana, bez pitanja.",
-          icon: "sync_alt"
-        }) %>
-        <%- include('../include/circularBadge.ejs', {
-          title: "Povrata Novca",
-          text: "U roku od 14 dana, bez pitanja.",
-          icon: "currency_exchange"
-        }) %>
-        <%- include('../include/circularBadge.ejs', {
-          title: "Sigurna Kupovina",
-          text: "Vaši podaci su enkriptovani i bezbedni.",
-          icon: "lock"
-        }) %>
-        <%- include('../include/circularBadge.ejs', {
-          title: "Lako Dostupni",
-          text: "Možete nas kontaktirati putem forme, email ili teleofna.",
-          icon: "contact_support"
-        }) %>
-      </div>
-    </div>
-
+<section class="main__container section container">
+  <!-- Hero Section -->
+  <div class="section">
+    <%- include('../include/hero.ejs', {
+      orientation: "left-right",
+      title: "Dobrodošli u Tophelanke",
+      subtitle: "Vaša destinacija za savremenu žensku garderobu",
+      paragraphs: [
+        "Otkrijte ogroman asortiman helanki trenerki fitness kompleta kupaćih majica šorceva haljina kardigana jakni i još mnogo toga!",
+        "Pažljivo odabrani artikli kako bi svaka žena pronašla svoj savršen stil.",
+        "Sa veličinama od XS do 4XL, garantujemo izuzetan kvalitet i moderno rešenje za svaku priliku i godišnje doba."
+      ],
+      ctaLink: "/prodavnica",
+      ctaText: "Posetite prodavnicu",
+      imageSrc: "/images/tophelanke_hero.jpg",
+      imageAlt: "tophelanke hero helanke prodavnica"
+    }) %>
   </div>
 
-  <!-- Shop Featured sekcija -->
-  <div class="shop-featured">
-    <h1 class="main__title"><a href="/prodavnica/istaknuto">Istaknuto iz Ponude</a></h1>
+  <!-- Policies Section -->
+  <div class="section">
+    <div class="grid grid-2 grid-md-5 gap-4 text-center">
+      <%- include('../include/circularBadge.ejs', { title: "Brza Dostava", text: "Post Express", icon: "local_shipping" }) %>
+      <%- include('../include/circularBadge.ejs', { title: "Garancija Zamene", text: "U roku od 14 dana, bez pitanja.", icon: "sync_alt" }) %>
+      <%- include('../include/circularBadge.ejs', { title: "Povrata Novca", text: "U roku od 14 dana, bez pitanja.", icon: "currency_exchange" }) %>
+      <%- include('../include/circularBadge.ejs', { title: "Sigurna Kupovina", text: "Vaši podaci su enkriptovani i bezbedni.", icon: "lock" }) %>
+      <%- include('../include/circularBadge.ejs', { title: "Lako Dostupni", text: "Forma, email ili telefon.", icon: "contact_support" }) %>
+      <%- include('../include/circularBadge.ejs', { title: "Istorija", text: "Pratite istoriju poručivanja", icon: "history" }) %>
+    </div>
+  </div>
+
+  <!-- Featured Products Section -->
+  <div class="section">
+    <h2 class="heading-lg mb-4">Istaknuto iz Ponude</h2>
     <div class="cards__container">
       <% featuredItems.forEach(item => { %>
-          <%- include('../include/card.ejs', {
-              item: item,
-              hasActions: true,
-              actions: [
-                  {
-                      type: 'link-name',
-                      link: "/prodavnica/artikal/",
-                      linkName: 'Pogledajte'
-                  }
-              ],
-              showId: false
-          }) %>
+        <%- include('../include/card.ejs', {
+            item: item,
+            hasActions: true,
+            actions: [
+                {
+                    type: 'link-name',
+                    link: "/prodavnica/artikal/",
+                    linkName: 'Pogledajte'
+                }
+            ],
+            showId: false
+        }) %>
       <% }) %>
     </div>
   </div>
 
-  <!-- Social proof sekcija (recenzije, ocene ili influencer endorsement) -->
-  <div class="social-proof">
-    <h1 class="main__title">Šta kažu naše zadovoljne klijentkinje?</h1>
-    <div class="testimonial-slider">
-      <div class="testimonial-track">
-        <%- include('../include/testimonialCard.ejs', {
-          image: "/images/tophelanke_logo.png", 
-          name: "Eleonora V.",
-          rating: 5,
-          text: "Odlična usluga, brza dostava i kvalitetni proizvodi. Preporučujem svima!"
-        }) %>
-        <%- include('../include/testimonialCard.ejs', {
-          image: "/images/tophelanke_logo.png", 
-          name: "Teodora M.",
-          rating: 5,
-          text: "Sve pohvale za brzu dostavu i kvalitet proizvoda. Jako sam zadovoljna!"
-        }) %>
-        <%- include('../include/testimonialCard.ejs', {
-          image: "/images/tophelanke_logo.png", 
-          name: "Ana P.",
-          rating: 5,
-          text: "Sve je bilo super, veličina nije odgovarala, uspešno i lako je urađena zamena. Sve u svemu, zadovoljna sam."
-        }) %>
-        <%- include('../include/testimonialCard.ejs', {
-          image: "/images/tophelanke_logo.png", 
-          name: "Ivana C.",
-          rating: 5,
-          text: "Lepo iskustvo, model mi nije odgovarao, uspešno urađen povrat novca. Zadovoljna sam."
-        }) %>
-        <%- include('../include/testimonialCard.ejs', {
-          image: "/images/tophelanke_logo.png", 
-          name: "Ana V.",
-          rating: 5,
-          text: "Helanke su vrhunske, odmah sam poručila jos 3 modela! Prezadovoljna."
-        }) %>
-      </div>
-    </div> 
+  <!-- Testimonials Section -->
+  <div class="section">
+    <h2 class="heading-lg mb-4">Šta kažu naše klijentkinje</h2>
+    <div class="grid grid-1 grid-md-3 gap-4">
+      <%- include('../include/testimonialCard.ejs', { image: "/images/tophelanke_logo.png", name: "Eleonora V.", rating: 5, text: "Odlična usluga, brza dostava i kvalitetni proizvodi. Preporučujem svima!" }) %>
+      <%- include('../include/testimonialCard.ejs', { image: "/images/tophelanke_logo.png", name: "Teodora M.", rating: 5, text: "Sve pohvale za brzu dostavu i kvalitet proizvoda. Jako sam zadovoljna!" }) %>
+      <%- include('../include/testimonialCard.ejs', { image: "/images/tophelanke_logo.png", name: "Ana P.", rating: 5, text: "Sve je bilo super, veličina nije odgovarala, uspešno i lako je urađena zamena." }) %>
+    </div>
   </div>
 
-  <div class="shop-featured">
-    <h1 class="main__title"><a href="/prodavnica/akcija">Na Akciji</a></h1>
+  <!-- Sale Items Section -->
+  <div class="section">
+    <h2 class="heading-lg mb-4">Na Akciji</h2>
     <div class="cards__container">
       <% actionItems.forEach(item => { %>
-          <%- include('../include/card.ejs', {
-              item: item,
-              hasActions: true,
-              actions: [
-                  {
-                      type: 'link-name',
-                      link: "/prodavnica/artikal/",
-                      linkName: 'Pogledajte'
-                  }
-              ],
-              showId: false
-          }) %>
+        <%- include('../include/card.ejs', {
+            item: item,
+            hasActions: true,
+            actions: [
+                {
+                    type: 'link-name',
+                    link: "/prodavnica/artikal/",
+                    linkName: 'Pogledajte'
+                }
+            ],
+            showId: false
+        }) %>
       <% }) %>
     </div>
   </div>
 
-  <!-- Blog sekcija -->
-  <div class="blog-section">
-    <h1 class="main__title"><a href="/forum">Najnovije sa Foruma</a></h1>
+  <!-- Blog Section -->
+  <div class="section">
+    <h2 class="heading-lg mb-4">Najnovije sa Foruma</h2>
     <div class="cards__container">
       <% forumPosts.posts.forEach(item => { %>
         <%- include('../include/card.ejs', {
@@ -153,15 +105,19 @@
     </div>
   </div>
 
-  <!-- CTA 2 sekcija (npr. ponuda za newsletter ili popust) -->
-  <div class="cta2 column-row__container">
-    <div class="cta2-text">
-      <h1>Program Partnerstva</h2>
-      <p>Uskoro će biti više o programu partnerstva, do tada prijavite se na naš newsletter za buduće informacije!</p>
+  <!-- CTA Section -->
+  <section class="section cta-partner bg-accent text-white rounded-lg p-6">
+    <div class="cta-partner__container">
+      <div class="cta-partner__text">
+        <h2 class="heading-lg">Program Partnerstva</h2>
+        <p>Uskoro više o programu partnerstva – prijavite se na naš newsletter za buduće informacije!</p>
+      </div>
+      <div class="cta-partner__form">
+        <%- include('../include/newsletter.ejs', { from: path }) %>
+      </div>
     </div>
-    <div class="cta2-form">
-      <%- include('../include/newsletter.ejs', {from: path }) %>
-    </div>
-  </div>
+  </section>
+
 </section>
+
 <%- include('../include/end.ejs') %>

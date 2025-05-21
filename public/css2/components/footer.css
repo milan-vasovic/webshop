@@ -1,0 +1,107 @@
+/* ===============================
+   🦶 Footer Styles (Responsive & Modular)
+   =============================== */
+
+.main-footer {
+  width: 100%;
+  background-color: var(--primary-background-color);
+  color: var(--primary-text-color);
+  padding: var(--space-6) var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  text-align: center;
+  border-top: var(--border-thin) solid var(--neutral-color);
+  z-index: var(--z-base); /* ili --z-footer ako si definisao */
+}
+
+.footer-info,
+.main-footer__nav,
+.footer-bottom {
+  width: 100%;
+}
+
+/* === Informacije (npr. adresa, kontakt) === */
+.footer-info {
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-normal);
+}
+
+.footer-info p {
+  margin: var(--space-1) 0;
+}
+
+.footer-info a {
+  color: var(--primary-color);
+  text-decoration: none;
+}
+.footer-info a:hover {
+  color: var(--primary-text-color);
+  border-radius: var(--radius-sm);
+}
+
+/* === Navigacija u footeru === */
+.main-footer__nav {
+  display: flex;
+  justify-content: center;
+}
+
+.main-footer__item-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.main-footer__item a {
+  color: var(--primary-text-color);
+  font-size: var(--font-size-sm);
+  text-decoration: none;
+}
+.main-footer__item a:hover,
+.main-footer__item a.active {
+  color: var(--primary-color);
+}
+
+/* === Donji deo (copyright, developer) === */
+.footer-bottom {
+  font-size: var(--font-size-xs);
+  color: var(--neutral-text-color);
+}
+.footer-bottom p {
+  margin: var(--space-1) 0;
+}
+.footer-bottom a {
+  color: var(--primary-color);
+  text-decoration: none;
+}
+.footer-bottom a:hover {
+  color: var(--primary-text-color);
+  border-radius: var(--radius-sm);
+}
+
+/* === Responsive stilovi === */
+@media (min-width: 768px) {
+  .main-footer {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .footer-info,
+  .main-footer__nav,
+  .footer-bottom {
+    width: auto;
+  }
+
+  .main-footer__nav {
+    justify-content: flex-start;
+  }
+
+  .main-footer__item-list {
+    justify-content: flex-start;
+  }
+}

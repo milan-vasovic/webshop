@@ -1,30 +1,51 @@
 <%- include('../include/head.ejs') %>
 <%- include('../include/navigation.ejs') %>
-<section class="container main__container">
-    <div class="main-form__container">
-        <h1 class="main-form__title"><%= pageTitle %></h1>
-        <form class="main-form" action="/prijava" method="post">
-            <div class="main-form__group">
-                <label class="main-form__label" for="email">Email:</label>
-                <input class="main-form__input" id="email" name="email" type="email" value="<% if (existingData) { %><%= existingData.email %><% } %>" required>
-            </div>
-            <div class="main-form__group">
-                <label class="main-form__label" for="password">Šifra:</label>
-                <input class="main-form__input" id="password" name="password" type="password" required>
-            </div>
-            <input class="main-form__input" type="hidden" name="CSRFToken" value="<%= csrfToken %>">
-            <input name="honeypot" type="hidden">
-            <input type="hidden" name="redirectTo" value="<%= redirectTo %>">
-            <button class="btn-primary" type="submit">Prijavite Se</button>
-            <% if (errorMessage) { %>
-                <div class="user-message--error"><%= errorMessage %></div>
-                <% if (showRequestNewActivation) { %>
-                    <a href="/zatrazite-aktivaciju" class="main__link">Zatražite Aktivaciju</a>
-                <% } %>
-            <% } %>
-            <a href="/registracija" class="main__link">Nemate nalog? Registrujte se!</a>
-            <a href="/zatrazite-novu-sifru" class="main__link">Zaboravili ste lozinku?</a>
-        </form>
+
+<main class="section container">
+  <h1 class="heading-xl mb-6"><%= pageTitle %></h1>
+
+  <form class="form max-w-md mx-auto" action="/prijava" method="post">
+    <div class="form__group">
+      <label for="email" class="form__label">Email</label>
+      <input
+        class="form__input"
+        type="email"
+        id="email"
+        name="email"
+        value="<%= existingData?.email || '' %>"
+        required
+      />
     </div>
-</section>
+
+    <div class="form__group">
+      <label for="password" class="form__label">Šifra</label>
+      <input
+        class="form__input"
+        type="password"
+        id="password"
+        name="password"
+        required
+      />
+    </div>
+
+    <input type="hidden" name="CSRFToken" value="<%= csrfToken %>" />
+    <input type="hidden" name="redirectTo" value="<%= redirectTo %>" />
+    <input type="hidden" name="honeypot" />
+
+    <button type="submit" class="button button--primary mt-2">Prijavite Se</button>
+
+    <% if (errorMessage) { %>
+      <div class="form__error mt-2"><%= errorMessage %></div>
+      <% if (showRequestNewActivation) { %>
+        <a href="/zatrazite-aktivaciju" class="main__link mt-1">Zatražite Aktivaciju</a>
+      <% } %>
+    <% } %>
+
+    <div class="mt-4 flex flex-column gap-2">
+      <a href="/registracija" class="main__link">Nemate nalog? Registrujte se!</a>
+      <a href="/zatrazite-novu-sifru" class="main__link">Zaboravili ste lozinku?</a>
+    </div>
+  </form>
+</main>
+
 <%- include('../include/end.ejs') %>

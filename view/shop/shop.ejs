@@ -1,160 +1,127 @@
 <%- include('../include/head.ejs') %>
 <%- include('../include/navigation.ejs') %>
 
-<section class="container main__container">
-    <h1 class="main__title"><%= pageTitle %></h1>
-    
-    <div class="column-row__container">
-        <div class="left__container-80">
-            <%- include('../include/breadcrumbs', { breadcrumbs }) %>
-            <!-- Search -->
-            <div class="main-form__container">
-                <form class="width-100 flex flex-row" action="/prodavnica/pretraga" method="post">
-                    <div class="main-form__group">
-                        <input class="main-form__input" type="text" name="search">
-                        <input name="honeypot" type="hidden">
-                        <input class="main-form__input" type="hidden" name="CSRFToken" value="<%= csrfToken %>">
-                        <input name="honeypot" type="hidden">
-                    </div>
-                    <button type="submit" class="btn-secondary">Pretraga</button>
-                </form>
-            </div>
-            
-            <% if (shop["Istaknuti Artikli"] && shop["Istaknuti Artikli"].length > 0) { %>
-                <!-- Featured Items -->
-                <div class="shop-featured">
-                    <h1><a href="/prodavnica/istaknuto">Istaknuto: <span class="material-symbols-outlined">arrow_forward</span></a></h1>
-                    <div class="cards__container">
-                        <% shop["Istaknuti Artikli"].forEach(item => { %>
-                            <%- include('../include/card.ejs', {
-                                item: item,
-                                hasActions: true,
-                                actions: [
-                                    {
-                                        type: 'link-name',
-                                        link: "/prodavnica/artikal/",
-                                        linkName: 'Pogledajte'
-                                    }
-                                ],
-                                showId: false
-                            }) %>
-                        <% }) %>
-                    </div>
-                </div>
-            <% } %>
+<section class="container section">
+  <h2 class="heading-lg mb-6"><%= pageTitle %></h2>
 
-            <% if (shop["Artikli Na Akciji"] && shop["Artikli Na Akciji"].length > 0) { %>
-                <!-- Items on Action -->
-                <div class="shop-featured">
-                    <h1><a href="/prodavnica/akcija">Artikli na Akciji: <span class="material-symbols-outlined">arrow_forward</span></a></h1>
-                    <div class="cards__container">
-                        <% shop["Artikli Na Akciji"].forEach(item => { %>
-                            <%- include('../include/card.ejs', {
-                                item: item,
-                                hasActions: true,
-                                actions: [
-                                    {
-                                        type: 'link-name',
-                                        link: "/prodavnica/artikal/",
-                                        linkName: 'Pogledajte'
-                                    }
-                                ],
-                                showId: false
-                            }) %>
-                        <% }) %>
-                    </div>
-                </div>
-            <% } %>
-            <!-- Items by category -->
-            <% if (shop["Artikli Po Kategorijama"] && shop["Artikli Po Kategorijama"].length > 0) { %>
-                <div class="shop-featured">
-                    <% shop["Artikli Po Kategorijama"].forEach(item => { %>
-                        <h1><a href="/prodavnica/kategorija/<%= item.Kategorija.value %>"><%= item.Kategorija.value %>: <span class="material-symbols-outlined">arrow_forward</span></a></h1>
-                        <div class="cards__container">
-                            <% item.Artikli.forEach(a => { %>
-                                <%- include('../include/card.ejs', {
-                                    item: a,
-                                    hasActions: true,
-                                    actions: [
-                                        {
-                                            type: 'link-name',
-                                            link: "/prodavnica/artikal/",
-                                            linkName: 'Pogledajte'
-                                        }
-                                    ],
-                                    showId: false
-                                }) %>
-                            <% }) %>
-                        </div>
-                    <% }) %>
-                </div>
-            <% } %>
-            
-            <!-- All items that are showed on category, tag and search cases -->
-            <% if (shop.Artikli && shop.Artikli.length > 0) { %>
-                <div class="shop-featured">
-                    <h1>Ostali Artikli:</h1>
-                    <div class="cards__container">
-                        <% shop.Artikli.forEach(item => { %>
-                            <%- include('../include/card.ejs', {
-                                item: item,
-                                hasActions: true,
-                                actions: [
-                                    {
-                                        type: 'link-name',
-                                        link: "/prodavnica/artikal/",
-                                        linkName: 'Pogledajte'
-                                    }
-                                ],
-                                showId: false
-                            }) %>
-                        <% }) %>
-                    </div>
-                    <%- include('../include/pagination.ejs', {
-                        currentPage: currentPage,
-                        totalPages: totalPages,
-                        basePath: basePath
-                      }) %>             
-                </div>
-            <% } %>
+  <div class="grid-cols-main-sidebar gap-8">
+    <!-- LEVA STRANA -->
+    <div>
+      <%- include('../include/breadcrumbs', { breadcrumbs }) %>
+
+      <form action="/prodavnica/pretraga" method="POST" class="form mb-8">
+        <div class="form__group">
+          <input class="form__input" type="text" name="search" placeholder="Pretraga...">
+          <input name="honeypot" type="hidden">
+          <input class="form__input" type="hidden" name="CSRFToken" value="<%= csrfToken %>">
         </div>
-        
-        <!-- Desni dio: Sidebar s kategorijama i tagovima -->
-        <div class="right__container-20">
-            <% if (shop.Kategorije && shop.Kategorije.value) { %>
-                <div>
-                    <h1>Kategorije:</h1>
-                    <% if (shop.Kategorije.value.length > 0) { %>
-                        <ul class="grid grid-2">
-                            <% shop.Kategorije.value.forEach(c => { %>
-                                <li>
-                                    <a href="/prodavnica/kategorija/<%= c %>"><%= c %></a>
-                                </li>
-                            <% }) %>
-                        </ul>
-                    <% } else { %>
-                        <p>Nema dostupnih kategorija.</p>
-                    <% } %>
-                </div>
-            <% } %>
-            <% if (shop.Tagovi && shop.Tagovi.value) { %>
-                <div>
-                    <h1>Tagovi:</h1>
-                    <% if (shop.Tagovi.value.length > 0) { %>
-                        <ul class="grid grid-2">
-                            <% shop.Tagovi.value.forEach(t => { %>
-                                <li>
-                                    <a href="/prodavnica/oznaka/<%= encodeURIComponent(t) %>"><%= t %></a>
-                                </li>
-                            <% }) %>
-                        </ul>
-                    <%  } else { %>
-                        <p>Nema dostupnih oznaka.</p>
-                    <% } %>
-                </div>
-            <% } %>
+        <button type="submit" class="button button--secondary">Pretraga</button>
+      </form>
+
+      <% if (shop["Istaknuti Artikli"]?.length) { %>
+        <div class="shop-featured mb-10">
+          <h2 class="heading-md mb-4">
+            <a href="/prodavnica/istaknuto">Istaknuto <span class="material-symbols-outlined">arrow_forward</span></a>
+          </h2>
+          <div class="cards__container grid grid-1 grid-md-3 gap-6">
+            <% shop["Istaknuti Artikli"].forEach(item => { %>
+              <%- include('../include/card.ejs', {
+                item,
+                hasActions: true,
+                actions: [{ type: 'link-name', link: '/prodavnica/artikal/', linkName: 'Pogledajte' }],
+                showId: false
+              }) %>
+            <% }) %>
+          </div>
         </div>
+      <% } %>
+
+      <% if (shop["Artikli Na Akciji"]?.length) { %>
+        <div class="shop-featured mb-10">
+          <h2 class="heading-md mb-4">
+            <a href="/prodavnica/akcija">Na Akciji <span class="material-symbols-outlined">arrow_forward</span></a>
+          </h2>
+          <div class="cards__container grid grid-1 grid-md-3 gap-6">
+            <% shop["Artikli Na Akciji"].forEach(item => { %>
+              <%- include('../include/card.ejs', {
+                item,
+                hasActions: true,
+                actions: [{ type: 'link-name', link: '/prodavnica/artikal/', linkName: 'Pogledajte' }],
+                showId: false
+              }) %>
+            <% }) %>
+          </div>
+        </div>
+      <% } %>
+
+      <% if (shop["Artikli Po Kategorijama"]?.length) { %>
+        <% shop["Artikli Po Kategorijama"].forEach(item => { %>
+          <div class="shop-featured mb-10">
+            <h2 class="heading-md mb-4">
+              <a href="/prodavnica/kategorija/<%= item.Kategorija.value %>"><%= item.Kategorija.value %> <span class="material-symbols-outlined">arrow_forward</span></a>
+            </h2>
+            <div class="cards__container grid grid-1 grid-md-3 gap-6">
+              <% item.Artikli.forEach(a => { %>
+                <%- include('../include/card.ejs', {
+                  item: a,
+                  hasActions: true,
+                  actions: [{ type: 'link-name', link: '/prodavnica/artikal/', linkName: 'Pogledajte' }],
+                  showId: false
+                }) %>
+              <% }) %>
+            </div>
+          </div>
+        <% }) %>
+      <% } %>
+
+      <% if (shop.Artikli?.length) { %>
+        <div class="shop-featured mb-10">
+          <h2 class="heading-md mb-4">Ostali Artikli</h2>
+          <div class="cards__container grid grid-1 grid-md-3 gap-6">
+            <% shop.Artikli.forEach(item => { %>
+              <%- include('../include/card.ejs', {
+                item,
+                hasActions: true,
+                actions: [{ type: 'link-name', link: '/prodavnica/artikal/', linkName: 'Pogledajte' }],
+                showId: false
+              }) %>
+            <% }) %>
+          </div>
+
+          <%- include('../include/pagination.ejs', {
+            currentPage,
+            totalPages,
+            basePath
+          }) %>
+        </div>
+      <% } %>
     </div>
+
+    <!-- DESNA STRANA: SIDEBAR -->
+    <aside class="sidebar flex flex-column gap-6">
+      <% if (shop.Kategorije?.value?.length) { %>
+        <div class="sidebar-block">
+          <h2 class="heading-md mb-2">Kategorije</h2>
+          <ul class="grid grid-2">
+            <% shop.Kategorije.value.forEach(k => { %>
+              <li><a href="/prodavnica/kategorija/<%= k %>"><%= k %></a></li>
+            <% }) %>
+          </ul>
+        </div>
+      <% } %>
+
+      <% if (shop.Tagovi?.value?.length) { %>
+        <div class="sidebar-block">
+          <h2 class="heading-md mb-2">Tagovi</h2>
+          <ul class="grid grid-2">
+            <% shop.Tagovi.value.forEach(t => { %>
+              <li><a href="/prodavnica/oznaka/<%= encodeURIComponent(t) %>"><%= t %></a></li>
+            <% }) %>
+          </ul>
+        </div>
+      <% } %>
+    </aside>
+  </div>
 </section>
 
 <%- include('../include/end.ejs') %>

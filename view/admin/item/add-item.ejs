@@ -1,41 +1,41 @@
 <%- include('../../include/head.ejs') %>
 <%- include('../../include/navigation.ejs') %>
 
-<section class="container main__container">
-  <div class="main-form__container">
-    <h1 class="main-form__title"><%= pageTitle %></h1>
+<section class="container main__container section md-6">
+  <div class="form__wrapper">
+    <h1 class="form__title"><%= pageTitle %></h1>
     
     <form action="<% if (editing) { %>/admin/artikal-izmena<% } else { %>/admin/artikal-dodavanje<% } %>" 
-          method="POST" enctype="multipart/form-data" class="main-form width-100">
+          method="POST" enctype="multipart/form-data" class="form width-100">
           
       <% if (errorMessage) { %>
-        <div class="user-message--error"><%= errorMessage %></div>
+        <div class="form__error-message"><%= errorMessage %></div>
       <% } %>
       
       <!-- Naslov -->
-      <div class="main-form__group">
-        <label for="title" class="main-form__label">Naslov:</label>
-        <input type="text" id="title" name="title" class="main-form__input" 
+      <div class="form__group">
+        <label for="title" class="form__label">Naslov:</label>
+        <input type="text" id="title" name="title" class="form__input" 
                value="<%= existingData ? existingData.Naziv.value : '' %>" required>
       </div>
       
       <!-- SKU -->
-      <div class="main-form__group">
-        <label for="sku" class="main-form__label">SKU:</label>
-        <input type="text" id="sku" name="sku" class="main-form__input" 
+      <div class="form__group">
+        <label for="sku" class="form__label">SKU:</label>
+        <input type="text" id="sku" name="sku" class="form__input" 
                value="<%= existingData ? existingData.SKU.value : '' %>" required>
       </div>
       
       <!-- Kratak opis -->
-      <div class="main-form__group">
-        <label for="shortDescription" class="main-form__label">Kratak opis:</label>
+      <div class="form__group">
+        <label for="shortDescription" class="form__label">Kratak opis:</label>
         <textarea id="shortDescription" name="shortDescription" rows="3" 
-                  class="main-form__textarea" required><% if(existingData) { %><%= existingData["Kratak Opis"].value %><% } %></textarea>
+                  class="form__textarea" required><% if(existingData) { %><%= existingData["Kratak Opis"].value %><% } %></textarea>
       </div>
-      
+
       <!-- Ključne reči -->
-      <div class="main-form__group" id="keyWordsContainer">
-        <label class="main-form__label">Ključne reči:</label>
+      <div class="form__group" id="keyWordsContainer">
+        <label class="form__label">Ključne reči:</label>
         <% 
           let keywordsArray = [];
           if (existingData && existingData['Ključne Reči']) {
@@ -48,58 +48,56 @@
         %>
         <% if (keywordsArray.length > 0) { %>
           <% keywordsArray.forEach((k, index) => { %>
-            <div class="dynamic-group">
-              <input type="text" id="keyWords<%= index %>" name="keyWords[]" class="main-form__input" 
-                     value="<%= k %>" required>
-              <button type="button" class="btn btn-danger removeField">Izbriši</button>
+            <div class="form__group-inline">
+              <input type="text" id="keyWords<%= index %>" name="keyWords[]" class="form__input" value="<%= k %>" required>
+              <button type="button" class="button button--danger removeField">Izbriši</button>
             </div>
           <% }); %>
         <% } else { %>
-          <div class="dynamic-group">
-            <input type="text" id="keyWords0" name="keyWords[]" class="main-form__input" required>
-            <button type="button" class="btn btn-danger removeField">Izbriši</button>
+          <div class="form__group-inline">
+            <input type="text" id="keyWords0" name="keyWords[]" class="form__input" required>
+            <button type="button" class="button button--danger removeField">Izbriši</button>
           </div>
         <% } %>
       </div>
-      <button id="addKeyWord" type="button" class="btn-secondary">Dodajte Ključnu Reč</button>
+      <button id="addKeyWord" type="button" class="button button--secondary">Dodajte Ključnu Reč</button>
       
       <!-- Opis -->
-      <div class="main-form__group">
-        <label for="description" class="main-form__label">Opis:</label>
-        <textarea id="description" name="description" rows="5" class="main-form__textarea" required><% if(existingData) { %><%= existingData.Opis.value %><% } %></textarea>
+      <div class="form__group">
+        <label for="description" class="form__label">Opis:</label>
+        <textarea id="description" name="description" rows="5" class="form__textarea" required><% if(existingData) { %><%= existingData.Opis.value %><% } %></textarea>
       </div>
-      
       <!-- Cena i akcijska cena -->
-      <div class="main-form__group">
-        <label for="price" class="main-form__label">Cena:</label>
-        <input type="number" id="price" name="price" min="100" class="main-form__input" step="10"
+      <div class="form__group">
+        <label for="price" class="form__label">Cena:</label>
+        <input type="number" id="price" name="price" min="100" class="form__input" step="10"
                value="<%= existingData ? existingData.Cena.value : '' %>" required>
         
-        <label for="actionPrice" class="main-form__label">Cena na akciji:</label>
-        <input type="number" id="actionPrice" name="actionPrice" min="100" class="main-form__input" step="10"
+        <label for="actionPrice" class="form__label">Cena na akciji:</label>
+        <input type="number" id="actionPrice" name="actionPrice" min="100" class="form__input" step="10"
                value="<%= existingData ? existingData['Akcijska Cena'].value : '' %>" required>
       </div>
       
       <!-- Glavna slika -->
-      <div class="main-form__group">
-        <label for="featureImage" class="main-form__label">Glavna slika:</label>
-        <input type="file" id="featureImage" name="featureImage" accept="image/*" class="main-form__file" <% if (!editing) { %>required<% } %>>
-        <label for="featureImageDesc" class="main-form__label">Opis glavne slike:</label>
-        <input type="text" id="featureImageDesc" name="featureImageDesc" class="main-form__input"
+      <div class="form__group">
+        <label for="featureImage" class="form__label">Glavna slika:</label>
+        <input type="file" id="featureImage" name="featureImage" accept="image/*" class="form__file" <% if (!editing) { %>required<% } %>>
+        <label for="featureImageDesc" class="form__label">Opis glavne slike:</label>
+        <input type="text" id="featureImageDesc" name="featureImageDesc" class="form__input"
                value="<%= existingData ? existingData.Slike['Istaknuta Slika'].Opis : '' %>" <% if (!editing) { %>required<% } %>>
       </div>
       
       <!-- Video -->
-      <div class="main-form__group">
-        <label for="video" class="main-form__label">Video:</label>
-        <input type="file" id="video" name="video" accept="video/*" class="main-form__file">
-        <label for="videoDesc" class="main-form__label">Opis videa:</label>
-        <input type="text" id="videoDesc" name="videoDesc" class="main-form__input" value="<%= existingData ? existingData.Video.Opis : '' %>">
+      <div class="form__group">
+        <label for="video" class="form__label">Video:</label>
+        <input type="file" id="video" name="video" accept="video/*" class="form__file">
+        <label for="videoDesc" class="form__label">Opis videa:</label>
+        <input type="text" id="videoDesc" name="videoDesc" class="form__input" value="<%= existingData ? existingData.Video.Opis : '' %>">
       </div>
       
       <!-- Kategorije -->
-      <div class="main-form__group" id="categoriesContainer">
-        <label class="main-form__label">Kategorije:</label>
+      <div class="form__group" id="categoriesContainer">
+        <label class="form__label">Kategorije:</label>
         <% 
           const allCategories = [
             "Odeća", "Helanke", "Trenerke", "Fitness", "Kompleti", 
@@ -119,31 +117,30 @@
         %>
         <% if (selectedCategories.length > 0) { %>
           <% selectedCategories.forEach((category, index) => { %>
-            <div class="dynamic-group">
-              <select id="categories<%= index %>" name="categories[]" class="main-form__select" required>
+            <div class="form__group-inline">
+              <select id="categories<%= index %>" name="categories[]" class="form__select" required>
                 <% allCategories.forEach(cat => { %>
                   <option value="<%= cat %>" <%= cat === category ? 'selected' : '' %>><%= cat %></option>
                 <% }); %>
               </select>
-              <button type="button" class="btn btn-danger removeField">Izbriši</button>
+              <button type="button" class="button button--danger removeField">Izbriši</button>
             </div>
           <% }); %>
         <% } else { %>
-          <div class="dynamic-group">
-            <select id="categories0" name="categories[]" class="main-form__select" required>
+          <div class="form__group-inline">
+            <select id="categories0" name="categories[]" class="form__select" required>
               <% allCategories.forEach(cat => { %>
                 <option value="<%= cat %>"><%= cat %></option>
               <% }); %>
             </select>
-            <button type="button" class="btn btn-danger removeField">Izbriši</button>
+            <button type="button" class="button button--danger removeField">Izbriši</button>
           </div>
         <% } %>
       </div>
-      <button id="addCategory" type="button" class="btn-secondary">Dodajte</button>
-      
+      <button id="addCategory" type="button" class="button button--secondary">Dodajte</button>
       <!-- Tagovi -->
-      <div class="main-form__group" id="tagsContainer">
-        <label class="main-form__label">Tagovi:</label>
+      <div class="form__group" id="tagsContainer">
+        <label class="form__label">Tagovi:</label>
         <% 
           let tagsArray = [];
           if (existingData && existingData.Tagovi) {
@@ -156,23 +153,23 @@
         %>
         <% if (tagsArray.length > 0) { %>
           <% tagsArray.forEach((tag, index) => { %>
-            <div class="dynamic-group">
-              <input type="text" id="tags<%= index %>" name="tags[]" class="main-form__input" value="<%= tag %>" required>
-              <button type="button" class="btn btn-danger removeField">Izbriši</button>
+            <div class="form__group-inline">
+              <input type="text" id="tags<%= index %>" name="tags[]" class="form__input" value="<%= tag %>" required>
+              <button type="button" class="button button--danger removeField">Izbriši</button>
             </div>
           <% }); %>
         <% } else { %>
-          <div class="dynamic-group">
-            <input type="text" id="tags0" name="tags[]" class="main-form__input" required>
-            <button type="button" class="btn btn-danger removeField">Izbriši</button>
+          <div class="form__group-inline">
+            <input type="text" id="tags0" name="tags[]" class="form__input" required>
+            <button type="button" class="button button--danger removeField">Izbriši</button>
           </div>
         <% } %>
       </div>
-      <button id="addTag" type="button" class="btn-secondary">Dodajte</button>
+      <button id="addTag" type="button" class="button button--secondary">Dodajte</button>
       
       <!-- Status -->
-      <div class="main-form__group" id="statusContainer">
-        <label class="main-form__label">Status:</label>
+      <div class="form__group" id="statusContainer">
+        <label class="form__label">Status:</label>
         <% 
           const allStatuses = ["normal", "featured", "empty", "action", "partnership", "not-published"];
           const selectedStatuses = Array.isArray(existingData?.Status?.value)
@@ -182,185 +179,176 @@
 
         <% if (selectedStatuses.length) { %>
           <% selectedStatuses.forEach((status, index) => { %>
-            <div class="dynamic-group">
-              <select id="status<%= index %>" name="status[]" class="main-form__select" required>
+            <div class="form__group-inline">
+              <select id="status<%= index %>" name="status[]" class="form__select" required>
                 <% allStatuses.forEach(st => { %>
                   <option value="<%= st %>" <%= st === status ? 'selected' : '' %>><%= st %></option>
                 <% }); %>
               </select>
-              <button type="button" class="btn btn-danger removeField">Izbriši</button>
+              <button type="button" class="button button--danger removeField">Izbriši</button>
             </div>
           <% }); %>
         <% } else { %>
-          <div class="dynamic-group">
-            <select id="status0" name="status[]" class="main-form__select" required>
+          <div class="form__group-inline">
+            <select id="status0" name="status[]" class="form__select" required>
               <% allStatuses.forEach(st => { %>
                 <option value="<%= st %>"><%= st %></option>
               <% }); %>
             </select>
-            <button type="button" class="btn btn-danger removeField">Izbriši</button>
+            <button type="button" class="button button--danger removeField">Izbriši</button>
           </div>
         <% } %>
       </div>
-      <button id="addStatus" type="button" class="btn-secondary">Dodajte Status</button>
+      <button id="addStatus" type="button" class="button button--secondary">Dodajte Status</button>
 
       <!-- Backorder -->
-      <div class="main-form__group">
-        <label for="backorderAllowed" class="main-form__label">Dozvoljen backorder:</label>
-        <input type="checkbox" id="backorderAllowed" name="backorderAllowed" class="main-form__input">
+      <div class="form__group">
+        <label for="backorderAllowed" class="form__label">Dozvoljen backorder:</label>
+        <input type="checkbox" id="backorderAllowed" name="backorderAllowed" class="form__input--checkbox">
       </div>
-      
       <!-- Variacije -->
-      <div id="variations-container" class="main-form__group">
-        <h3>Variacije:</h3>
-        <% if (existingData && existingData.Varijacije) { %>
-          <% existingData.Varijacije.forEach((variation, index) => { %>
-            <div class="variation dynamic-group">
-              <label for="variationSize<%= index %>" class="main-form__label">Veličina:</label>
-              <select id="variationSize<%= index %>" name="variations[<%= index %>][size]" class="main-form__select" required>
-                <% ["XS", "S", "M", "L", "XL", "2XL", "3XL", "4XL", "XS/S", "S/M", "M/L", "L/XL", "XL/2XL", "2XL/3XL", "3XL/4XL", "Uni", "26","27","28","29","30","31","32","33","34","35"].forEach(size => { %>
-                  <option value="<%= String(size) %>" <%= size === variation.Veličina ? "selected" : "" %>><%= size %></option>
-                <% }) %>
-              </select>
+      <div id="variations-container" class="form__group">
+        <h3 class="form__subtitle">Variacije:</h3>
         
-              <label for="variationColor<%= index %>" class="main-form__label">Boja:</label>
-              <input type="text" id="variationColor<%= index %>" name="variations[<%= index %>][color]" class="main-form__input" value="<%= variation.Boja %>" required>
+        <% const allSizes = ["XS", "S", "M", "L", "XL", "2XL", "3XL", "4XL", "XS/S", "S/M", "M/L", "L/XL", "XL/2XL", "2XL/3XL", "3XL/4XL", "Uni", "26","27","28","29","30","31","32","33","34","35"]; %>
         
-              <label for="variationAmount<%= index %>" class="main-form__label">Količina:</label>
-              <input type="number" id="variationAmount<%= index %>" name="variations[<%= index %>][amount]" min="0" class="main-form__input" value="<%= variation.Količina %>" required>
-        
-              <label for="variationImage<%= index %>" class="main-form__label">Slika:</label>
-              <!-- Ime file inputa uključuje ID varijacije -->
-              <input type="file" id="variationImage<%= index %>" name="variationImage_<%= variation.ID %>" accept="image/*" class="main-form__file">
-        
-              <label for="variationImageDesc<%= index %>" class="main-form__label">Opis slike:</label>
-              <input type="text" id="variationImageDesc<%= index %>" name="variations[<%= index %>][imgDesc]" class="main-form__input" value="<%= variation.Slika.Opis %>" required>
-        
-              <label for="variationAction<%= index %>" class="main-form__label">Na Akciji:</label>
-              <select id="variationAction<%= index %>" name="variations[<%= index %>][onAction]" class="main-form__select" required>
-                <option value="true" <%= true === variation.Akcija ? "selected" : "" %>>Da</option>
-                <option value="false" <%= false === variation.Akcija ? "selected" : "" %>>Ne</option>
-              </select>
+        <% const renderVariation = (variation, index, isNew) => { %>
+          <div class="form__group--block variation variation__container dynamic-group">
+            <div class="variation__grid">
+              <!-- Veličina -->
+              <div class="variation__field">
+                <label for="variationSize<%= index %>" class="form__label">Veličina:</label>
+                <select id="variationSize<%= index %>" name="variations[<%= index %>][size]" class="form__select" required>
+                  <% allSizes.forEach(size => { %>
+                    <option value="<%= size %>" <%= size === variation?.Veličina ? 'selected' : '' %>><%= size %></option>
+                  <% }) %>
+                </select>
+              </div>
 
-              <!-- Skriveno polje za ID varijacije -->
-              <input type="hidden" name="variations[<%= index %>][variationId]" value="<%= variation.ID %>">
-        
-              <button type="button" class="btn-danger removeField">Izbriši</button>
+              <!-- Boja -->
+              <div class="variation__field">
+                <label for="variationColor<%= index %>" class="form__label">Boja:</label>
+                <input type="text" id="variationColor<%= index %>" name="variations[<%= index %>][color]" class="form__input" value="<%= variation?.Boja || '' %>" required>
+              </div>
+
+              <!-- Količina -->
+              <div class="variation__field">
+                <label for="variationAmount<%= index %>" class="form__label">Količina:</label>
+                <input type="number" id="variationAmount<%= index %>" name="variations[<%= index %>][amount]" class="form__input" min="0" value="<%= variation?.Količina || '' %>" required>
+              </div>
+
+              <!-- Na akciji -->
+              <div class="variation__field">
+                <label for="variationAction<%= index %>" class="form__label">Na Akciji:</label>
+                <select id="variationAction<%= index %>" name="variations[<%= index %>][onAction]" class="form__select" required>
+                  <option value="true" <%= variation?.Akcija === true ? 'selected' : '' %>>Da</option>
+                  <option value="false" <%= variation?.Akcija === false ? 'selected' : '' %>>Ne</option>
+                </select>
+              </div>
+
+              <!-- Slika -->
+              <div class="variation__field variation__file">
+                <label for="variationImage<%= index %>" class="form__label">Slika:</label>
+                <input type="file" id="variationImage<%= index %>" name="variationImage_<%= isNew ? 'new-' + index : variation?.ID %>" class="form__file" accept="image/*" <%= isNew ? 'required' : '' %>>
+              </div>
+
+              <!-- Opis slike -->
+              <div class="variation__field">
+                <label for="variationImageDesc<%= index %>" class="form__label">Opis slike:</label>
+                <input type="text" id="variationImageDesc<%= index %>" name="variations[<%= index %>][imgDesc]" class="form__input" value="<%= variation?.Slika?.Opis || '' %>" required>
+              </div>
             </div>
-          <% }) %>
-        <% } else { %>
-          <div class="variation dynamic-group">
-            <label for="variationSize0" class="main-form__label">Veličina:</label>
-            <select id="variationSize0" name="variations[0][size]" class="main-form__select" required>
-              <% ["XS", "S", "M", "L", "XL", "2XL", "3XL", "4XL","XS/S", "S/M", "M/L", "L/XL", "XL/2XL", "2XL/3XL", "3XL/4XL", "Uni", "26","27","28","29","30","31","32","33","34","35"].forEach(size => { %>
-                <option value="<%= String(size) %>"><%= size %></option>
-              <% }) %>
-            </select>
-        
-            <label for="variationColor0" class="main-form__label">Boja:</label>
-            <input type="text" id="variationColor0" name="variations[0][color]" class="main-form__input" required>
-        
-            <label for="variationAmount0" class="main-form__label">Količina:</label>
-            <input type="number" id="variationAmount0" name="variations[0][amount]" min="0" class="main-form__input" required>
-        
-            <label for="variationImage0" class="main-form__label">Slika:</label>
-            <!-- Za novu varijaciju, koristimo privremeni ID (npr. "new-0") -->
-            <input type="file" id="variationImage0" name="variationImage_new-0" accept="image/*" class="main-form__file" required>
-        
-            <label for="variationImageDesc0" class="main-form__label">Opis slike:</label>
-            <input type="text" id="variationImageDesc0" name="variations[0][imgDesc]" class="main-form__input" required>
-        
-            <label for="variationAction0" class="main-form__label">Na Akciji:</label>
-            <select id="variationAction0" name="variations[0][onAction]" class="main-form__select" required>
-              <option value="true">Da</option>
-              <option value="false">Ne</option>
-            </select>
 
-            <!-- Skriveno polje za privremeni ID varijacije -->
-            <input type="hidden" name="variations[0][variationId]" value="new-0">
-        
-            <button type="button" class="btn-danger removeField">Izbriši</button>
+            <input type="hidden" name="variations[<%= index %>][variationId]" value="<%= isNew ? 'new-' + index : variation?.ID %>">
+            <button type="button" class="button button--danger removeField">Izbriši</button>
           </div>
         <% } %>
-      </div>
-      <button id="addVariation" type="button" class="btn-secondary">Dodajte</button>
 
-      
+        <% if (existingData && existingData.Varijacije && existingData.Varijacije.length > 0) { %>
+          <% existingData.Varijacije.forEach((variation, index) => { %>
+            <%- renderVariation(variation, index, false) %>
+          <% }) %>
+        <% } else { %>
+          <%- renderVariation({}, 0, true) %>
+        <% } %>
+      </div>
+
+      <button id="addVariation" type="button" class="button button--secondary">Dodajte</button>
+
       <!-- UpSell Artikli -->
-      <div id="upSellItems-container" class="main-form__group">
-        <h3>UpSell Artikli:</h3>
+      <div id="upSellItems-container" class="form__group">
+        <h3 class="form__subtitle">UpSell Artikli:</h3>
         <% if (existingData && existingData["UpSell Artikli"] && existingData["UpSell Artikli"].length > 0) { %>
           <% existingData["UpSell Artikli"].forEach((item, index) => { %>
             <div class="dynamic-group">
-              <label class="main-form__label" for="upSellItems<%= index %>">Odaberite artikal:</label>
-              <select id="upSellItems<%= index %>" name="upSellItems[]" class="main-form__select" required>
+              <label class="form__label" for="upSellItems<%= index %>">Odaberite artikal:</label>
+              <select id="upSellItems<%= index %>" name="upSellItems[]" class="form__select" required>
                 <option value="<%= item.ID %>" selected><%= item.Naziv %></option>
                 <% allUpsellItems.forEach(optionItem => { %>
                   <option value="<%= optionItem.ID.value %>" <%= optionItem.ID.value === item.ID.value ? 'selected' : '' %>><%= optionItem.Naziv.value %></option>
                 <% }) %>
               </select>
-              <button type="button" class="btn-danger removeField">Izbriši</button>
+              <button type="button" class="button button--danger removeField">Izbriši</button>
             </div>
           <% }) %>
         <% } else { %>
           <div class="dynamic-group">
-            <label class="main-form__label" for="upSellItems0">Odaberite artikal:</label>
-            <select id="upSellItems0" name="upSellItems[]" class="main-form__select" required>
+            <label class="form__label" for="upSellItems0">Odaberite artikal:</label>
+            <select id="upSellItems0" name="upSellItems[]" class="form__select" required>
               <% allUpsellItems.forEach(item => { %>
                 <option value="<%= item.ID.value %>"><%= item.Naziv.value %></option>
               <% }) %>
             </select>
-            <button type="button" class="btn-danger removeField">Izbriši</button>
+            <button type="button" class="button button--danger removeField">Izbriši</button>
           </div>
         <% } %>
       </div>
-      <button id="addUpSellItem" type="button" class="btn-secondary">Dodajte</button>
-      
+      <button id="addUpSellItem" type="button" class="button button--secondary">Dodajte</button>
+
       <!-- CrossSell Artikli -->
-      <div id="crossSellItems-container" class="main-form__group">
-        <h3>CrossSell Artikli:</h3>
+      <div id="crossSellItems-container" class="form__group">
+        <h3 class="form__subtitle">CrossSell Artikli:</h3>
         <% if (existingData && existingData["CrossSell Artikli"] && existingData["CrossSell Artikli"].length > 0) { %>
           <% existingData["CrossSell Artikli"].forEach((item, index) => { %>
             <div class="dynamic-group">
-              <label class="main-form__label" for="crossSellItems<%= index %>">Odaberite artikal:</label>
-              <select id="crossSellItems<%= index %>" name="crossSellItems[]" class="main-form__select" <% if (editing ) { %>required<% } %>>
+              <label class="form__label" for="crossSellItems<%= index %>">Odaberite artikal:</label>
+              <select id="crossSellItems<%= index %>" name="crossSellItems[]" class="form__select" <%= editing ? 'required' : '' %>>
                 <option value="<%= item.ID %>" selected><%= item.Naziv %></option>
                 <% allCrosselItems.forEach(optionItem => { %>
                   <option value="<%= optionItem.ID.value %>" <%= optionItem.ID.value === item.ID.value ? 'selected' : '' %>><%= optionItem.Naziv.value %></option>
                 <% }) %>
               </select>
-              <button type="button" class="btn-danger removeField">Izbriši</button>
+              <button type="button" class="button button--danger removeField">Izbriši</button>
             </div>
           <% }) %>
         <% } else { %>
           <div class="dynamic-group">
-            <label class="main-form__label" for="crossSellItems0">Odaberite artikal:</label>
-            <select id="crossSellItems0" name="crossSellItems[]" class="main-form__select" <% if (editing ) { %>required<% } %>>
+            <label class="form__label" for="crossSellItems0">Odaberite artikal:</label>
+            <select id="crossSellItems0" name="crossSellItems[]" class="form__select" <%= editing ? 'required' : '' %>>
               <% allCrosselItems.forEach(item => { %>
                 <option value="<%= item.ID.value %>"><%= item.Naziv.value %></option>
               <% }) %>
             </select>
-            <button type="button" class="btn-danger removeField">Izbriši</button>
+            <button type="button" class="button button--danger removeField">Izbriši</button>
           </div>
         <% } %>
       </div>
-      <button id="addCrossSellItem" type="button" class="btn-secondary">Dodajte</button>
-      
+      <button id="addCrossSellItem" type="button" class="button button--secondary">Dodajte</button>
+
       <% if (editing && existingData) { %>
-        <input class="main-form__input" id="itemId" type="hidden" name="itemId" value="<%= existingData.ID.value ? existingData.ID.value : existingData.ID %>">
+        <input class="form__input" type="hidden" name="itemId" value="<%= existingData.ID.value ? existingData.ID.value : existingData.ID %>">
       <% } %>
-      <input name="honeypot" type="hidden">
-      <input class="main-form__input" type="hidden" name="CSRFToken" value="<%= csrfToken %>" required>
-      
-      <div class="main-form__group">
-        <br>
-        <button type="submit" class="btn-primary">
+      <input type="hidden" name="honeypot">
+      <input type="hidden" name="CSRFToken" value="<%= csrfToken %>" required>
+
+      <div class="form__group">
+        <button type="submit" class="button button--primary">
           <% if (editing) { %>Izmenite Artikal<% } else { %>Dodaj Artikal<% } %>
         </button>
       </div>
-      
+
       <% if (errorMessage) { %>
-        <p><%= errorMessage %></p>
+        <p class="user-message--error"><%= errorMessage %></p>
       <% } %>
     </form>
   </div>

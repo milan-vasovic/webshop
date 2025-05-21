@@ -1,26 +1,30 @@
 <%- include('../include/head.ejs') %>
 <%- include('../include/navigation.ejs') %>
 
-<section class="container main__container">
-  <h1 class="main__title"><%= pageTitle %></h1>
-  <div class="column-row__container">
-    <div class="left__container-80">
+<section class="container section">
+  <h1 class="heading-xl mb-6"><%= pageTitle %></h1>
+
+  <div class="grid-cols-main-sidebar gap-8">
+    <!-- LEVA STRANA -->
+    <div>
       <%- include('../include/breadcrumbs', { breadcrumbs }) %>
-      <div>
-        <form class="width-100 flex flex-row" action="/forum/pretraga" method="post">
-          <div class="main-form__group">
-            <input class="main-form__input" type="text" name="search" placeholder="Pretražite objave...">
-            <input name="honeypot" type="hidden">
-            <input class="main-form__input" type="hidden" name="CSRFToken" value="<%= csrfToken %>">
-          </div>
-          <button type="submit" class="btn-secondary">Pretraga</button>
-        </form>
-      </div>
+
+      <!-- Pretraga -->
+      <form action="/forum/pretraga" method="POST" class="form mb-8">
+        <div class="form__group">
+          <input class="form__input" type="text" name="search" placeholder="Pretražite objave...">
+          <input name="honeypot" type="hidden">
+          <input class="form__input" type="hidden" name="CSRFToken" value="<%= csrfToken %>">
+        </div>
+        <button type="submit" class="button button--secondary">Pretraga</button>
+      </form>
+
       <!-- Lista objava -->
-      <div class="cards__container">
-        <% posts.posts.forEach(item => { %>
-          <%- include('../include/card.ejs', {
-              item: item,
+      <% if (posts?.posts?.length) { %>
+        <div class="cards__container grid grid-1 grid-md-3 gap-6 mb-8">
+          <% posts.posts.forEach(item => { %>
+            <%- include('../include/card.ejs', {
+              item,
               showId: false,
               hasActions: true,
               actions: [
@@ -30,46 +34,48 @@
                   linkName: 'Pogledajte'
                 }
               ]
-          }) %>
-        <% }) %>
-      </div>
-      <%- include('../include/pagination.ejs', {
-        currentPage: currentPage,
-        totalPages: totalPages,
-        basePath: basePath
-      }) %>
-    </div>
-    <!-- Desna kolona: Sidebar s kategorijama i tagovima -->
-    <div class="right__container-20">
-      <% if (!isAuthenticated) { %>
-        <%- include('../include/newsletter.ejs', {from: path }) %>
+            }) %>
+          <% }) %>
+        </div>
+
+        <%- include('../include/pagination.ejs', {
+          currentPage,
+          totalPages,
+          basePath
+        }) %>
+      <% } else { %>
+        <p>Nema objava za prikaz.</p>
       <% } %>
-      <% if (categories && categories.length > 0) { %>
-        <div>
-          <h1>Kategorije:</h1>
-          <ul class="grid grid-3">
+    </div>
+
+    <!-- DESNA STRANA: Sidebar -->
+    <aside class="sidebar flex flex-column gap-6">
+      <% if (!isAuthenticated) { %>
+        <%- include('../include/newsletter.ejs', { from: path }) %>
+      <% } %>
+
+      <% if (categories?.length) { %>
+        <div class="sidebar-block">
+          <h2 class="heading-md mb-2">Kategorije</h2>
+          <ul class="grid grid-2">
             <% categories.forEach(c => { %>
-              <li>
-                <a href="/forum/kategorija/<%= encodeURIComponent(c) %>"><%= c %></a>
-              </li>
+              <li><a href="/forum/kategorija/<%= encodeURIComponent(c) %>"><%= c %></a></li>
             <% }) %>
           </ul>
         </div>
       <% } %>
-      <% if (tags && tags.length > 0) { %>
-        <div>
-          <h1>Tagovi:</h1>
+
+      <% if (tags?.length) { %>
+        <div class="sidebar-block">
+          <h2 class="heading-md mb-2">Tagovi</h2>
           <ul class="grid grid-2">
             <% tags.forEach(t => { %>
-              <li>
-                <a href="/forum/oznaka/<%= encodeURIComponent(t) %>"><%= t %></a>
-              </li>
+              <li><a href="/forum/oznaka/<%= encodeURIComponent(t) %>"><%= t %></a></li>
             <% }) %>
           </ul>
         </div>
       <% } %>
-      
-    </div>
+    </aside>
   </div>
 </section>
 

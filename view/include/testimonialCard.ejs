@@ -1,29 +1,30 @@
-<div class="card__container card__container--testimonial">
-  <!-- Header: Image and Name -->
-  <div class="card__header card__header--testimonial">
-    <% if (image) { %>
-      <div class="testimonial__image">
-        <img src="<%= image %>" alt="<%= name || 'User' %>">
-      </div>
-    <% } %>
-    <% if (name) { %>
-      <div class="testimonial__name"><%= name %></div>
-    <% } %>
-  </div>
+<%
+  // Parametri:
+  // image (string): putanja do slike (npr. /images/user.jpg)
+  // name (string): ime korisnika
+  // rating (number): broj zvezdica (1–5)
+  // text (string): tekst recenzije
+%>
 
-  <!-- Content: Stars and Text -->
-  <div class="card__content card__content--testimonial">
+<div class="testimonial-card">
+  <% if (image) { %>
+    <img class="testimonial-card__image" src="<%= image %>" alt="<%= name || 'User' %>">
+  <% } %>
+
+  <% if (name) { %>
+    <div class="testimonial-card__name"><%= name %></div>
+  <% } %>
+
+  <% if (rating) { %>
     <div class="testimonial__stars">
-      <% 
-        const maxStars = 5;
-        let validRating = rating && rating > 0 ? rating : 0;
-        if (validRating > maxStars) { validRating = maxStars; }
-      %>
+      <% const maxStars = 5; %>
       <% for (let i = 1; i <= maxStars; i++) { %>
-        <span class="testimonial__star <%= i <= validRating ? 'testimonial__star--filled' : '' %>">★</span>
+        <span class="testimonial__star <%= i <= rating ? 'testimonial__star--filled' : '' %>">★</span>
       <% } %>
     </div>
-    <div class="testimonial__text"><%= text %></div>
-  </div>
+  <% } %>
+
+  <% if (text) { %>
+    <div class="testimonial-card__text"><%= text %></div>
+  <% } %>
 </div>
-<script src="/js/testemonialSlider.js"></script>

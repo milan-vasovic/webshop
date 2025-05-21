@@ -1,47 +1,41 @@
 <% if (totalPages > 1) { %>
-    <nav class="pagination">
-      <ul>
-        <% // Prva stranica (uvek prikazuj, označi kao aktivnu ako je currentPage) %>
+  <nav class="pagination">
+    <ul class="pagination__list">
+      <li>
+        <a href="<%= basePath %>?page=1" class="pagination__item <%= currentPage === 1 ? 'pagination__item--active' : '' %>">1</a>
+      </li>
+
+      <% if (currentPage > 3) { %>
+        <li><span class="pagination__item">...</span></li>
+      <% } %>
+
+      <% if (currentPage - 1 > 1) { %>
         <li>
-          <a href="<%= basePath %>?page=1" class="<%= currentPage === 1 ? 'active' : '' %>">1</a>
+          <a href="<%= basePath %>?page=<%= currentPage - 1 %>" class="pagination__item"><%= currentPage - 1 %></a>
         </li>
-  
-        <% // Elipsa ako postoji razmak između 1 i (currentPage - 1) %>
-        <% if (currentPage > 3) { %>
-          <li><span>...</span></li>
-        <% } %>
-  
-        <% // Prethodna stranica (ako nije 1) %>
-        <% if (currentPage - 1 > 1) { %>
-          <li>
-            <a href="<%= basePath %>?page=<%= currentPage - 1 %>"><%= currentPage - 1 %></a>
-          </li>
-        <% } %>
-  
-        <% // Trenutna stranica (uvek prikaži kao aktivnu ako nije 1 ili totalPages) %>
-        <% if (currentPage !== 1 && currentPage !== totalPages) { %>
-          <li><a href="#" class="active"><%= currentPage %></a></li>
-        <% } %>
-  
-        <% // Sledeća stranica ako ima još prostora (ali ne ako je odmah pre totalPages) %>
-        <% if (currentPage + 1 < totalPages) { %>
-          <li>
-            <a href="<%= basePath %>?page=<%= currentPage + 1 %>"><%= currentPage + 1 %></a>
-          </li>
-        <% } %>
-  
-        <% // Elipsa ako postoji razmak između (currentPage + 1) i totalPages %>
-        <% if (currentPage < totalPages - 2) { %>
-          <li><span>...</span></li>
-        <% } %>
-  
-        <% // Poslednja stranica (uvek prikazuj, označi kao aktivnu ako je currentPage) %>
-        <% if (totalPages !== 1) { %>
-          <li>
-            <a href="<%= basePath %>?page=<%= totalPages %>" class="<%= currentPage === totalPages ? 'active' : '' %>"><%= totalPages %></a>
-          </li>
-        <% } %>
-      </ul>
-    </nav>
-  <% } %>
-  
+      <% } %>
+
+      <% if (currentPage !== 1 && currentPage !== totalPages) { %>
+        <li>
+          <a href="#" class="pagination__item pagination__item--active"><%= currentPage %></a>
+        </li>
+      <% } %>
+
+      <% if (currentPage + 1 < totalPages) { %>
+        <li>
+          <a href="<%= basePath %>?page=<%= currentPage + 1 %>" class="pagination__item"><%= currentPage + 1 %></a>
+        </li>
+      <% } %>
+
+      <% if (currentPage < totalPages - 2) { %>
+        <li><span class="pagination__item">...</span></li>
+      <% } %>
+
+      <% if (totalPages !== 1) { %>
+        <li>
+          <a href="<%= basePath %>?page=<%= totalPages %>" class="pagination__item <%= currentPage === totalPages ? 'pagination__item--active' : '' %>"><%= totalPages %></a>
+        </li>
+      <% } %>
+    </ul>
+  </nav>
+<% } %>

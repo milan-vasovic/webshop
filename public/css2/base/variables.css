@@ -1,0 +1,148 @@
+:root {
+  /* === Brand Colors === */
+  --primary-color: #2563eb;
+  --primary-hover-color: #1e40af;
+  --on-primary-text-color: #ffffff;
+
+  --secondary-color: #22c55e;
+  --secondary-hover-color: #15803d;
+  --on-secondary-text-color: #ffffff;
+
+  --accent-color: #ef4444;
+  --accent-hover-color: #b91c1c;
+  --on-accent-text-color: #ffffff;
+
+  --neutral-color: #64748b;
+  --neutral-hover-color: #475569;
+  --on-neutral-text-color: #ffffff;
+
+  --warning-color: #f97316;
+  --on-warning-text-color: #ffffff;
+
+  --info-color: #6366f1;
+  --on-info-text-color: #ffffff;
+
+  --success-color: #16a34a;
+  --on-success-text-color: #ffffff;
+
+  --danger-color: #dc2626;
+  --on-danger-text-color: #ffffff;
+
+  /* === Backgrounds === */
+  --primary-background-color: #f9fafb;
+  --secondary-background-color: #e5e7eb;
+  --neutral-background-color: #f1f5f9;
+  --white-color: #ffffff;
+
+  /* === Text === */
+  --primary-text-color: #1e293b;
+  --secondary-text-color: #334155;
+  --neutral-text-color: #64748b;
+
+  /* === Typography === */
+  --primary-font-family: 'Inter', sans-serif;
+  --heading-font-family: 'Poppins', sans-serif;
+  --accent-font-family: 'Playfair Display', serif;
+  --info-font-family: 'Roboto Condensed', sans-serif;
+  --code-font-family: 'Fira Code', monospace;
+
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-md: 1rem;
+  --font-size-lg: 1.25rem;
+  --font-size-xl: 1.5rem;
+  --font-size-2xl: 2rem;
+  --font-size-3xl: 2.5rem;
+  --font-size-4xl: 3rem;
+
+  --line-height-tight: 1.2;
+  --line-height-normal: 1.5;
+  --line-height-loose: 1.75;
+
+  --letter-spacing-tight: -0.01em;
+  --letter-spacing-normal: 0;
+  --letter-spacing-wide: 0.03em;
+
+  /* === Spacing === */
+  --space-0: 0;
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+
+  /* === Radius & Borders === */
+  --radius-none: 0;
+  --radius-sm: 0.125rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 1rem;
+  --radius-full: 9999px;
+
+  --border-thin: 1px;
+  --border-medium: 2px;
+  --border-thick: 4px;
+
+  /* === Z-Index === */
+  --z-base: 0;
+  --z-dropdown: 10;
+  --z-sticky: 100;
+  --z-modal: 1000;
+  --z-toast: 2000;
+
+  /* === Pagination === */
+  --pagination-size-sm: 1.5rem;
+  --pagination-size-md: 2rem;
+  --pagination-size-lg: 2.5rem;
+
+  /* === Containers === */
+  --container-sm: 640px;
+  --container-md: 768px;
+  --container-lg: 1024px;
+  --container-xl: 1280px;
+  --container-2xl: 1536px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --primary-color: #3b82f6;
+    --primary-hover-color: #60a5fa;
+    --on-primary-text-color: #ffffff;
+
+    --secondary-color: #4ade80;
+    --secondary-hover-color: #22c55e;
+    --on-secondary-text-color: #0f172a;
+
+    --accent-color: #f87171;
+    --accent-hover-color: #ef4444;
+    --on-accent-text-color: #0f172a;
+
+    --neutral-color: #94a3b8;
+    --neutral-hover-color: #64748b;
+    --on-neutral-text-color: #0f172a;
+
+    --warning-color: #fb923c;
+    --on-warning-text-color: #0f172a;
+
+    --info-color: #818cf8;
+    --on-info-text-color: #0f172a;
+
+    --success-color: #22c55e;
+    --on-success-text-color: #0f172a;
+
+    --danger-color: #f87171;
+    --on-danger-text-color: #0f172a;
+
+    --primary-background-color: #0f172a;
+    --secondary-background-color: #1e293b;
+    --neutral-background-color: #334155;
+
+    --primary-text-color: #f8fafc;
+    --secondary-text-color: #e2e8f0;
+    --neutral-text-color: #cbd5e1;
+  }
+}

@@ -1,11 +1,31 @@
-<div class="card__container">
+<div class="card <%= item.Status?.value ? 'card--' + item.Status.value.toLowerCase() : '' %>">
   <!-- Header -->
-  <div class="card__header <%= item.Status?.value?.toLowerCase() || 'normal' %>">
+  <div class="card__header">
+    <% if (item.Status?.value) { %>
+      <% 
+        const status = item.Status?.value?.toLowerCase();
+        const isFeatured = status?.includes('featured');
+        const isAction = status?.includes('action');
+        const isPartnership = status?.includes('partnership');
+      %>
+
+      <% if (!isPartnership && (isFeatured || isAction)) { %>
+        <span class="badge 
+          <% if (isFeatured && isAction) { %> badge--primary 
+          <% } else if (isFeatured) { %> badge--primary 
+          <% } else if (isAction) { %> badge--danger 
+          <% } %>">
+          <%= isFeatured ? "Istaknuto" : "Akcija" %>
+        </span>
+      <% } %>
+    <% } %>
+
     <% if (item.Naziv) { %>
       <h2 class="card__title"><%= item.Naziv.value || "N/A" %></h2>
     <% } %>
+
     <% if (item.Slika?.value) { %>
-      <img class="card__image" src="/images/<%= item.Slika.value.img || item.Slika.value %>" alt="<%= item.Naziv?.value || 'Slika' %>">
+      <img class="image--card" src="/images/<%= item.Slika.value.img || item.Slika.value %>" alt="<%= item.Naziv?.value || 'Slika' %>">
     <% } %>
   </div>
 
@@ -18,27 +38,17 @@
            ["naziv", "slika", "status", "akcijska cena", "autor", "link", "slug", "kategorije", "tagovi"].includes(lowerKey)
          ) return;
     %>
-      <div class="card__field
-        <% if (lowerKey === 'cena' || lowerKey === 'price') { %> card__field--price <% } %>
-        <% if (['kategorija', 'kategorije', 'tag', 'tagovi'].includes(lowerKey)) { %> card__field--badges <% } %>
-      ">
+      <div class="card__field">
         <% if (lowerKey === "cena" || lowerKey === "price") { %>
-          <% if (item.Status.value.includes("action") && item["Akcijska Cena"]) { %>
-            <strong><%= item["Akcijska Cena"].value %> RSD</strong> <s><%= field.value %> RSD</s>
+          <% if (item.Status?.value?.toLowerCase().includes("action") && item["Akcijska Cena"]) { %>
+            <strong><%= item["Akcijska Cena"].value %> RSD</strong>
+            <s><%= field.value %> RSD</s>
           <% } else { %>
             <strong><%= field.value %> RSD</strong>
           <% } %>
-        <% } else if (["kategorija", "kategorije"].includes(lowerKey)) { %>
-          <% (Array.isArray(field.value) ? field.value : [field.value]).forEach(val => { %>
-            <a class="card__badge" href="/prodavnica/kategorija/<%= encodeURIComponent(val) %>"><%= val %></a>
-          <% }); %>
-        <% } else if (["tag", "tagovi"].includes(lowerKey)) { %>
-          <% (Array.isArray(field.value) ? field.value : [field.value]).forEach(val => { %>
-            <a class="card__badge" href="/prodavnica/oznaka/<%= encodeURIComponent(val) %>"><%= val %></a>
-          <% }); %>
         <% } else { %>
           <% if (field?.link) { %>
-            <a class="card__link" href="<%= field.link %>"><%= field.value %></a>
+            <a href="<%= field.link %>" class="card__link"><%= field.value %></a>
           <% } else if (field?.value) { %>
             <%= field.value %>
           <% } else { %>
@@ -51,19 +61,19 @@
 
   <!-- Actions -->
   <% if (hasActions) { %>
-    <div class="card__actions">
+    <div class="card__footer">
       <% actions.forEach(action => { %>
         <% if (action.type === 'form') { %>
           <form action="<%= action.formAction %>" method="POST">
             <input type="hidden" name="<%= itemName %>" value="<%= item._id || item.ID?.value %>">
             <input type="hidden" name="honeypot">
             <input type="hidden" name="CSRFToken" value="<%= csrfToken %>">
-            <button class="btn-primary" type="submit"><%= action.buttonName %></button>
+            <button class="button button--primary" type="submit"><%= action.buttonName %></button>
           </form>
         <% } else if (action.type === 'link-name') { %>
-          <a class="btn-primary" href="<%= action.link + (item.Link?.value || '') %>"><%= action.linkName %></a>
+          <a class="button" href="<%= action.link + (item.Link?.value || '') %>"><%= action.linkName %></a>
         <% } else { %>
-          <a class="btn-primary" href="<%= action.link + (item.ID?.value || item._id) %>"><%= action.linkName %></a>
+          <a class="button" href="<%= action.link + (item.ID?.value || item._id) %>"><%= action.linkName %></a>
         <% } %>
       <% }); %>
     </div>

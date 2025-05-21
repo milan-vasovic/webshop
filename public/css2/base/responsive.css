@@ -1,0 +1,253 @@
+/* ===============================
+   📐 Breakpoint Reference (for devs)
+   ===============================
+   sm: 640px
+   md: 768px
+   lg: 1024px
+   xl: 1280px
+   2xl: 1536px
+*/
+
+/* ===============================
+   🧱 Base Visibility Utilities
+   =============================== */
+
+.show {
+  display: block !important;
+}
+.hide {
+  display: none !important;
+}
+
+/* ===============================
+     📱 Mobile / Desktop Visibility
+     =============================== */
+
+@media (max-width: 767px) {
+  .hide-mobile {
+    display: none !important;
+  }
+  .show-mobile {
+    display: block !important;
+  }
+}
+
+@media (min-width: 768px) {
+  .hide-desktop {
+    display: none !important;
+  }
+  .show-desktop {
+    display: block !important;
+  }
+}
+
+/* ===============================
+     🧭 Step-by-step Visibility by Breakpoint
+     =============================== */
+
+@media (min-width: 640px) {
+  .show-sm {
+    display: block !important;
+  }
+  .hide-sm {
+    display: none !important;
+  }
+}
+@media (min-width: 768px) {
+  .show-md {
+    display: block !important;
+  }
+  .hide-md {
+    display: none !important;
+  }
+}
+@media (min-width: 1024px) {
+  .show-lg {
+    display: block !important;
+  }
+  .hide-lg {
+    display: none !important;
+  }
+}
+@media (min-width: 1280px) {
+  .show-xl {
+    display: block !important;
+  }
+  .hide-xl {
+    display: none !important;
+  }
+}
+@media (min-width: 1536px) {
+  .show-2xl {
+    display: block !important;
+  }
+  .hide-2xl {
+    display: none !important;
+  }
+}
+
+/* ===============================
+     🔠 Responsive Typography Helpers
+     =============================== */
+
+.text-responsive {
+  font-size: var(--font-size-md);
+}
+@media (min-width: 768px) {
+  .text-responsive {
+    font-size: var(--font-size-lg);
+  }
+}
+@media (min-width: 1024px) {
+  .text-responsive {
+    font-size: var(--font-size-xl);
+  }
+}
+
+/* ===============================
+     🧷 Responsive Alignment Utilities
+     =============================== */
+
+@media (max-width: 767px) {
+  .text-center-mobile {
+    text-align: center;
+  }
+  .text-left-mobile {
+    text-align: left;
+  }
+  .text-right-mobile {
+    text-align: right;
+  }
+}
+
+@media (min-width: 768px) {
+  .text-center-desktop {
+    text-align: center;
+  }
+  .text-left-desktop {
+    text-align: left;
+  }
+  .text-right-desktop {
+    text-align: right;
+  }
+}
+
+/* ===============================
+     🔀 Responsive Flex Direction
+     =============================== */
+
+/* Mobile: column → Desktop: row */
+.flex-col-lg\:row {
+  flex-direction: column;
+}
+@media (min-width: 1024px) {
+  .flex-col-lg\:row {
+    flex-direction: row;
+  }
+}
+
+/* Desktop: row → Mobile: column */
+.flex-row-sm\:col {
+  flex-direction: row;
+}
+@media (max-width: 767px) {
+  .flex-row-sm\:col {
+    flex-direction: column;
+  }
+}
+
+/* Generic breakpoint-based direction */
+@media (min-width: 640px) {
+  .flex-sm\:row {
+    flex-direction: row;
+  }
+  .flex-sm\:col {
+    flex-direction: column;
+  }
+}
+@media (min-width: 768px) {
+  .flex-md\:row {
+    flex-direction: row;
+  }
+  .flex-md\:col {
+    flex-direction: column;
+  }
+}
+@media (min-width: 1024px) {
+  .flex-lg\:row {
+    flex-direction: row;
+  }
+  .flex-lg\:col {
+    flex-direction: column;
+  }
+}
+@media (min-width: 1280px) {
+  .flex-xl\:row {
+    flex-direction: row;
+  }
+  .flex-xl\:col {
+    flex-direction: column;
+  }
+}
+
+/* ===============================
+     🧱 Responsive Grid Columns
+     =============================== */
+
+@media (min-width: 640px) {
+  .grid-sm-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .grid-sm-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+@media (min-width: 768px) {
+  .grid-md-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .grid-md-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .grid-md-4 {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+@media (min-width: 1024px) {
+  .grid-lg-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .grid-lg-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .grid-lg-4 {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+@media (min-width: 1280px) {
+  .grid-xl-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .grid-xl-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .grid-xl-4 {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* ===============================
+     🎯 Responsive Stack-to-Grid Layout
+     =============================== */
+
+.responsive-stack {
+  display: flex;
+  flex-direction: column;
+}
+@media (min-width: 1024px) {
+  .responsive-stack {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-6);
+  }
+}

@@ -1,35 +1,41 @@
 <%- include('../include/head.ejs') %>
 <%- include('../include/navigation.ejs') %>
 
-<section class="container main__container">
-    <h1 class="main__title"><%= pageTitle %></h1>
-    <div class="flex flex-column width-100">
-        <% if (cart.length > 0) { %>
-            <div class="flex flex-row  width-100" >
-                <a class="btn-primary" href="/prodavnica/porudzbina">Nastavite Sa Poručivanjem</a>
-                <form action="/prodavnica/korpa-praznjenje" method="POST" class="flex flex-row align-center">
-                    <input name="honeypot" type="hidden">
-                    <input type="hidden" name="CSRFToken" value="<%= csrfToken %>">
-                    <button class="btn-danger" type="submit">Ispraznite Korpu</button>
-                </form>
-            </div>
-        <% } %>
-        <%- include('../include/table.ejs', {
-            items: cart,
-            showId: false,
-            caption: "Artikli",
-            hasActions: true,
-            hasFooter: true,
-            totals: true,
-            actions: [
-                {
-                    type: 'form',
-                    formAction: "/prodavnica/korpa-izbacivanje",
-                    buttonName: 'delete'
-                }
-            ]
-        }) %>
-    </div>
+<section class="container section main__container">
+  <h1 class="heading-xl mb-4"><%= pageTitle %></h1>
+
+  <div class="d-flex flex-column gap-6 width-100">
+
+    <% if (cart.length > 0) { %>
+      <!-- Akcije: Nastavi & Isprazni -->
+      <div class="d-flex flex-wrap gap-4 justify-between mb-4">
+        <a href="/prodavnica/porudzbina" class="button button--primary">Nastavite Sa Poručivanjem</a>
+
+        <form action="/prodavnica/korpa-praznjenje" method="POST" class="d-flex align-center">
+          <input name="honeypot" type="hidden">
+          <input type="hidden" name="CSRFToken" value="<%= csrfToken %>">
+          <button class="button button--danger" type="submit">Ispraznite Korpu</button>
+        </form>
+      </div>
+    <% } %>
+
+    <!-- Tabela Artikala -->
+    <%- include('../include/table.ejs', {
+        items: cart,
+        showId: false,
+        caption: "Artikli",
+        hasActions: true,
+        hasFooter: true,
+        totals: true,
+        actions: [
+          {
+            type: 'form',
+            formAction: "/prodavnica/korpa-izbacivanje",
+            buttonName: 'delete'
+          }
+        ]
+    }) %>
+  </div>
 </section>
 
 <%- include('../include/end.ejs') %>

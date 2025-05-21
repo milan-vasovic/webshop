@@ -1,40 +1,39 @@
-<div class="info__container">
-    <% data.forEach((item) => { %>
-      <div class="info__item">
-        <% if (typeof item === 'object' && !Array.isArray(item)) { %>
-          <% Object.keys(item).forEach((key) => { %>
-            <div class="info__row">
-              <span class="info__key"><%= key %>:</span>
-              <span class="info__value">
-                <% if (typeof item[key] === 'object') { %>
-                  <% if (item[key] instanceof Date) { %>
-                    <%= item[key].toLocaleString("sr-RS") %>
-                  <% } else if (Array.isArray(item[key])) { %>
-                    <ul class="info__list">
-                      <% item[key].forEach((listItem) => { %>
-                        <li><%= listItem %></li>
-                      <% }); %>
-                    </ul>
-                  <% } else { %>
-                    <ul class="info__list">
-                      <% Object.keys(item[key]).forEach((nestedKey) => { %>
-                        <li><%= nestedKey %>: <%= item[key][nestedKey] %></li>
-                      <% }); %>
-                    </ul>
-                  <% } %>
+<div class="info-block">
+  <% data.forEach((item) => { %>
+    <div class="info-block__card">
+      <% if (typeof item === 'object' && !Array.isArray(item)) { %>
+        <% Object.keys(item).forEach((key) => { %>
+          <div class="info-block__row">
+            <span class="info-block__key"><%= key %>:</span>
+            <span class="info-block__value">
+              <% if (typeof item[key] === 'object') { %>
+                <% if (item[key] instanceof Date) { %>
+                  <%= item[key].toLocaleString("sr-RS") %>
+                <% } else if (Array.isArray(item[key])) { %>
+                  <ul class="info-block__list">
+                    <% item[key].forEach((listItem) => { %>
+                      <li class="info-block__list-item"><%= listItem %></li>
+                    <% }); %>
+                  </ul>
                 <% } else { %>
-                  <%= item[key] %>
+                  <ul class="info-block__list">
+                    <% Object.keys(item[key]).forEach((nestedKey) => { %>
+                      <li class="info-block__list-item"><%= nestedKey %>: <%= item[key][nestedKey] %></li>
+                    <% }); %>
+                  </ul>
                 <% } %>
-              </span>
-            </div>
-          <% }); %>
-        <% } else { %>
-          <div class="info__row">
-            <span class="info__key">Vrednost:</span>
-            <span class="info__value"><%= item %></span>
+              <% } else { %>
+                <%= item[key] %>
+              <% } %>
+            </span>
           </div>
-        <% } %>
-      </div>
-    <% }); %>
-  </div>
-  
+        <% }); %>
+      <% } else { %>
+        <div class="info-block__row">
+          <span class="info-block__key">Vrednost:</span>
+          <span class="info-block__value"><%= item %></span>
+        </div>
+      <% } %>
+    </div>
+  <% }); %>
+</div>

@@ -1,0 +1,148 @@
+/* ===============================
+   📐 Z-Index Layer System (Recommended)
+=============================== */
+:root {
+  --z-base: 1;
+  --z-header: 100;
+  --z-mobile-menu: 500;
+  --z-overlay: 400;
+  --z-overlay-ui: 401;
+}
+
+/* ===============================
+   🖼️ Gallery + Media
+=============================== */
+.gallery {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--space-8);
+}
+
+.gallery__main-media {
+  width: 100%;
+  max-width: 800px;
+  position: relative;
+  background-color: var(--neutral-background-color);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  cursor: pointer;
+}
+
+.gallery__main-media img,
+.gallery__main-media video {
+  width: 100%;
+  height: auto;
+  max-height: 500px;
+  object-fit: contain;
+  border-radius: var(--radius-md);
+  background-color: var(--neutral-background-color);
+}
+
+/* ===============================
+   📷 Thumbnails
+=============================== */
+.gallery__thumbnails {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  justify-content: center;
+}
+
+.gallery__thumbnail {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  border: 2px solid transparent;
+  background-color: var(--neutral-background-color);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, outline 0.2s ease;
+}
+
+.gallery__thumbnail:hover {
+  transform: scale(1.05);
+  border-color: var(--accent-color);
+  box-shadow: var(--shadow-sm);
+}
+
+.gallery__thumbnail[data-type="video"] {
+  object-fit: contain;
+}
+
+/* ✅ Highlighted thumbnail */
+.image--chosen {
+  outline: 3px solid var(--accent-color);
+  border-radius: var(--radius-md);
+}
+
+/* ===============================
+   🔍 Overlay Viewer
+=============================== */
+.overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.85);
+  z-index: var(--z-overlay); /* Is below mobile menu */
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+}
+
+.overlay-content {
+  max-width: 90vw;
+  max-height: 90vh;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  object-fit: contain;
+}
+
+/* ⛔ Prevent scroll when overlay is active */
+.no-scroll {
+  overflow: hidden;
+  height: 100vh;
+}
+
+/* ✖️ Close Button */
+.overlay .close-btn {
+  position: absolute;
+  top: var(--space-4);
+  right: var(--space-4);
+  font-size: 2rem;
+  color: var(--white-color);
+  background-color: rgba(0, 0, 0, 0.808);
+  padding: 0.4rem 0.7rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  z-index: var(--z-overlay-ui); /* Stays above overlay content */
+  transition: background-color 0.2s ease;
+}
+
+.overlay .close-btn:hover {
+  background-color: var(--accent-color);
+}
+
+/* ===============================
+   📱 Responsive
+=============================== */
+@media (max-width: 768px) {
+  .gallery__main-media {
+    max-width: 100%;
+  }
+
+  .gallery__thumbnail {
+    width: 70px;
+    height: 70px;
+  }
+
+  .overlay-content {
+    max-width: 95vw;
+    max-height: 80vh;
+  }
+}

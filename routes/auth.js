@@ -28,7 +28,7 @@ router.post('/prijava', loginLimiter, [
         .trim()
         .notEmpty().withMessage("Email adresa je obavezna.")
         .isEmail().withMessage("Email adresa nije validna.")
-        .normalizeEmail(),
+        .normalizeEmail({ gmail_remove_dots: false }),
 
     body("password")
         .notEmpty()
@@ -48,7 +48,7 @@ router.post('/registracija', loginLimiter, [
         .trim()
         .notEmpty().withMessage("Email adresa je obavezna.")
         .isEmail().withMessage("Email adresa nije validna.")
-        .normalizeEmail(),
+        .normalizeEmail({ gmail_remove_dots: false }),
 
     body("password")
         .notEmpty()
@@ -88,7 +88,7 @@ router.post("/zatrazite-novu-sifru", resetPasswordLimiter, [
         .trim()
         .notEmpty().withMessage("Email adresa je obavezna.")
         .isEmail().withMessage("Email adresa nije validna.")
-        .normalizeEmail(),
+        .normalizeEmail({ gmail_remove_dots: false }),
 ], AuthController.postRequestNewPassword);
 
 router.post("/zatrazite-aktivaciju", resetPasswordLimiter, [
@@ -96,7 +96,7 @@ router.post("/zatrazite-aktivaciju", resetPasswordLimiter, [
         .trim()
         .notEmpty().withMessage("Email adresa je obavezna.")
         .isEmail().withMessage("Email adresa nije validna.")
-        .normalizeEmail(),
+        .normalizeEmail({ gmail_remove_dots: false }),
 ], AuthController.postRequestActivation);
 
 router.post("/napravite-novu-sifru", resetPasswordLimiter, [ 

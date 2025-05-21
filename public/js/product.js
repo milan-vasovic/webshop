@@ -1,26 +1,40 @@
-document.addEventListener('DOMContentLoaded', function() {
-  // Preuzimamo podatke iz data atributa (npr. postavljenih u skrivenom elementu #item-data)
+function selectMedia(type, url, description = "") {
+  const mainMediaContainer = document.querySelector(".gallery__main-media");
+  const existing = document.getElementById("main-media");
+
+  if (type === "image") {
+    const newImageHTML = `<img id="main-media" src="/images/${url}" alt="${description}" class="gallery__main-image">`;
+    mainMediaContainer.innerHTML = newImageHTML;
+  } else if (type === "video") {
+    const newVideoHTML = `
+      <video id="main-media" controls class="gallery__main-video">
+        <source src="/videos/${url}" type="video/mp4">
+        ${description}
+      </video>`;
+    mainMediaContainer.innerHTML = newVideoHTML;
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
   const itemDataEl = document.getElementById('item-data');
   const variations = JSON.parse(itemDataEl.getAttribute('data-variations'));
   const backorderAllowed = itemDataEl.getAttribute('data-backorder') === 'true';
-  const defaultImage = itemDataEl.getAttribute('data-default-image'); // naziv fajla bez putanje (npr. "default.jpg")
-  const itemStatusAttr = itemDataEl.getAttribute('data-status');
-  const itemStatus = itemStatusAttr ? itemStatusAttr.split(',').map(s => s.trim()) : [];
+  const defaultImage = itemDataEl.getAttribute('data-default-image');
+  const itemStatus = (itemDataEl.getAttribute('data-status') || "")
+    .split(',').map(s => s.trim());
   const basePrice = parseFloat(itemDataEl.getAttribute('data-price'));
   const actionPrice = parseFloat(itemDataEl.getAttribute('data-action-price'));
-  const priceDisplay = document.getElementById('productPriceDisplay');
 
-  // Ostali DOM selektori (forma, input polja, itd.)
+  const priceDisplay = document.getElementById('productPriceDisplay');
   const variationsSelect = document.getElementById('variationsSelect');
   const amountInput = document.getElementById('amountInput');
   const stockMessage = document.getElementById('stockMessage');
   const productForm = document.getElementById('productForm');
   const formSubmitContainer = document.getElementById('formSubmitContainer');
-  const quantityContainer = document.getElementById('amountInput'); // novi kontejner
+  const variationIdInput = document.getElementById('variationId');
 
   function updatePriceDisplay(isAction) {
     if (!priceDisplay) return;
-  
     if (isAction && !isNaN(actionPrice)) {
       priceDisplay.innerHTML = `<s>${basePrice} RSD</s> <span class="highlight">${actionPrice} RSD</span>`;
     } else {
@@ -28,99 +42,89 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 
-  
   function updateVariation(index) {
     const variation = variations[index];
     const isOnAction = variation.Akcija && itemStatus.includes("action");
     updatePriceDisplay(isOnAction);
-    // Ažuriranje glavnog medija
-    if (variation.Slika && variation.Slika.URL) {
+
+    if (variation.Slika?.URL) {
       selectMedia("image", variation.Slika.URL, variation.Slika.Opis || '');
     } else {
       selectMedia("image", defaultImage, "Default slika");
     }
 
     const availableQuantity = variation.Količina;
-    formSubmitContainer.innerHTML = ''; // reset dugmeta
+    formSubmitContainer.innerHTML = '';
 
     if (availableQuantity < 1) {
       if (backorderAllowed) {
         productForm.action = '/prodavnica/backorder-dodavanje';
         stockMessage.textContent = "Nema na stanju, ali poručivanje (backorder) je dozvoljeno.";
         amountInput.removeAttribute('max');
-
-        // Prikazujemo količinu (možda kao 1) – ili ostavite vidljivo
-        if (quantityContainer) {
-          quantityContainer.style.display = ''; // ostaje vidljivo
-        }
+        amountInput.disabled = false;
+        amountInput.value = 1;
 
         const backorderBtn = document.createElement('button');
         backorderBtn.type = 'submit';
         backorderBtn.id = 'submitBtn';
-        backorderBtn.classList.add('btn-primary');
+        backorderBtn.className = 'button button--primary mt-3';
         backorderBtn.textContent = 'Poruči (backorder)';
         formSubmitContainer.appendChild(backorderBtn);
       } else {
-        stockMessage.textContent = "Nema na stanju.";
         productForm.action = '';
-        // Sakrij polje za količinu
-        if (quantityContainer) {
-          quantityContainer.style.display = 'none';
-        }
-        formSubmitContainer.innerHTML = '';
+        stockMessage.textContent = "Nema na stanju.";
+        amountInput.disabled = true;
+
+        const disabledBtn = document.createElement('button');
+        disabledBtn.type = 'button';
+        disabledBtn.id = 'submitBtn';
+        disabledBtn.className = 'button button--primary mt-3';
+        disabledBtn.disabled = true;
+        disabledBtn.textContent = 'Nedostupno';
+        formSubmitContainer.appendChild(disabledBtn);
       }
     } else {
-      // Ako ima zaliha, obezbediti da je polje za količinu vidljivo
-      if (quantityContainer) {
-        quantityContainer.style.display = '';
-      }
       productForm.action = '/prodavnica/korpa-dodavanje';
       stockMessage.textContent = "";
       amountInput.max = availableQuantity;
+      amountInput.disabled = false;
 
       const addToCartBtn = document.createElement('button');
       addToCartBtn.type = 'submit';
       addToCartBtn.id = 'submitBtn';
-      addToCartBtn.classList.add('btn-primary');
+      addToCartBtn.className = 'button button--primary mt-3';
       addToCartBtn.textContent = 'Dodaj u korpu';
       formSubmitContainer.appendChild(addToCartBtn);
     }
 
-    // Ažuriramo skriveno polje sa ID-em izabrane varijacije
-    document.getElementById('variationId').value = variation.ID;
+    variationIdInput.value = variation.ID;
   }
 
-  // Inicijalno postavljanje – prikaz prve varijacije
   updateVariation(0);
 
-  variationsSelect.addEventListener('change', function(e) {
+  variationsSelect.addEventListener('change', (e) => {
     const selectedIndex = parseInt(e.target.value, 10);
     updateVariation(selectedIndex);
   });
 
-   // Pronađi sve slike koje se mogu kliknuti (sličice)
-   const thumbnail = document.getElementById('main-media');
+  // Overlay logika (samo slike)
+  const overlay = document.getElementById('overlay');
+  const overlayImg = document.getElementById('overlay-img');
+  const closeBtn = overlay.querySelector('.close-btn');
 
-   // Pronađi overlay element i sliku unutar overlay-a
-   const overlay = document.getElementById('overlay');
-   const overlayImg = document.getElementById('overlay-img');
-   const closeBtn = document.querySelector('.close-btn');
+  document.addEventListener('click', (e) => {
+    const mainMedia = document.getElementById('main-media');
 
-   // Kada se klikne na sličicu, prikaži je u overlay-u
-    thumbnail.addEventListener('click', function() {
+    if (e.target === mainMedia && mainMedia.tagName.toLowerCase() === 'img') {
+      overlayImg.src = mainMedia.src;
       overlay.style.display = 'flex';
-      overlayImg.src = this.src;
-    });
+      document.body.classList.add('no-scroll');
+    }
 
-   // Kada se klikne na dugme za zatvaranje, sakrij overlay
-   closeBtn.addEventListener('click', function() {
-   overlay.style.display = 'none';
-   });
-
-   // Opcionalno: Zatvori overlay klikom na pozadinu
-   overlay.addEventListener('click', function(event) {
-   if (event.target === overlay) {
-       overlay.style.display = 'none';
-   }
-   });
+    if (e.target === closeBtn || e.target === overlay) {
+      overlay.style.display = 'none';
+      overlayImg.src = "";
+      document.body.classList.remove('no-scroll');
+    }
+  });
 });

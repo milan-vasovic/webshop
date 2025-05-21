@@ -1,0 +1,171 @@
+/* ===============================
+   🔤 Base Reset for Text Elements
+   =============================== */
+
+body {
+  font-family: var(--primary-font-family);
+  font-size: var(--font-size-md);
+  line-height: var(--line-height-normal);
+  color: var(--primary-text-color);
+  margin: 0;
+}
+
+/* Headings */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--heading-font-family);
+  font-weight: 600;
+  line-height: var(--line-height-tight);
+  color: var(--primary-text-color);
+  margin: 0 0 var(--space-3) 0;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+
+}
+
+h1 {
+  font-size: var(--font-size-4xl);
+}
+h2 {
+  font-size: var(--font-size-3xl);
+}
+h3 {
+  font-size: var(--font-size-2xl);
+}
+h4 {
+  font-size: var(--font-size-xl);
+}
+h5 {
+  font-size: var(--font-size-lg);
+}
+h6 {
+  font-size: var(--font-size-md);
+}
+
+/* Paragraph */
+p {
+  font-size: var(--font-size-md);
+  margin: 0 0 var(--space-3) 0;
+  color: var(--neutral-text-color);
+}
+
+/* Small text */
+small {
+  font-size: var(--font-size-sm);
+  color: var(--neutral-text-color);
+}
+
+/* Links */
+a {
+  color: var(--primary-color);
+  text-decoration: underline;
+  transition: color var(--transition-medium);
+}
+a:hover {
+  color: var(--primary-background-color);
+}
+
+/* Emphasis */
+strong {
+  font-weight: bold;
+}
+em {
+  font-style: italic;
+}
+
+/* Blockquote */
+blockquote {
+  font-family: var(--accent-font-family);
+  font-style: italic;
+  font-size: var(--font-size-lg);
+  border-left: 4px solid var(--neutral-color);
+  padding-left: var(--space-3);
+  margin: var(--space-4) 0;
+  color: var(--neutral-text-color);
+}
+
+/* Code / Preformatted */
+code,
+pre {
+  font-family: var(--code-font-family);
+  background-color: var(--neutral-background-color);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  color: var(--accent-color);
+}
+pre {
+  overflow-x: auto;
+}
+
+/* ===============================
+     🎯 Utility Typography Classes
+     =============================== */
+
+/* Headings (can be used anywhere) */
+.heading-xl {
+  font-family: var(--heading-font-family);
+  font-size: var(--font-size-4xl);
+}
+.heading-lg {
+  font-family: var(--heading-font-family);
+  font-size: var(--font-size-3xl);
+}
+.heading-md {
+  font-family: var(--heading-font-family);
+  font-size: var(--font-size-2xl);
+}
+.heading-sm {
+  font-family: var(--heading-font-family);
+  font-size: var(--font-size-lg);
+}
+.heading-xs {
+  font-family: var(--heading-font-family);
+  font-size: var(--font-size-md);
+}
+
+/* Accent Text */
+.text-accent {
+  font-family: var(--accent-font-family);
+  font-weight: 500;
+  color: var(--accent-color);
+}
+
+/* Lead Paragraph */
+.text-lead {
+  font-size: var(--font-size-lg);
+  line-height: var(--line-height-loose);
+  font-weight: 400;
+}
+
+/* Muted / Secondary Text */
+.text-muted {
+  color: var(--neutral-text-color);
+}
+
+/* Caption / Label Text */
+.text-caption {
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  letter-spacing: var(--letter-spacing-wide);
+  text-transform: uppercase;
+  color: var(--secondary-text-color);
+}
+
+/* Notification text */
+.text-info {
+  font-family: var(--info-font-family);
+  font-size: var(--font-size-sm);
+  color: var(--info-color);
+}
+
+/* Code Highlight */
+.text-code {
+  font-family: var(--code-font-family);
+  font-size: var(--font-size-sm);
+  color: var(--accent-color);
+}

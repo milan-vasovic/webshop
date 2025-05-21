@@ -1,62 +1,84 @@
 <%- include('../../include/head.ejs') %>
 <%- include('../../include/navigation.ejs') %>
+
 <section class="container main__container">
-    <h1 class="main__title"><%= pageTitle %></h1>
-    <div class="column-row__container">
-        <div class="left__container-30">
-            <% if (order.Status.value !== 'failed' && order.Status.value !== 'cancelled') { %>
-                <div>
-                    <button id="toggleBtn" class="btn-secondary">Upravljanje</button>
-                    <form style="display: none;" id="statusForm" action="/admin/izmenite-porudzbinu" method="post">
-                        <div class="main-form__group">
-                            <label class="main-form__label" for="statusSelect">Status:</label>
-                            <select class="main-form__select" name="status" id="statusSelect">
-                                <option value="processing">Processing</option>
-                                <% if (order.Status.value === 'processing') { %>
-                                    <option value="cancelled">Cancelled</option>
-                                <% } %>
-                                <option value="pending-payment">Pending Payment</option>
-                                <option value="refund-period">Refund Period</option>
-                                <option value="fulfilled">Fulfilled</option>
-                                <option value="sent-exchange">Sent Exchange</option>
-                                <option value="exchanged">Exchanged</option>
-                                <option value="returned">Returned</option>
-                                <option value="failed">Failed</option>
-                            </select>
-                        </div>
-                        <input type="hidden" name="orderId" value="<%= order.ID.value %>" required>
-                        <input name="honeypot" type="hidden">
-                        <input type="hidden" name="CSRFToken" value="<%= csrfToken %>" required>
-                        <button type="submit" class="btn-primary">Izmenite</button>
-                    </form>
-                </div>
-            <% } %>
-            <h2>Broj Porudžbine: <%= order.ID.value %></h2>
-            <h3>Datum: <%= order.Datum.value %></h3>
-            <h3>Status: <%= order.Status.value %></h3>
-            <hr><br>
-            <h3>Kupac: <a href="/admin/<% if (order.Kupac.Tip.value === 'User') { %>korisnik-detalji<% } else { %>kupac-detalji<% } %>/<%= order.Kupac.ID.value %>?email=<%= order.Kupac.Email.value %>" class="main__title"><%= order.Kupac.Ime.value %> <%= order.Kupac.Prezime.value %></a></h3>
-            <p>Broj Telefona: <%= order.Telefon.value %></p>
-            <p>Adresa: <%= order.Adresa.Grad.value %>, <%= order.Adresa.Ulica.value %>, <%= order.Adresa.Broj.value %>, <%= order.Adresa["Poštanski Broj"].value %></p>
-            <p>Napomena: <%= order.Napomena.value %></p>
-            <br><hr><br>
-            <h3>Kupon: </h3> 
-            <p>Kod: <strong><%= order.Kupon.Kod.value || "nema" %></strong> Popust: <strong><% if (order.Kupon.Popust.value !== 'undefined %') { %><%= order.Kupon.Popust.value %><% } else { %>nema<% } %></strong></p>
-            <p>Poštarina: <strong><%= order.Poštarina.value %> RSD</strong></p>
-            <h2>Ukupna Cena: <%= order['Ukupna Cena'].value %></h2>
+  <h1 class="main__title break-all"><%= pageTitle %></h1>
+
+  <div class="flex flex-col gap-6 lg:flex-row">
+    
+    <!-- Leva kolona (admin akcije + informacije) -->
+    <div class="w-full lg:w-1/3 flex flex-col gap-4">
+      <% if (order.Status.value !== 'failed' && order.Status.value !== 'cancelled') { %>
+        <div>
+          <button id="toggleBtn" class="btn-secondary mb-2">Upravljanje</button>
+          <form id="statusForm" class="form hidden" action="/admin/izmenite-porudzbinu" method="post">
+            <div class="form__group">
+              <label class="form__label" for="statusSelect">Status:</label>
+              <select class="form__select" name="status" id="statusSelect">
+                <option value="processing">Processing</option>
+                <% if (order.Status.value === 'processing') { %>
+                  <option value="cancelled">Cancelled</option>
+                <% } %>
+                <option value="pending-payment">Pending Payment</option>
+                <option value="refund-period">Refund Period</option>
+                <option value="fulfilled">Fulfilled</option>
+                <option value="sent-exchange">Sent Exchange</option>
+                <option value="exchanged">Exchanged</option>
+                <option value="returned">Returned</option>
+                <option value="failed">Failed</option>
+              </select>
+            </div>
+            <input type="hidden" name="orderId" value="<%= order.ID.value %>" required>
+            <input name="honeypot" type="hidden">
+            <input type="hidden" name="CSRFToken" value="<%= csrfToken %>" required>
+            <button type="submit" class="button button-primary">Izmenite</button>
+          </form>
         </div>
-        <div class="right__container-70">
-            <%- include('../../include/table.ejs', {
-                items: order.Artikli,
-                showId: false,
-                caption: 'Artikli',
-                hasActions: false,
-                hasFooter: false,
-                totals: false,
-                actions: []
-            }) %>
-        </div>
+      <% } %>
+
+      <div class="flex flex-col gap-2">
+        <h2 class="break-all">Broj Porudžbine: <%= order.ID.value %></h2>
+        <h3>Datum: <%= order.Datum.value %></h3>
+        <h3>Status: <%= order.Status.value %></h3>
+        <hr>
+        <h3>Kupac: 
+          <a href="/admin/<% if (order.Kupac.Tip.value === 'User') { %>korisnik-detalji<% } else { %>kupac-detalji<% } %>/<%= order.Kupac.ID.value %>?email=<%= order.Kupac.Email.value %>" 
+             class="main__title">
+            <%= order.Kupac.Ime.value %> <%= order.Kupac.Prezime.value %>
+          </a>
+        </h3>
+        <p>Broj Telefona: <%= order.Telefon.value %></p>
+        <p>Adresa: <%= order.Adresa.Grad.value %>, <%= order.Adresa.Ulica.value %>, <%= order.Adresa.Broj.value %>, <%= order.Adresa["Poštanski Broj"].value %></p>
+        <p>Napomena: <%= order.Napomena.value %></p>
+        <hr>
+        <h3>Kupon:</h3> 
+        <p>Kod: <strong><%= order.Kupon.Kod.value || "nema" %></strong></p>
+        <p>Popust: <strong>
+          <% if (order.Kupon.Popust.value !== 'undefined %') { %>
+            <%= order.Kupon.Popust.value %>
+          <% } else { %>
+            nema
+          <% } %>
+        </strong></p>
+        <p>Poštarina: <strong><%= order.Poštarina.value %> RSD</strong></p>
+        <h2>Ukupna Cena: <%= order['Ukupna Cena'].value %></h2>
+      </div>
     </div>
+
+    <!-- Desna kolona (artikli) -->
+    <div class="w-full lg:w-2/3">
+      <%- include('../../include/table.ejs', {
+          items: order.Artikli,
+          showId: false,
+          caption: 'Artikli',
+          hasActions: false,
+          hasFooter: false,
+          totals: false,
+          actions: []
+      }) %>
+    </div>
+  </div>
 </section>
+
 <script src="/js/orderForm.js"></script>
 <%- include('../../include/end.ejs') %>

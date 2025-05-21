@@ -1,26 +1,22 @@
-<% 
+<%
   // Parametri:
-  // title (string): naslov bedža (opciono)
-  // text (string): kratak tekst unutar bedža (opciono)
-  // icon (string): putanja do slike (opciono)
+  // title (string): Naslov bedža (opciono)
+  // text (string): Dodatni opis (opciono)
+  // icon (string): Material symbol ikonica (opciono)
 %>
-<div class="circular-badge">
+
+<div class="info-badge">
   <% if (icon) { %>
-    <div class="badge-image">
-      <span class="material-symbols-outlined">
-        <%= icon || 'Badge' %>
-      </span>
+    <div class="info-badge__icon">
+      <span class="material-symbols-outlined"><%= icon %></span>
     </div>
   <% } %>
+
   <% if (title) { %>
-    <div class="badge-title">
-      <%= title %>
-    </div>
+    <div class="info-badge__title"><%= title %></div>
   <% } %>
+
   <% if (text) { %>
-    <div class="badge-text">
-      <%= text %>
-    </div>
+    <div class="info-badge__text"><%= text %></div>
   <% } %>
 </div>
-<script src="/js/cardSlider.js"></script>

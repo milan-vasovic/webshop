@@ -1,70 +1,85 @@
 <%- include('../include/head.ejs') %>
 <%- include('../include/navigation.ejs') %>
 
-<section class="container main__container">
-    <h1 class="main__title"><%= pageTitle %></h1>
-    <div class="width-100">
-        <h3>Za sve informacije, pitanja i nedoumice</h3>
-        <p>Slobodno nas kontaktirajte, postavite pitanja, potrudićemo se da vam odgovorimo u najkraćem mogućem roku.</p>
-        <p>Možete nas dobiti putem forme ili telefona:</p>
-        <h4>+381 65 977 4000</h4>
-        <!-- Container za formu i mapu -->
-        <div class="contact__content">
-            <!-- Kontakt forma -->
-            <form class="main-form contact__form" action="/kontaktiranje" method="post">
-                <div class="main-form__group">
-                    <label for="nameInput">Ime:</label>
-                    <input class="main-form__input" id="nameInput" name="name" type="text" required>
-                </div>
-                <div class="main-form__group">
-                    <label for="emailInput">Email:</label>
-                    <input class="main-form__input" id="emailInput" type="email" name="email" required>
-                </div>
-                <div class="main-form__group">
-                    <label for="titleInput">Naslov:</label>
-                    <select class="main-form__select" name="title" id="titleInput">
-                        <option value="Informacije" selected>Informacije</option>
-                        <option value="Pitanje">Pitanja</option>
-                        <option value="Porudžbine">Porudžbine</option>
-                        <option value="Partnerstvo">Partnerstvo</option>
-                        <option value="Nalog">Nalog</option>
-                        <option value="Greška">Greška</option>
-                    </select>
-                </div>
-                <div class="main-form__group">
-                    <label for="phoneInput">Telefon: (opcionalno)</label>
-                    <input class="main-form__input" id="phoneInput" type="tel" name="phone">
-                </div>
-                <div class="main-form__group">
-                    <label for="msgInput">Poruka:</label>
-                    <textarea class="main-form__textarea" id="msgInput" name="msg" required></textarea>
-                </div>
-                <div class="main-form__group">
-                    <label class="main-form__label" for="acceptance">Saglasnost:</label>
-                    <p>
-                        Prihvatate <a class="main__link" href="/uslovi-koriscenja">Uslove Korišćenja</a> i <a class="main__link" href="/politika-privatnosti">Politiku Privatnosti</a>
-                    </p>
-                    <input class="main-form__input" id="acceptance" name="acceptance" type="checkbox" required>
-                </div>
-                <input class="main-form__input" type="hidden" name="CSRFToken" value="<%= csrfToken %>" required>
-                <input name="honeypot" type="hidden">
-                <button class="btn-primary" type="submit">Pošaljite</button>
-                <% if (errorMessage) { %>
-                    <p class="user-message--error"><%= errorMessage %></p>
-                <% } %>
-            </form>
-            <!-- Google mapa -->
-            <div class="contact__map">
-                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2808.0233263590544!2d19.805638776650355!3d45.26753924653822!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x475b11a58a5c961f%3A0x88089247cd6b3a07!2sBo%C5%A1ka%20Vrebalova%2026%2C%20Novi%20Sad!5e0!3m2!1sen!2srs!4v1738934562872!5m2!1sen!2srs" 
-                        width="100%" 
-                        height="450" 
-                        style="border:0;" 
-                        allowfullscreen="" 
-                        loading="lazy"
-                        referrerpolicy="no-referrer-when-downgrade"></iframe>
-            </div>
-        </div>
+<section class="container section">
+  <h1 class="heading-xl mb-4"><%= pageTitle %></h1>
+
+  <div class="mb-6">
+    <h2 class="heading-md">Za sve informacije, pitanja i nedoumice</h2>
+    <p class="mb-2">Slobodno nas kontaktirajte – potrudićemo se da odgovorimo u najkraćem mogućem roku.</p>
+    <p class="mb-2">Možete nas kontaktirati putem forme ili direktno na:</p>
+    <h3 class="heading-sm text-accent">+381 65 977 4000</h3>
+  </div>
+
+  <!-- Grid: 2 kolone na desktopu, 1 na mobilnom -->
+  <div class="grid grid-1 grid-md-2 gap-8">
+    
+    <!-- Kontakt Forma -->
+    <form class="form" action="/kontaktiranje" method="POST">
+      <div class="form__group">
+        <label for="nameInput" class="form__label">Ime:</label>
+        <input class="form__input" id="nameInput" name="name" type="text" required>
+      </div>
+
+      <div class="form__group">
+        <label for="emailInput" class="form__label">Email:</label>
+        <input class="form__input" id="emailInput" type="email" name="email" required>
+      </div>
+
+      <div class="form__group">
+        <label for="titleInput" class="form__label">Naslov:</label>
+        <select class="form__select" name="title" id="titleInput">
+          <option value="Informacije" selected>Informacije</option>
+          <option value="Pitanje">Pitanja</option>
+          <option value="Porudžbine">Porudžbine</option>
+          <option value="Partnerstvo">Partnerstvo</option>
+          <option value="Nalog">Nalog</option>
+          <option value="Greška">Greška</option>
+        </select>
+      </div>
+
+      <div class="form__group">
+        <label for="phoneInput" class="form__label">Telefon (opciono):</label>
+        <input class="form__input" id="phoneInput" type="tel" name="phone">
+      </div>
+
+      <div class="form__group">
+        <label for="msgInput" class="form__label">Poruka:</label>
+        <textarea class="form__textarea" id="msgInput" name="msg" required></textarea>
+      </div>
+
+      <div class="form__group">
+        <label for="acceptance" class="form__label">Saglasnost:</label>
+        <p class="form__helper">
+          <input class="form__input" id="acceptance" name="acceptance" type="checkbox" required>
+          Prihvatate <a class="main__link" href="/uslovi-koriscenja">Uslove Korišćenja</a> i 
+          <a class="main__link" href="/politika-privatnosti">Politiku Privatnosti</a>
+        </p>
+      </div>
+
+      <input type="hidden" name="CSRFToken" value="<%= csrfToken %>">
+      <input type="hidden" name="honeypot">
+
+      <button class="button button--primary form__submit" type="submit">Pošaljite</button>
+
+      <% if (errorMessage) { %>
+        <p class="form__error"><%= errorMessage %></p>
+      <% } %>
+    </form>
+
+    <!-- Google Mapa -->
+    <div class="contact__map">
+      <iframe
+        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2808.0233263590544!2d19.805638776650355!3d45.26753924653822!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x475b11a58a5c961f%3A0x88089247cd6b3a07!2sBo%C5%A1ka%20Vrebalova%2026%2C%20Novi%20Sad!5e0!3m2!1sen!2srs!4v1738934562872!5m2!1sen!2srs"
+        width="100%"
+        height="450"
+        style="border:0;"
+        allowfullscreen=""
+        loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade">
+      </iframe>
     </div>
+  </div>
 </section>
 
 <%- include('../include/end.ejs') %>

@@ -1,0 +1,21 @@
+.checkout__layout {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: var(--space-6);
+}
+
+.checkout__left,
+.checkout__right {
+  width: 100%;
+}
+
+@media (min-width: 1024px) {
+  .checkout__layout {
+    flex-direction: row;
+  }
+
+  .checkout__left,
+  .checkout__right {
+    width: 50%;
+  }
+}

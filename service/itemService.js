@@ -1121,10 +1121,8 @@ class ItemService {
       Link: { value: item.slug },
       SKU: { value: item.sku },
       Naziv: { value: item.title },
-      Opis: { value: item.shortDescription },
       Status: { value: item.status.join(", ") },
       Kategorije: { value: item.categories.join(", ") },
-      Tagovi: { value: item.tags.join(", ") },
       Slika: {
         value: item.featureImage.img,
         Opis: item.featureImage.imgDesc,

@@ -1,0 +1,107 @@
+/* ===============================
+   🧾 Card Component Styles
+   =============================== */
+
+.card {
+  background-color: var(--primary-background-color);
+  color: var(--primary-text-color);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  padding: var(--space-4);
+  transition: box-shadow var(--transition-medium), transform var(--transition-medium);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.card__header {
+  margin-bottom: var(--space-3);
+  font-family: var(--heading-font-family);
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--primary-text-color);
+}
+
+.card__title {
+  margin: 0;
+  font-size: var(--font-size-xl);
+  font-weight: 600;
+  color: var(--primary-text-color);
+}
+
+.card__subtitle {
+  margin-top: var(--space-1);
+  font-size: var(--font-size-sm);
+  color: var(--neutral-text-color);
+}
+
+.card__content {
+  flex: 1 1 auto;
+  font-size: var(--font-size-md);
+  line-height: var(--line-height-normal);
+  color: var(--primary-text-color);
+}
+
+.card__field {
+  margin-bottom: var(--space-2);
+}
+
+.card__field:last-child {
+  margin-bottom: 0;
+}
+
+.card__footer {
+  margin-top: var(--space-4);
+  text-align: right;
+  font-size: var(--font-size-sm);
+  color: var(--secondary-text-color);
+}
+
+.card__actions {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+}
+
+.card--accent {
+  border-left: var(--border-thick) solid var(--accent-color);
+}
+
+.card--success {
+  border-left: var(--border-thick) solid var(--success-color);
+}
+
+.card--warning {
+  border-left: var(--border-thick) solid var(--warning-color);
+}
+
+.card--danger {
+  border-left: var(--border-thick) solid var(--danger-color);
+}
+
+/* 📦 Card Grid Container */
+.cards__container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-4);
+  align-items: stretch;
+}
+
+@media (min-width: 1024px) {
+  .cards__container {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .cards__container {
+    grid-template-columns: 1fr;
+  }
+}
+

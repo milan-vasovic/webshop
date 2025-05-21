@@ -1,4 +1,4 @@
-import sanitize from 'mongo-sanitize';
+import sanitize from "mongo-sanitize";
 import sanitizeHtml from 'sanitize-html';
 import { validationResult } from 'express-validator';
 import { generateBreadcrumbJsonLd } from "../helper/breadcrumbsSchema.js";
@@ -171,7 +171,7 @@ async function getSearchForumsPage(req, res, next) {
 
 async function getForumPostDetailsPage(req, res, next) {
     try {
-        const postSlug = rsanitizeHtml(sanitize(eq.params.postSlug));
+        const postSlug = sanitizeHtml(sanitize(req.params.postSlug));
         const post = await ForumService.findPostBySlug(postSlug);
 
         const breadcrumbs = buildBreadcrumbs({

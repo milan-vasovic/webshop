@@ -1,109 +1,116 @@
 <%- include('../include/head.ejs') %>
 <%- include('../include/navigation.ejs') %>
 
-<section class="container main__container">
-  <h1 class="main__title"><%= item.Naziv.value %></h1>
-  <div class="column-row__container flex-column-normal-force">
-    <div class="left__container-30">
+<section class="container section">
+  <h1 class="heading-xl mb-4"><%= item.Naziv.value %></h1>
+  <div class="flex flex-column flex-lg:row gap-6">
+    <!-- Left: Gallery -->
+    <div class="w-full w-lg-half">
       <%- include('../include/galery.ejs', {
-            images: item.Slike.Slike,
-            selectedImage: item.Slike['Istaknuta Slika'],
-            video: item.Video
-        }) %>
+        images: item.Slike.Slike,
+        selectedImage: item.Slike['Istaknuta Slika'],
+        video: item.Video,
+        cspNonce: cspNonce
+      }) %>
     </div>
 
-    <div class="right__container-70">
+    <!-- Right: Product Info -->
+    <div class="w-full w-lg-half">
       <%- include('../include/breadcrumbs', { breadcrumbs }) %>
-      <!-- Cena -->
-      <div class="product__price-block">
+
+      <div class="product__price-block mb-4">
         <h2 class="product__price" id="productPriceDisplay">
           <% if (item.Status.value.includes('action') && item.Varijacije.some(v => v.Akcija)) { %>
-            <s><%= item.Cena.value %> RSD</s> <span class="highlight"><%= item["Akcijska Cena"].value %> RSD</span>
+            <s><%= item.Cena.value %> RSD</s> <span class="highlight"><%= item['Akcijska Cena'].value %> RSD</span>
           <% } else { %>
             <%= item.Cena.value %> RSD
           <% } %>
         </h2>
       </div>
-            
-      <div>
-        <form id="productForm" action="/prodavnica/korpa-dodavanje" method="post">
-          <div>
-            <label class="main-form__label" for="variationsSelect">Izaberite:</label>
-            <select class="main-form__input" name="variationsSelect" id="variationsSelect">
-              <% item.Varijacije.forEach((v, index) => { %>
-                <option value="<%= index %>" class="<%= v.Akcija ? 'variation-on-sale' : '' %>"><%= v.Veličina %> <%= v.Boja %></option>
-              <% }) %>
-            </select>
-          </div>
-          <div>
-            <label class="main-form__label" for="amountInput">Količina:</label>
-            <input class="main-form__input" type="number" name="amount" id="amountInput" min="1" placeholder="1" required >
-          </div>
-          <div id="stockMessage"></div>
-          <div id="formSubmitContainer">
-            <button class="btn-primary" type="submit" id="submitBtn">Dodaj u korpu</button>
-          </div>
-          <input class="main-form__input" type="hidden" name="itemId" value="<%= item.ID.value %>">
-          <input class="main-form__input" type="hidden" name="CSRFToken" value="<%= csrfToken %>">
-          <input type="hidden" name="variationId" id="variationId" value="<%= item.Varijacije[0].ID %>">
-          <input name="honeypot" type="hidden">
-        </form>
-      </div>
-      <% if (isAuthenticated) { %>
-        <div>
-          <br>
-          <form action="/korisnik/<% if (!isWishlisted) { %>dodavanje-u-listu-zelja<% } else { %>izbacivanje-iz-liste-zelja<% } %>" method="post">
-            <input class="main-form__input" id="itemId" type="hidden" name="itemId" value="<%= item.ID.value %>">
-            <input name="honeypot" type="hidden">
-            <input class="main-form__input" type="hidden" name="CSRFToken" value="<%= csrfToken %>" required>
-            <button type="submit" class="btn-primary"><% if (!isWishlisted) { %>Ubacite u Listu Želja &#9829;<% } else { %>Izbacite iz Liste Želja &#9825;<% } %></button>
-          </form>
-        </div>
-        <br>
-      <% } %>
-      
-      <div class="product__info-block">
-        <p class="product__description"><%= item.Opis.value %></p>
-    
-        <div class="product__meta flex flex-column align-center gap-medium">
-            <h3 class="product__meta-title">Kategorije:</h3>
-            <ul class="flex flex-row flex-wrap gap-small">
-              <% item.Kategorije.value.forEach(c => { %>
-                <li><a href="/prodavnica/kategorija/<%= c %>" class="card__badge"><%= c %></a></li>
-              <% }) %>
-            </ul>
 
-            <h3 class="product__meta-title">Tagovi:</h3>
-            <ul class="flex flex-row flex-wrap justify-center gap-small">
-              <% item.Tagovi.value.forEach(t => { %>
-                <li><a href="/prodavnica/oznaka/<%= t %>" class="card__badge"><%= t %></a></li>
-              <% }) %>
-            </ul>
-        </div>
-      </div>
-    
-      <% if (item["CrossSell Artikli"].length > 0) { %>
-        <div class="margin__normal flex flex-column align-center">
-          <h2>Idealni Artikli uz Ovaj:</h2>
-          <div class="grid grid-3">
-            <% item["CrossSell Artikli"].forEach(i => { %>
-              <%- include('../include/card.ejs', {
-                item: i,
-                hasActions: true,
-                actions: [
-                  {
-                    type: 'link-name',
-                    link: "/prodavnica/artikal/",
-                    linkName: 'Pogledajte'
-                  }
-                ],
-                showId: false
-              }) %>
+      <form id="productForm" class="form mb-4" action="/prodavnica/korpa-dodavanje" method="post">
+        <div class="form__group">
+          <label class="form__label" for="variationsSelect">Izaberite:</label>
+          <select class="form__input" name="variationsSelect" id="variationsSelect">
+            <% item.Varijacije.forEach((v, index) => { %>
+              <option value="<%= index %>" class="<%= v.Akcija ? 'variation-on-sale' : '' %>">
+                <%= v.Veličina %> <%= v.Boja %>
+              </option>
             <% }) %>
-          </div>    
+          </select>
         </div>
+
+        <div class="form__group">
+          <label class="form__label" for="amountInput">Količina:</label>
+          <input class="form__input" type="number" name="amount" id="amountInput" min="1" placeholder="1" required>
+        </div>
+
+        <div id="stockMessage" class="text-sm mt-2 text-danger"></div>
+
+        <div id="formSubmitContainer">
+          <button class="button button--primary mt-3" type="submit" id="submitBtn">Dodaj u korpu</button>
+        </div>
+
+        <input type="hidden" name="itemId" value="<%= item.ID.value %>">
+        <input type="hidden" name="CSRFToken" value="<%= csrfToken %>">
+        <input type="hidden" name="variationId" id="variationId" value="<%= item.Varijacije[0].ID %>">
+        <input name="honeypot" type="hidden">
+      </form>
+
+      <% if (isAuthenticated) { %>
+        <form action="/korisnik/<%= !isWishlisted ? 'dodavanje-u-listu-zelja' : 'izbacivanje-iz-liste-zelja' %>" method="post">
+          <input type="hidden" name="itemId" value="<%= item.ID.value %>">
+          <input type="hidden" name="CSRFToken" value="<%= csrfToken %>">
+          <input name="honeypot" type="hidden">
+          <button class="button button--primary mt-3">
+            <% if (!isWishlisted) { %>
+              Ubacite u Listu Želja ♥
+            <% } else { %>
+              Izbacite iz Liste Želja ♡
+            <% } %>
+          </button>
+        </form>
       <% } %>
+
+      <div class="product__description mt-6">
+        <p><%= item.Opis.value %></p>
+      </div>
+
+      <div class="product__meta mt-6">
+        <h3 class="product__meta-title">Kategorije:</h3>
+        <ul class="flex flex-wrap gap-2">
+          <% item.Kategorije.value.forEach(c => { %>
+            <li><a href="/prodavnica/kategorija/<%= c %>" class="badge badge--primary"><%= c %></a></li>
+          <% }) %>
+        </ul>
+
+        <h3 class="product__meta-title mt-4">Tagovi:</h3>
+        <ul class="flex flex-wrap gap-2">
+          <% item.Tagovi.value.forEach(t => { %>
+            <li><a href="/prodavnica/oznaka/<%= t %>" class="badge badge--neutral"><%= t %></a></li>
+          <% }) %>
+        </ul>
+      </div>
+    </div>
   </div>
+
+  <% if (item["CrossSell Artikli"].length > 0) { %>
+    <div class="section mt-6">
+      <h2 class="heading-lg text-center mb-4">Idealni Artikli uz Ovaj</h2>
+      <div class="grid grid-1 grid-md-3 gap-4">
+        <% item["CrossSell Artikli"].forEach(i => { %>
+          <%- include('../include/card.ejs', {
+            item: i,
+            hasActions: true,
+            actions: [
+              { type: 'link-name', link: "/prodavnica/artikal/", linkName: 'Pogledajte' }
+            ],
+            showId: false
+          }) %>
+        <% }) %>
+      </div>
+    </div>
+  <% } %>
 
   <div id="item-data"
     data-variations='<%- JSON.stringify(item.Varijacije) %>'
@@ -112,9 +119,8 @@
     data-status="<%= item.Status?.value?.map(s => s.trim()).join(',') %>"
     data-price="<%= item.Cena.value %>"
     data-action-price="<%= item['Akcijska Cena'].value %>"
-    style="display: none;">
+    hidden>
   </div>
-
 </section>
 
 <script src="/js/product.js"></script>

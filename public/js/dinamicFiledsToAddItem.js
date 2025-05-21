@@ -1,121 +1,75 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // Lista svih dostupnih kategorija
   const availableCategories = [
-    "Odeća",
-    "Helanke",
-    "Trenerke",
-    "Fitness",
-    "Kompleti",
-    "Majice",
-    "Farmerice",
-    "Pantalone",
-    "Šorc",
-    "Haljine",
-    "Suknje",
-    "Kardigani",
-    "Jakne",
-    "Muško",
-    "Žensko",
-    "Kupaći Kostimi Jednodelni",
-    "Kupaći Kostimi Dvodelni",
-    "Zimsko",
-    "Letnje",
-    "Prolećno",
-    "Jesenje",
-    "Veš",
-  ];
+  "Odeća", "Helanke", "Trenerke", "Fitness", "Kompleti",
+  "Majice", "Farmerice", "Pantalone", "Šorc", "Haljine",
+  "Suknje", "Kardigani", "Jakne", "Muško", "Žensko",
+  "Kupaći Kostimi Jednodelni", "Kupaći Kostimi Dvodelni",
+  "Zimsko", "Letnje", "Prolećno", "Jesenje", "Veš"
+];
 
-  // Lista za praćenje izabranih kategorija
   const selectedCategories = [];
-
-  // Reference na elemente forme
   const categoriesContainer = document.getElementById("categoriesContainer");
   const addCategoryButton = document.getElementById("addCategory");
 
-  // Funkcija za ažuriranje izabranih kategorija
   const updateSelectedCategories = () => {
-    // Resetujemo listu i ponovo je popunjavamo iz forme
     selectedCategories.length = 0;
-    const allSelects = categoriesContainer.querySelectorAll("select");
-    allSelects.forEach((select) => {
-      if (select.value) {
-        selectedCategories.push(select.value);
-      }
+    categoriesContainer.querySelectorAll("select").forEach(select => {
+      if (select.value) selectedCategories.push(select.value);
     });
   };
 
-  // Funkcija za ažuriranje dostupnih opcija u svim poljima
   const updateCategoryOptions = () => {
-    const allSelects = categoriesContainer.querySelectorAll("select");
-    allSelects.forEach((select) => {
-      const currentValue = select.value; // Trenutno selektovana vrednost
-      select.innerHTML = ``; // Reset opcija
-
-      availableCategories.forEach((category) => {
-        // Prikazujemo samo dostupne kategorije ili trenutno selektovanu vrednost
-        if (
-          !selectedCategories.includes(category) ||
-          category === currentValue
-        ) {
+    categoriesContainer.querySelectorAll("select").forEach(select => {
+      const currentValue = select.value;
+      select.innerHTML = "";
+      availableCategories.forEach(category => {
+        if (!selectedCategories.includes(category) || category === currentValue) {
           const option = document.createElement("option");
           option.value = category;
           option.textContent = category;
-          if (category === currentValue) {
-            option.selected = true;
-          }
+          if (category === currentValue) option.selected = true;
           select.appendChild(option);
         }
       });
     });
   };
 
-  // Funkcija za dodavanje nove kategorije
   const addCategoryField = () => {
-    // Provera: Da li možemo da dodamo novu kategoriju?
     if (selectedCategories.length >= availableCategories.length - 1) {
       alert("Ne možete dodati više kategorija. Dostigli ste maksimalan broj!");
       return;
     }
 
-    // Kreiranje novog polja za kategoriju
-    const index = categoriesContainer.querySelectorAll(".dynamic-group").length;
+    const index = categoriesContainer.querySelectorAll(".form__group--block").length;
     const group = document.createElement("div");
-    group.classList.add("dynamic-group");
+    group.classList.add("form__group--block", "dynamic-group");
 
     const select = document.createElement("select");
     select.id = `categories${index}`;
     select.name = "categories[]";
-    select.classList.add("main-form__select");
+    select.classList.add("form__select");
     select.required = true;
 
     const removeButton = document.createElement("button");
     removeButton.type = "button";
-    removeButton.classList.add("btn", "btn-danger", "removeField");
+    removeButton.classList.add("button", "button--danger", "removeField");
     removeButton.textContent = "Izbriši";
 
     group.appendChild(select);
     group.appendChild(removeButton);
     categoriesContainer.appendChild(group);
 
-    // Ažuriranje opcija za novododato polje
     updateSelectedCategories();
     updateCategoryOptions();
 
-    // Event za promenu selektovane vrednosti
     select.addEventListener("change", () => {
       updateSelectedCategories();
       updateCategoryOptions();
     });
 
-    // Event za brisanje polja
     removeButton.addEventListener("click", () => {
-      if (select.value) {
-        // Ukloni vrednost kategorije iz liste `selectedCategories`
-        const index = selectedCategories.indexOf(select.value);
-        if (index !== -1) {
-          selectedCategories.splice(index, 1); // Ukloni izabranu kategoriju
-        }
-      }
+      const index = selectedCategories.indexOf(select.value);
+      if (index !== -1) selectedCategories.splice(index, 1);
       group.remove();
       updateSelectedCategories();
       updateCategoryOptions();
@@ -124,19 +78,13 @@ document.addEventListener("DOMContentLoaded", () => {
     select.addEventListener("change", refreshItems);
   };
 
-  // Event listener za dugme "Dodaj kategoriju"
   addCategoryButton.addEventListener("click", addCategoryField);
-
-  // Inicijalno ažuriranje opcija u postojećim poljima
   updateSelectedCategories();
   updateCategoryOptions();
 
-  const existingCategories = categoriesContainer.querySelectorAll(
-    ".dynamic-group .removeField"
-  );
-  existingCategories.forEach((button) => {
-    button.addEventListener("click", (event) => {
-      const group = event.target.closest(".dynamic-group");
+  categoriesContainer.querySelectorAll(".removeField").forEach(button => {
+    button.addEventListener("click", event => {
+      const group = event.target.closest(".form__group--block");
       if (group) group.remove();
     });
   });
@@ -147,95 +95,82 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Funkcija za dodavanje novog polja za tag
   const addTagField = () => {
-    // Kreiramo novu grupu za dinamičko polje
-    const index = tagsContainer.querySelectorAll(".dynamic-group").length;
-    const group = document.createElement("div");
-    group.classList.add("dynamic-group");
+    const index = tagsContainer.querySelectorAll(".form__group--block").length;
 
-    // Kreiramo input polje za tag
+    const group = document.createElement("div");
+    group.classList.add("form__group--block", "dynamic-group");
+
     const input = document.createElement("input");
     input.type = "text";
     input.id = `tags${index}`;
     input.name = "tags[]";
-    input.classList.add("main-form__input");
+    input.classList.add("form__input");
     input.required = true;
 
-    // Kreiramo dugme za brisanje
     const removeButton = document.createElement("button");
     removeButton.type = "button";
-    removeButton.classList.add("btn", "btn-danger", "removeField");
+    removeButton.classList.add("button", "button--danger", "removeField");
     removeButton.textContent = "Izbriši";
 
-    // Dodajemo input i dugme u grupu
     group.appendChild(input);
     group.appendChild(removeButton);
     tagsContainer.appendChild(group);
 
-    // Dodajemo listener za dugme za brisanje
     removeButton.addEventListener("click", () => {
       group.remove();
     });
   };
 
-  // Dodajemo listener na dugme za dodavanje
+  // Dodavanje event listener-a za "Dodajte" dugme
   addTagButton.addEventListener("click", addTagField);
 
-  // Prolazimo kroz već postojeće tagove (ako ih ima) i dodajemo listener za brisanje
-  const existingTags = tagsContainer.querySelectorAll(
-    ".dynamic-group .removeField"
-  );
-  existingTags.forEach((button) => {
+  // Dodavanje listenera za postojeće "Izbriši" dugmiće
+  tagsContainer.querySelectorAll(".removeField").forEach((button) => {
     button.addEventListener("click", (event) => {
-      const group = event.target.closest(".dynamic-group");
+      const group = event.target.closest(".form__group--block");
       if (group) group.remove();
     });
   });
+
 
   const keyWordsContainer = document.getElementById("keyWordsContainer");
   const addKeyWordButton = document.getElementById("addKeyWord");
 
   // Funkcija za dodavanje novog polja za ključne reči
   const addKeyWordField = () => {
-    // Kreiramo novu grupu za dinamičko polje
-    const index = keyWordsContainer.querySelectorAll(".dynamic-group").length;
-    const group = document.createElement("div");
-    group.classList.add("dynamic-group");
+    const index = keyWordsContainer.querySelectorAll(".form__group--block").length;
 
-    // Kreiramo input polje za ključnu reč
+    const group = document.createElement("div");
+    group.classList.add("form__group--block", "dynamic-group");
+
     const input = document.createElement("input");
     input.type = "text";
     input.id = `keyWords${index}`;
     input.name = "keyWords[]";
-    input.classList.add("main-form__input");
+    input.classList.add("form__input");
     input.required = true;
 
-    // Kreiramo dugme za brisanje
     const removeButton = document.createElement("button");
     removeButton.type = "button";
-    removeButton.classList.add("btn", "btn-danger", "removeField");
+    removeButton.classList.add("button", "button--danger", "removeField");
     removeButton.textContent = "Izbriši";
 
-    // Dodajemo input i dugme u grupu
     group.appendChild(input);
     group.appendChild(removeButton);
     keyWordsContainer.appendChild(group);
 
-    // Dodajemo listener za dugme za brisanje
     removeButton.addEventListener("click", () => {
       group.remove();
     });
   };
 
-  // Dodajemo listener na dugme za dodavanje ključnih reči
+  // Listener na "Dodaj ključnu reč" dugme
   addKeyWordButton.addEventListener("click", addKeyWordField);
 
-  // Prolazimo kroz već postojeće ključne reči (ako ih ima) i dodajemo listener za brisanje
-  const existingKeyWords = keyWordsContainer.querySelectorAll(
-    ".dynamic-group .removeField"
-  );
-  existingKeyWords.forEach((button) => {
+  // Listeneri za postojeća "Izbriši" dugmad
+  keyWordsContainer.querySelectorAll(".removeField").forEach((button) => {
     button.addEventListener("click", (event) => {
-      const group = event.target.closest(".dynamic-group");
+      const group = event.target.closest(".form__group--block");
       if (group) group.remove();
     });
   });
@@ -247,7 +182,7 @@ document.addEventListener("DOMContentLoaded", () => {
     "empty",
     "normal",
     "partnership",
-    "not-published",
+    "not-published"
   ];
 
   // Lista za praćenje izabranih statusa
@@ -259,13 +194,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Funkcija za ažuriranje izabranih statusa
   const updateSelectedStatuses = () => {
-    // Resetujemo listu i ponovo je popunjavamo iz forme
     selectedStatuses.length = 0;
     const allSelects = statusesContainer.querySelectorAll("select");
     allSelects.forEach((select) => {
-      if (select.value) {
-        selectedStatuses.push(select.value);
-      }
+      if (select.value) selectedStatuses.push(select.value);
     });
   };
 
@@ -273,70 +205,59 @@ document.addEventListener("DOMContentLoaded", () => {
   const updateStatusOptions = () => {
     const allSelects = statusesContainer.querySelectorAll("select");
     allSelects.forEach((select) => {
-      const currentValue = select.value; // Trenutno selektovana vrednost
-      select.innerHTML = ``; // Reset opcija
+      const currentValue = select.value;
+      select.innerHTML = "";
 
       availableStatuses.forEach((status) => {
-        // Prikazujemo samo dostupne statuse ili trenutno selektovanu vrednost
         if (!selectedStatuses.includes(status) || status === currentValue) {
           const option = document.createElement("option");
           option.value = status;
           option.textContent = status;
-          if (status === currentValue) {
-            option.selected = true;
-          }
+          if (status === currentValue) option.selected = true;
           select.appendChild(option);
         }
       });
     });
   };
 
-  // Funkcija za dodavanje novog statusa
+  // Funkcija za dodavanje novog status polja
   const addStatusField = () => {
-    // Provera: Da li možemo da dodamo novi status?
     if (selectedStatuses.length >= availableStatuses.length - 1) {
       alert("Ne možete dodati više statusa. Dostigli ste maksimalan broj!");
       return;
     }
 
-    // Kreiranje novog polja za status
-    const index = statusesContainer.querySelectorAll(".dynamic-group").length;
+    const index = statusesContainer.querySelectorAll(".form__group--block").length;
     const group = document.createElement("div");
-    group.classList.add("dynamic-group");
+    group.classList.add("form__group--block", "dynamic-group");
 
     const select = document.createElement("select");
     select.id = `status${index}`;
     select.name = "status[]";
-    select.classList.add("main-form__select");
+    select.classList.add("form__select");
     select.required = true;
 
     const removeButton = document.createElement("button");
     removeButton.type = "button";
-    removeButton.classList.add("btn-danger", "removeField");
+    removeButton.classList.add("button", "button--danger", "removeField");
     removeButton.textContent = "Izbriši";
 
     group.appendChild(select);
     group.appendChild(removeButton);
     statusesContainer.appendChild(group);
 
-    // Ažuriranje opcija za novododato polje
     updateSelectedStatuses();
     updateStatusOptions();
 
-    // Event za promenu selektovane vrednosti
     select.addEventListener("change", () => {
       updateSelectedStatuses();
       updateStatusOptions();
     });
 
-    // Event za brisanje polja
     removeButton.addEventListener("click", () => {
       if (select.value) {
-        // Ukloni vrednost statusa iz liste `selectedStatuses`
         const index = selectedStatuses.indexOf(select.value);
-        if (index !== -1) {
-          selectedStatuses.splice(index, 1); // Ukloni izabrani status
-        }
+        if (index !== -1) selectedStatuses.splice(index, 1);
       }
       group.remove();
       updateSelectedStatuses();
@@ -344,19 +265,17 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   };
 
-  // Event listener za dugme "Dodaj status"
+  // Event listener za "Dodajte status"
   addStatusButton.addEventListener("click", addStatusField);
 
-  // Inicijalno ažuriranje opcija u postojećim poljima
+  // Inicijalno ažuriraj sve opcije
   updateSelectedStatuses();
   updateStatusOptions();
 
-  const existingStatuses = statusesContainer.querySelectorAll(
-    ".dynamic-group .removeField"
-  );
-  existingStatuses.forEach((button) => {
+  // Listeneri za postojeće dugme "Izbriši"
+  statusesContainer.querySelectorAll(".removeField").forEach((button) => {
     button.addEventListener("click", (event) => {
-      const group = event.target.closest(".dynamic-group");
+      const group = event.target.closest(".form__group--block");
       if (group) group.remove();
     });
   });
@@ -364,182 +283,54 @@ document.addEventListener("DOMContentLoaded", () => {
   const variationsContainer = document.getElementById("variations-container");
   const addVariationButton = document.getElementById("addVariation");
 
-  // Funkcija za dodavanje nove varijacije
   const addVariationField = () => {
-    // Broj već postojećih varijacija kao indeks
     const index = variationsContainer.querySelectorAll(".dynamic-group").length;
-
-    // Kreiranje wrapper div-a za novu varijaciju
     const group = document.createElement("div");
-    group.classList.add("variation", "dynamic-group");
+    group.classList.add("form__group--block", "variation", "dynamic-group");
 
-    // Kreiraj privremeni ID, na primer: "new-" + timestamp
     const tempId = "new-" + Date.now();
 
-    // Skriveno polje za privremeni ID varijacije
-    const variationIdInput = document.createElement("input");
-    variationIdInput.type = "hidden";
-    variationIdInput.name = `variations[${index}][variationId]`;
-    variationIdInput.value = tempId;
+    group.innerHTML = `
+      <label for="variationSize${index}" class="form__label">Veličina:</label>
+      <select id="variationSize${index}" name="variations[${index}][size]" class="form__select" required>
+        ${["XS","S","M","L","XL","2XL","3XL","4XL","XS/S","S/M","M/L","L/XL","XL/2XL","2XL/3XL","3XL/4XL","Uni","26","27","28","29","30","31","32","33","34","35"]
+          .map(size => `<option value="${size}">${size}</option>`).join("")}
+      </select>
 
-    // Label i select za veličinu
-    const sizeLabel = document.createElement("label");
-    sizeLabel.textContent = "Veličina:";
-    sizeLabel.setAttribute("for", `variationSize${index}`);
-    sizeLabel.classList.add("main-form__label");
+      <label for="variationColor${index}" class="form__label">Boja:</label>
+      <input type="text" id="variationColor${index}" name="variations[${index}][color]" class="form__input" required>
 
-    const sizeSelect = document.createElement("select");
-    sizeSelect.id = `variationSize${index}`;
-    sizeSelect.name = `variations[${index}][size]`;
-    sizeSelect.classList.add("main-form__select");
-    sizeSelect.required = true;
+      <label for="variationAmount${index}" class="form__label">Količina:</label>
+      <input type="number" id="variationAmount${index}" name="variations[${index}][amount]" min="0" class="form__input" required>
 
-    const sizes = [
-      "XS",
-      "S",
-      "M",
-      "L",
-      "XL",
-      "2XL",
-      "3XL",
-      "4XL",
-      "XS/S",
-      "S/M",
-      "M/L",
-      "L/XL",
-      "XL/2XL",
-      "2XL/3XL",
-      "3XL/4XL",
-      "Uni",
-      "26",
-      "27",
-      "28",
-      "29",
-      "30",
-      "31",
-      "32",
-      "33",
-      "34",
-      "35",
-    ];
-    sizes.forEach((size) => {
-      const option = document.createElement("option");
-      option.value = size;
-      option.textContent = size;
-      sizeSelect.appendChild(option);
-    });
+      <label for="variationImage${index}" class="form__label">Slika:</label>
+      <input type="file" id="variationImage${index}" name="variationImage_${tempId}" accept="image/*" class="form__file">
 
-    // Input za boju
-    const colorLabel = document.createElement("label");
-    colorLabel.textContent = "Boja:";
-    colorLabel.setAttribute("for", `variationColor${index}`);
-    colorLabel.classList.add("main-form__label");
+      <label for="variationImageDesc${index}" class="form__label">Opis slike:</label>
+      <input type="text" id="variationImageDesc${index}" name="variations[${index}][imgDesc]" class="form__input" required>
 
-    const colorInput = document.createElement("input");
-    colorInput.type = "text";
-    colorInput.id = `variationColor${index}`;
-    colorInput.name = `variations[${index}][color]`;
-    colorInput.classList.add("main-form__input");
-    colorInput.required = true;
+      <label for="variationAction${index}" class="form__label">Na Akciji:</label>
+      <select id="variationAction${index}" name="variations[${index}][onAction]" class="form__select" required>
+        <option value="true">Da</option>
+        <option value="false">Ne</option>
+      </select>
 
-    // Input za količinu
-    const amountLabel = document.createElement("label");
-    amountLabel.textContent = "Količina:";
-    amountLabel.setAttribute("for", `variationAmount${index}`);
-    amountLabel.classList.add("main-form__label");
+      <input type="hidden" name="variations[${index}][variationId]" value="${tempId}">
+    `;
 
-    const amountInput = document.createElement("input");
-    amountInput.type = "number";
-    amountInput.id = `variationAmount${index}`;
-    amountInput.name = `variations[${index}][amount]`;
-    amountInput.classList.add("main-form__input");
-    amountInput.min = "0";
-    amountInput.required = true;
-
-    // Input za sliku – preimenuj file input tako da uključuje tempId
-    const imageLabel = document.createElement("label");
-    imageLabel.textContent = "Slika:";
-    imageLabel.setAttribute("for", `variationImage${index}`);
-    imageLabel.classList.add("main-form__label");
-
-    const imageInput = document.createElement("input");
-    imageInput.type = "file";
-    imageInput.id = `variationImage${index}`;
-    // Ime file inputa sadrži privremeni ID, npr. "variationImage_new-<timestamp>"
-    imageInput.name = `variationImage_${tempId}`;
-    imageInput.classList.add("main-form__file");
-    imageInput.accept = "image/*";
-
-    // Input za opis slike
-    const imageDescLabel = document.createElement("label");
-    imageDescLabel.textContent = "Opis slike:";
-    imageDescLabel.setAttribute("for", `variationImageDesc${index}`);
-    imageDescLabel.classList.add("main-form__label");
-
-    const imageDescInput = document.createElement("input");
-    imageDescInput.type = "text";
-    imageDescInput.id = `variationImageDesc${index}`;
-    imageDescInput.name = `variations[${index}][imgDesc]`;
-    imageDescInput.classList.add("main-form__input");
-    imageDescInput.required = true;
-
-    // Select za 'onAction'
-    const actionLabel = document.createElement("label");
-    actionLabel.textContent = "Na akciji:";
-    actionLabel.setAttribute("for", `variationAction${index}`);
-    actionLabel.classList.add("main-form__label");
-
-    const actionSelect = document.createElement("select");
-    actionSelect.id = `variationAction${index}`;
-    actionSelect.name = `variations[${index}][onAction]`;
-    actionSelect.classList.add("main-form__select");
-    actionSelect.required = true;
-
-    const optionYes = document.createElement("option");
-    optionYes.value = "true";
-    optionYes.textContent = "Da";
-    actionSelect.appendChild(optionYes);
-
-    const optionNo = document.createElement("option");
-    optionNo.value = "false";
-    optionNo.textContent = "Ne";
-    actionSelect.appendChild(optionNo);
-
-    // Dugme za brisanje polja
     const removeButton = document.createElement("button");
     removeButton.type = "button";
-    removeButton.classList.add("btn-danger", "removeField");
+    removeButton.classList.add("button", "button--danger", "removeField");
     removeButton.textContent = "Izbriši";
-    removeButton.addEventListener("click", () => {
-      group.remove();
-    });
+    removeButton.addEventListener("click", () => group.remove());
 
-    // Sklapanje svih elemenata u grupu
-    group.appendChild(sizeLabel);
-    group.appendChild(sizeSelect);
-    group.appendChild(colorLabel);
-    group.appendChild(colorInput);
-    group.appendChild(amountLabel);
-    group.appendChild(amountInput);
-    group.appendChild(imageLabel);
-    group.appendChild(imageInput);
-    group.appendChild(imageDescLabel);
-    group.appendChild(imageDescInput);
-    group.appendChild(variationIdInput);
-    group.appendChild(actionLabel);
-    group.appendChild(actionSelect);
     group.appendChild(removeButton);
-
-    // Dodavanje grupe u container
     variationsContainer.appendChild(group);
   };
 
-  // Event listener za dugme "Dodajte"
   addVariationButton.addEventListener("click", addVariationField);
 
-  const existingVariations = variationsContainer.querySelectorAll(
-    ".dynamic-group .removeField"
-  );
+  const existingVariations = variationsContainer.querySelectorAll(".dynamic-group .removeField");
   existingVariations.forEach((button) => {
     button.addEventListener("click", (event) => {
       const group = event.target.closest(".dynamic-group");
@@ -553,54 +344,37 @@ document.addEventListener("DOMContentLoaded", () => {
   const selectedCrossSellItems = [];
 
   const upSellContainer = document.getElementById("upSellItems-container");
-  const crossSellContainer = document.getElementById(
-    "crossSellItems-container"
-  );
+  const crossSellContainer = document.getElementById("crossSellItems-container");
   const addUpSellButton = document.getElementById("addUpSellItem");
   const addCrossSellButton = document.getElementById("addCrossSellItem");
-  const categoryInputs = document.querySelectorAll(
-    'select[name="categories[]"]'
-  );
+  const categoryInputs = document.querySelectorAll('select[name="categories[]"]');
   const itemId = document.getElementById("itemId")?.value;
 
-  // Function to fetch items from the database
   const fetchItemsFromDatabase = async (categories, type) => {
     if (!categories.length) return [];
     try {
-      const endpoint =
-        type === "upsell"
-          ? "/admin/upsell-artikli"
-          : "/admin/crosssell-artikli";
-      const response = await fetch(
-        `${endpoint}?categories=${categories}&itemId=${itemId || ""}`
-      );
-      if (!response.ok) throw new Error(`Error fetching ${type} items`);
+      const endpoint = type === "upsell" ? "/admin/upsell-artikli" : "/admin/crosssell-artikli";
+      const response = await fetch(`${endpoint}?categories=${categories}&itemId=${itemId || ""}`);
+      if (!response.ok) throw new Error(`Greška prilikom učitavanja ${type} artikala`);
       return await response.json();
-    } catch (error) {
+    } catch {
       return [];
     }
   };
 
-  // Function to update selected items
   const updateSelectedItems = (container, selectedItems) => {
     selectedItems.length = 0;
-    const selects = container.querySelectorAll("select");
-    selects.forEach((select) => {
+    container.querySelectorAll("select").forEach(select => {
       if (select.value) selectedItems.push(select.value);
     });
   };
 
-  // Function to update options in all select fields
   const updateOptions = (container, availableItems, selectedItems) => {
-    const allSelects = container.querySelectorAll("select");
-    allSelects.forEach((select) => {
+    container.querySelectorAll("select").forEach(select => {
       const currentValue = select.value;
       select.innerHTML = "";
-      availableItems.forEach((item) => {
-        if (
-          !selectedItems.includes(item.ID.value) ||
-          item.ID.value === currentValue
-        ) {
+      availableItems.forEach(item => {
+        if (!selectedItems.includes(item.ID.value) || item.ID.value === currentValue) {
           const option = document.createElement("option");
           option.value = item.ID.value;
           option.textContent = item.Naziv.value;
@@ -611,68 +385,59 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   };
 
-  // Function to add a new dynamic field
   const addDynamicField = (container, availableItems, selectedItems, type) => {
-    if (selectedItems.length >= availableItems.length) {
-      alert("You have reached the maximum number of selections.");
-      return;
-    }
+    // if (selectedItems.length >= availableItems.length) {
+    //   alert("Dostigli ste maksimalan broj selekcija.");
+    //   return;
+    // }
 
     const group = document.createElement("div");
-    group.classList.add("dynamic-group");
+    group.classList.add("form__group--block", "dynamic-group");
+
+    const label = document.createElement("label");
+    label.classList.add("form__label");
+    label.textContent = "Odaberite artikal:";
 
     const select = document.createElement("select");
     select.name = `${type}[]`;
-    select.classList.add("main-form__select");
+    select.classList.add("form__select");
     select.required = true;
 
     const removeButton = document.createElement("button");
     removeButton.type = "button";
-    removeButton.classList.add("btn", "btn-danger", "removeField");
+    removeButton.classList.add("button", "button--danger", "removeField");
     removeButton.textContent = "Izbriši";
 
+    group.appendChild(label);
     group.appendChild(select);
     group.appendChild(removeButton);
     container.appendChild(group);
 
-    const firstAvailableItem = availableItems.find(
-      (item) => !selectedItems.includes(item.ID.value)
-    );
-
-    if (firstAvailableItem) {
-      const firstValue = firstAvailableItem.ID.value;
-      selectedItems.push(firstValue);
-      select.value = firstValue;
+    const firstAvailable = availableItems.find(item => !selectedItems.includes(item.ID.value));
+    if (firstAvailable) {
+      selectedItems.push(firstAvailable.ID.value);
+      select.value = firstAvailable.ID.value;
     }
 
     updateOptions(container, availableItems, selectedItems);
+    if (select.value) select.setAttribute("data-prev-value", select.value);
 
-    if (select.value) {
-      select.setAttribute("data-prev-value", select.value);
-    }
+    select.addEventListener("change", (e) => {
+      const prev = e.target.getAttribute("data-prev-value");
+      const current = select.value;
 
-    select.addEventListener("change", (event) => {
-      const prevValue = event.target.getAttribute("data-prev-value");
-      const newValue = select.value;
-
-      if (prevValue && selectedItems.includes(prevValue)) {
-        const index = selectedItems.indexOf(prevValue);
-        if (index !== -1) selectedItems.splice(index, 1);
-      }
-
-      if (newValue && !selectedItems.includes(newValue)) {
-        selectedItems.push(newValue);
-      }
+      if (prev && selectedItems.includes(prev)) selectedItems.splice(selectedItems.indexOf(prev), 1);
+      if (current && !selectedItems.includes(current)) selectedItems.push(current);
 
       updateOptions(container, availableItems, selectedItems);
-      event.target.setAttribute("data-prev-value", newValue);
+      select.setAttribute("data-prev-value", current);
     });
 
     removeButton.addEventListener("click", () => {
-      const value = select.value;
-      if (value) {
-        const index = selectedItems.indexOf(value);
-        if (index !== -1) selectedItems.splice(index, 1);
+      const val = select.value;
+      if (val) {
+        const i = selectedItems.indexOf(val);
+        if (i !== -1) selectedItems.splice(i, 1);
       }
       group.remove();
       updateOptions(container, availableItems, selectedItems);
@@ -681,98 +446,61 @@ document.addEventListener("DOMContentLoaded", () => {
     updateSelectedItems(container, selectedItems);
   };
 
-  // Function to initialize existing fields
-  const initializeExistingFields = (container, selectedItems) => {
-    const allSelects = container.querySelectorAll("select");
-    allSelects.forEach((select) => {
+  const initializeExistingFields = (container, selectedItems, availableItems) => {
+    container.querySelectorAll("select").forEach(select => {
       if (select.value && !selectedItems.includes(select.value)) {
         selectedItems.push(select.value);
         select.setAttribute("data-prev-value", select.value);
 
-        const removeButton = select
-          .closest(".dynamic-group")
-          ?.querySelector(".removeField");
-        if (removeButton) {
-          removeButton.addEventListener("click", () => {
-            const value = select.value;
-            if (value) {
-              const index = selectedItems.indexOf(value);
-              if (index !== -1) selectedItems.splice(index, 1);
+        const removeBtn = select.closest(".dynamic-group")?.querySelector(".removeField");
+        if (removeBtn) {
+          removeBtn.addEventListener("click", () => {
+            const val = select.value;
+            if (val) {
+              const i = selectedItems.indexOf(val);
+              if (i !== -1) selectedItems.splice(i, 1);
             }
             select.closest(".dynamic-group").remove();
             updateSelectedItems(container, selectedItems);
           });
         }
 
-        select.addEventListener("change", (event) => {
-          const prevValue = event.target.getAttribute("data-prev-value");
-          const newValue = select.value;
+        select.addEventListener("change", (e) => {
+          const prev = e.target.getAttribute("data-prev-value");
+          const current = select.value;
 
-          if (prevValue && selectedItems.includes(prevValue)) {
-            const index = selectedItems.indexOf(prevValue);
-            if (index !== -1) selectedItems.splice(index, 1);
-          }
-
-          if (newValue && !selectedItems.includes(newValue)) {
-            selectedItems.push(newValue);
-          }
+          if (prev && selectedItems.includes(prev)) selectedItems.splice(selectedItems.indexOf(prev), 1);
+          if (current && !selectedItems.includes(current)) selectedItems.push(current);
 
           updateOptions(container, availableItems, selectedItems);
-          event.target.setAttribute("data-prev-value", newValue);
+          select.setAttribute("data-prev-value", current);
         });
       }
     });
   };
 
-  initializeExistingFields(upSellContainer, selectedUpSellItems);
-  initializeExistingFields(crossSellContainer, selectedCrossSellItems);
+  initializeExistingFields(upSellContainer, selectedUpSellItems, availableUpSellItems);
+  initializeExistingFields(crossSellContainer, selectedCrossSellItems, availableCrossSellItems);
 
-  // Refresh items when categories change
   const refreshItems = async () => {
-    const selectedCategories = Array.from(categoryInputs)
-      .map((input) => input.value.trim())
-      .filter(Boolean);
-
-    availableUpSellItems = await fetchItemsFromDatabase(
-      selectedCategories,
-      "upsell"
-    );
-    availableCrossSellItems = await fetchItemsFromDatabase(
-      selectedCategories,
-      "crosssell"
-    );
+    const selectedCategories = Array.from(categoryInputs).map(input => input.value.trim()).filter(Boolean);
+    availableUpSellItems = await fetchItemsFromDatabase(selectedCategories, "upsell");
+    availableCrossSellItems = await fetchItemsFromDatabase(selectedCategories, "crosssell");
 
     updateOptions(upSellContainer, availableUpSellItems, selectedUpSellItems);
-    updateOptions(
-      crossSellContainer,
-      availableCrossSellItems,
-      selectedCrossSellItems
-    );
+    updateOptions(crossSellContainer, availableCrossSellItems, selectedCrossSellItems);
   };
 
-  // Add event listeners
   addUpSellButton.addEventListener("click", () =>
-    addDynamicField(
-      upSellContainer,
-      availableUpSellItems,
-      selectedUpSellItems,
-      "upSellItems"
-    )
+    addDynamicField(upSellContainer, availableUpSellItems, selectedUpSellItems, "upSellItems")
   );
 
   addCrossSellButton.addEventListener("click", () =>
-    addDynamicField(
-      crossSellContainer,
-      availableCrossSellItems,
-      selectedCrossSellItems,
-      "crossSellItems"
-    )
+    addDynamicField(crossSellContainer, availableCrossSellItems, selectedCrossSellItems, "crossSellItems")
   );
 
-  categoryInputs.forEach((input) =>
-    input.addEventListener("change", refreshItems)
-  );
+  categoryInputs.forEach(input => input.addEventListener("change", refreshItems));
 
-  // Refresh items on page load
   if (itemId) refreshItems();
+
 });

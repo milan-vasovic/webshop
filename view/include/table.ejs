@@ -1,108 +1,111 @@
 <% if (items && items.length > 0) { %>
-  <table>
-    <caption><%= caption %></caption>
-    <thead>
-      <tr>
-        <% Object.keys(items[0]).forEach((key, index) => { %>
-          <% if (!((index === 0 && (key === "ID" || key === "_id") && showId === false) || key === "Link" || key === "slug")) { %>
-            <th><%= key %></th>
-          <% } %>
-        <% }); %>
-        <% if (hasActions) { %>
-          <th>Akcije</th>
-        <% } %>
-      </tr>
-    </thead>
-    <tbody>
-      <% items.forEach(item => { %>
+  <div class="table__container">
+    <table class="table">
+      <caption><%= caption %></caption>
+      <thead>
         <tr>
-          <% Object.entries(item).forEach(([key, field], index) => { %>
+          <% Object.keys(items[0]).forEach((key, index) => { %>
             <% if (!((index === 0 && (key === "ID" || key === "_id") && showId === false) || key === "Link" || key === "slug")) { %>
-              <td data-label="<%= key %>">
-                <% if (key === "Slika" && field) { %>
-                  <img class="table__image" src="/images/<%= field.value || field.img %>" alt="<%= field.value %>">
-                <% } else if (field && typeof field === 'object' && field.link) { %>
-                  <a class="card__link" href="<%= field.link %>"><%= field.value %></a>
-                <% } else if (field && typeof field === 'object' && field.value) { %>
-                  <%= field.value %>
-                <% } else { %>
-                  <%= field || "N/A" %>
-                <% } %>
-              </td>
+              <th><%= key %></th>
             <% } %>
           <% }); %>
           <% if (hasActions) { %>
-            <td data-label="Akcije">
-              <div class="table__action">
-                <% actions.forEach(action => { %>
-                  <% if (action.type === 'form') { %>
-                    <form action="<%= action.formAction %>?_method=DELETE" method="POST">
-                      <input type="hidden" name="itemId" value="<%= item._id || item.ID?.value || item.ID %>">
-                      <input name="honeypot" type="hidden">
-                      <input type="hidden" name="CSRFToken" value="<%= csrfToken %>">
-                      <button class="btn-danger" type="submit">
-                        <span class="material-symbols-outlined">
-                          <%= action.buttonName %>
-                        </span>
-                      </button>
-                    </form>
-                  <% } else if (action.type === 'link') { %>
-                    <a class="btn-primary" href="<%= action.link %><%= item.ID?.value || item._id %>">
-                      <span class="material-symbols-outlined">
-                        <%= action.linkName %>
-                      </span>
-                    </a>
+            <th>Akcije</th>
+          <% } %>
+        </tr>
+      </thead>
+      <tbody>
+        <% items.forEach(item => { %>
+          <tr>
+            <% Object.entries(item).forEach(([key, field], index) => { %>
+              <% if (!((index === 0 && (key === "ID" || key === "_id") && showId === false) || key === "Link" || key === "slug")) { %>
+                <td data-label="<%= key %>">
+                  <% if (key === "Slika" && field) { %>
+                    <img class="table__image" src="/images/<%= field.value || field.img %>" alt="<%= field.value %>">
+                  <% } else if (field && typeof field === 'object' && field.link) { %>
+                    <a class="card__link" href="<%= field.link %>"><%= field.value %></a>
+                  <% } else if (field && typeof field === 'object' && field.value) { %>
+                    <%= field.value %>
+                  <% } else { %>
+                    <%= field || "N/A" %>
                   <% } %>
-                <% }); %>
-              </div>
+                </td>
+              <% } %>
+            <% }); %>
+            <% if (hasActions) { %>
+              <td data-label="Akcije">
+                <div class="table__action">
+                  <% actions.forEach(action => { %>
+                    <% if (action.type === 'form') { %>
+                      <form action="<%= action.formAction %>?_method=DELETE" method="POST">
+                        <input type="hidden" name="itemId" value="<%= item._id || item.ID?.value || item.ID %>">
+                        <input name="honeypot" type="hidden">
+                        <input type="hidden" name="CSRFToken" value="<%= csrfToken %>">
+                        <button class="button button--danger" type="submit">
+                          <span class="material-symbols-outlined">
+                            <%= action.buttonName %>
+                          </span>
+                        </button>
+                      </form>
+                    <% } else if (action.type === 'link') { %>
+                      <a class="button button--primary" href="<%= action.link %><%= item.ID?.value || item._id %>">
+                        <span class="material-symbols-outlined">
+                          <%= action.linkName %>
+                        </span>
+                      </a>
+                    <% } %>
+                  <% }); %>
+                </div>
+              </td>
+            <% } %>
+          </tr>
+        <% }); %>
+      </tbody>
+
+      <% if (hasFooter) { %>
+        <tfoot>
+          <tr>
+            <td colspan="<%= Object.keys(items[0]).length + (hasActions ? 1 : 0) %>">
+              <strong><%= caption %> Prikazano:</strong> <%= items.length %> stavki
             </td>
+          </tr>
+
+          <% if (totals) { %>
+            <% 
+              if (
+                items.length > 0 &&
+                (
+                  (Object.keys(items[0]).includes('amount') || Object.keys(items[0]).includes('Količina')) &&
+                  (Object.keys(items[0]).includes('price') || Object.keys(items[0]).includes('Cena'))
+                )
+              ) {
+                let totalQuantity = 0;
+                let totalPrice = 0;
+                items.forEach(item => {
+                  const quantity = item.amount ? Number(item.amount) : (item.Količina ? Number(item.Količina.value) : 0);
+                  const price = item.price ? Number(item.price) : (item.Cena ? Number(item.Cena.value) : 0);
+                  totalQuantity += quantity;
+                  totalPrice += price;
+                });
+            %>
+              <tr>
+                <td colspan="<%= Object.keys(items[0]).length + (hasActions ? 1 : 0) %>">
+                  <strong>Ukupna količina:</strong> <%= totalQuantity %> &nbsp;&nbsp;
+                  <strong>Ukupna cena:</strong> <%= totalPrice %> RSD
+                </td>
+              </tr>
+            <% } else { %>
+              <tr>
+                <td colspan="<%= Object.keys(items[0]).length + (hasActions ? 1 : 0) %>">
+                  Podaci o količini i ceni nisu dostupni.
+                </td>
+              </tr>
+            <% } %>
           <% } %>
-        </tr>
-      <% }); %>
-    </tbody>
-    <% if (hasFooter) { %>
-      <tfoot>
-        <tr>
-          <td colspan="<%= Object.keys(items[0]).length + (hasActions ? 1 : 0) %>">
-            <strong><%= caption %> Prikazano:</strong> <%= items.length %> stavki
-          </td>
-        </tr>
-        <% if (totals) { %>
-          <% 
-            if (
-              items &&
-              items.length > 0 &&
-              (
-                (Object.keys(items[0]).includes('amount') || Object.keys(items[0]).includes('Količina')) &&
-                (Object.keys(items[0]).includes('price') || Object.keys(items[0]).includes('Cena'))
-              )
-            ) { 
-              let totalQuantity = 0;
-              let totalPrice = 0;
-              items.forEach(item => {
-                const quantity = item.amount ? Number(item.amount) : (item.Količina ? Number(item.Količina.value) : 0);
-                const price = item.price ? Number(item.price) : (item.Cena ? Number(item.Cena.value) : 0);
-                totalQuantity += quantity;
-                totalPrice += price;
-              });
-          %>
-            <tr>
-              <td colspan="<%= Object.keys(items[0]).length + (hasActions ? 1 : 0) %>">
-                <strong>Ukupna količina:</strong> <%= totalQuantity %> &nbsp;&nbsp;
-                <strong>Ukupna cena:</strong> <%= totalPrice %> RSD
-              </td>
-            </tr>
-          <% } else { %>
-            <tr>
-              <td colspan="<%= Object.keys(items[0]).length + (hasActions ? 1 : 0) %>">
-                Podaci o količini i ceni nisu dostupni.
-              </td>
-            </tr>
-          <% } %>
-        <% } %>
-      </tfoot>
-    <% } %>
-  </table>
+        </tfoot>
+      <% } %>
+    </table>
+  </div>
 <% } else { %>
   <p class="text-center">Nema dostupnih podataka za "<%= caption %>".</p>
 <% } %>

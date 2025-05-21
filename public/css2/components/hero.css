@@ -1,0 +1,102 @@
+.hero {
+  width: 100%;
+  padding: var(--space-2) var(--space-4);
+}
+
+.hero__container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+/* Glavni tekst */
+.hero__content {
+  flex: 1 1 45%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.hero__content h1 {
+  font-size: var(--font-size-xl);
+  color: var(--primary-text-color);
+}
+
+.hero__content h2 {
+  font-size: var(--font-size-lg);
+  color: var(--neutral-text-color);
+}
+
+.hero__cta {
+  margin-top: var(--space-2);
+  align-self: start;
+  color: var(--white-color);
+}
+
+/* Slika */
+.hero__image {
+  flex: 1 1 45%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.image--hero {
+  width: 100%;
+  max-width: 500px;
+  height: auto;
+  object-fit: contain;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Defaultno: desktop prikazuje samo .hero__paragraphs--desktop */
+.hero__paragraphs--desktop {
+  display: block;
+}
+
+.hero__paragraphs--mobile {
+  display: none;
+}
+
+/* 📱 Responsive: stack on mobile and reorder content */
+@media (max-width: 768px) {
+  .hero__container {
+    flex-direction: column;
+    text-align: center;
+    padding: var(--space-4);
+  }
+
+  .hero__content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    order: 1;
+  }
+
+  .hero__title {
+    order: 1;
+  }
+
+  .hero__subtitle {
+    order: 2;
+  }
+
+  .hero__cta {
+    order: 3;
+    align-self: center;
+  }
+
+  .hero__image {
+    order: 4;
+  }
+
+  .hero__paragraphs {
+    order: 5;
+    margin-top: var(--space-4);
+    text-align: center;
+  }
+}

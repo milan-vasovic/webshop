@@ -1,0 +1,76 @@
+/* ===============================
+   🧭 Tab Navigation System
+   =============================== */
+
+.tabs-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+  border-bottom: 1px solid var(--neutral-color);
+}
+
+.tab-btn {
+  background: none;
+  border: none;
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--primary-text-color);
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.tab-btn:hover {
+  color: var(--accent-color);
+}
+
+.tab-btn.active {
+  color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.tabs-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* ===============================
+   🧱 Responsive Grid Layout Fix
+   =============================== */
+
+.column-row__container {
+  display: flex;
+  flex-direction: row;
+  gap: var(--space-6);
+  margin-bottom: var(--space-6);
+}
+
+.left__container-30 {
+  flex: 1 1 30%;
+}
+
+.right__container-70 {
+  flex: 1 1 70%;
+}
+
+@media (max-width: 768px) {
+  .column-row__container {
+    flex-direction: column;
+  }
+
+  .left__container-30,
+  .right__container-70 {
+    width: 100%;
+  }
+}

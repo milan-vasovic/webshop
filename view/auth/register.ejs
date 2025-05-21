@@ -1,44 +1,91 @@
 <%- include('../include/head.ejs') %>
 <%- include('../include/navigation.ejs') %>
-<section class="main__container">
-    <div class="container main-form__container">
-        <h1 class="main-form__title"><%= pageTitle %></h1>
-        <form class="main-form width-100" action="/registracija" method="post">
-            <div class="main-form__group">
-                <label class="main-form__label" for="email">Email:</label>
-                <input class="main-form__input" id="email" name="email" type="email" <% if (existingData) { %>value='<%= existingData.email %>'<% } %>>
-            </div>
-            <div class="main-form__group">
-                <label class="main-form__label" for="password">Šifra:</label>
-                <input class="main-form__input" id="password" name="password" type="password">
-            </div>
-            <div class="main-form__group">
-                <label class="main-form__label" for="confirmedPassword">Potvrdite Šifru:</label>
-                <input class="main-form__input" id="confirmedPassword" name="confirmedPassword" type="password">
-            </div>
-            <div class="main-form__group">
-                <label class="main-form__label" for="firstname">Ime:</label>
-                <input class="main-form__input" id="firstname" name="firstname" type="text" <% if (existingData) { %>value='<%= existingData.firstname %>'<% } %>>
-            </div>
-            <div class="main-form__group">
-                <label class="main-form__label" for="lastname">Prezime:</label>
-                <input class="main-form__input" id="lastname" name="lastname" type="text" <% if (existingData) { %>value='<%= existingData.lastname %>'<% } %>>
-            </div>
-            <div class="main-form__group">
-                <label class="main-form__label" for="acceptance">Saglasnost:</label>
-                <p>
-                    Prihvatate <a class="main__link" href="/uslovi-koriscenja">Uslove Korišćenja</a> i <a class="main__link" href="/politika-privatnosti">Politiku Privatnosti</a>
-                </p>
-                <input class="main-form__input" id="acceptance" name="acceptance" type="checkbox" required>
-            </div>
-            <input class="main-form__input" type="hidden" name="CSRFToken" value="<%= csrfToken %>">
-            <input name="honeypot" type="hidden">
-            <button class="btn-primary" type="submit">Registrujte Se</button>
-            <% if (errorMessage) { %>
-                <div class="user-message--error"><%= errorMessage %></div>
-            <% } %>
-            <a href="/prijava" class="main__link">Imate nalog? Prijavite se!</a>
-        </form>
+
+<main class="section container min-h-screen flex flex-column justify-center">
+  <h1 class="heading-xl mb-6"><%= pageTitle %></h1>
+
+  <form class="form max-w-md mx-auto" action="/registracija" method="post">
+    <div class="form__group">
+      <label for="email" class="form__label">Email</label>
+      <input
+        class="form__input"
+        id="email"
+        name="email"
+        type="email"
+        value="<%= existingData?.email || '' %>"
+        required
+      />
     </div>
-</section>
+
+    <div class="form__group">
+      <label for="password" class="form__label">Šifra</label>
+      <input
+        class="form__input"
+        id="password"
+        name="password"
+        type="password"
+        required
+      />
+    </div>
+
+    <div class="form__group">
+      <label for="confirmedPassword" class="form__label">Potvrdite Šifru</label>
+      <input
+        class="form__input"
+        id="confirmedPassword"
+        name="confirmedPassword"
+        type="password"
+        required
+      />
+    </div>
+
+    <div class="form__group">
+      <label for="firstname" class="form__label">Ime</label>
+      <input
+        class="form__input"
+        id="firstname"
+        name="firstname"
+        type="text"
+        value="<%= existingData?.firstname || '' %>"
+        required
+      />
+    </div>
+
+    <div class="form__group">
+      <label for="lastname" class="form__label">Prezime</label>
+      <input
+        class="form__input"
+        id="lastname"
+        name="lastname"
+        type="text"
+        value="<%= existingData?.lastname || '' %>"
+        required
+      />
+    </div>
+
+    <div class="form__group">
+      <label for="acceptance" class="form__label">Saglasnost</label>
+      <p class="form__helper">
+        <input class="form__input" id="acceptance" name="acceptance" type="checkbox" required />
+        Prihvatate <a href="/uslovi-koriscenja" class="main__link">Uslove Korišćenja</a> i
+        <a href="/politika-privatnosti" class="main__link">Politiku Privatnosti</a>
+      </p>
+      
+    </div>
+
+    <input type="hidden" name="CSRFToken" value="<%= csrfToken %>" />
+    <input type="hidden" name="honeypot" />
+
+    <button class="button button--primary mt-2" type="submit">Registrujte Se</button>
+
+    <% if (errorMessage) { %>
+      <div class="form__error mt-2"><%= errorMessage %></div>
+    <% } %>
+
+    <div class="mt-4">
+      <a href="/prijava" class="main__link">Imate nalog? Prijavite se!</a>
+    </div>
+  </form>
+</main>
+
 <%- include('../include/end.ejs') %>

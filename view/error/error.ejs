@@ -1,12 +1,16 @@
 <%- include('../include/head.ejs') %>
 <%- include('../include/navigation.ejs') %>
-<section class="container main__container flex flex-column align-center">
-    <p class="error-code"><%= statusCode %></p>
-    <p class="error-message"><%= errorMsg || "Došlo je do greške. Pokušajte ponovo kasnije." %></p>
-    <% if (errorDetails) { %>
-        <p class="error-details"><%= errorDetails %></p>
-    <% } %>
-    <a href="/" class="back-link">Nazad na početnu stranicu</a>
-    </section>
+
+<section class="container main__container  d-flex flex-column justify-center items-center text-center gap-4 p-4">
+  <p class="text-2xl text-danger font-bold"><%= statusCode %></p>
+
+  <p class="text-lg text-muted"><%= errorMsg || "Došlo je do greške. Pokušajte ponovo kasnije." %></p>
+
+  <% if (errorDetails) { %>
+    <p class="text-sm text-muted"><%= errorDetails %></p>
+  <% } %>
+
+  <a href="/" class="button button--primary mt-4">Nazad na početnu stranicu</a>
+</section>
 
 <%- include('../include/end.ejs') %>

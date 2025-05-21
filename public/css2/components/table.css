@@ -1,0 +1,133 @@
+/* ===============================
+   📊 Responsive Table (Improved Mobile + Elegant Desktop)
+   =============================== */
+
+.table__container {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-bottom: var(--space-6);
+  border: var(--border-thin) solid var(--neutral-color);
+  border-radius: var(--radius-md);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--primary-font-family);
+  font-size: var(--font-size-sm);
+  background-color: var(--primary-background-color);
+  color: var(--primary-text-color);
+}
+
+.table caption {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  padding: var(--space-3);
+  background-color: var(--primary-color);
+  color: var(--white-color);
+  text-align: center;
+  caption-side: top;
+}
+
+.table th,
+.table td {
+  padding: var(--space-3) var(--space-4);
+  border: var(--border-thin) solid var(--neutral-color);
+  text-align: left;
+  vertical-align: middle;
+  word-break: break-word;
+}
+
+.table thead {
+  background-color: var(--secondary-background-color);
+  color: var(--secondary-text-color);
+  font-weight: 600;
+  font-size: var(--font-size-xs);
+  text-transform: uppercase;
+}
+
+.table tbody tr:nth-child(even) {
+  background-color: var(--neutral-background-color);
+}
+
+.table tbody tr:hover {
+  background-color: var(--secondary-background-color);
+}
+
+/* 📷 Image Cell */
+.table__image {
+  max-width: 80px;
+  max-height: 80px;
+  border-radius: var(--radius-sm);
+  object-fit: cover;
+  display: block;
+  margin: 0 auto;
+}
+
+/* 🛠️ Actions Cell */
+.table__action {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  text-align: center;
+}
+
+.table__action a,
+.table__action button {
+  transition: transform 0.2s ease;
+}
+
+.table__action a:hover,
+.table__action button:hover {
+  transform: scale(1.05);
+}
+
+/* 🧭 Text Alignment Utilities */
+td.text-right { text-align: right; }
+td.text-left  { text-align: left; }
+td.text-center { text-align: center; }
+
+/* 📱 Responsive Enhancements */
+@media (max-width: 768px) {
+  .table {
+    display: block;
+    width: 100%;
+  }
+
+  .table thead,
+  .table tbody,
+  .table tr,
+  .table th,
+  .table td {
+    display: block;
+    width: 100%;
+  }
+
+  .table thead {
+    display: none;
+  }
+
+  .table tr {
+    margin-bottom: var(--space-4);
+    border: var(--border-thin) solid var(--neutral-color);
+    border-radius: var(--radius-sm);
+    padding: var(--space-3);
+    background-color: var(--neutral-background-color);
+  }
+
+  .table td {
+    text-align: left;
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--font-size-sm);
+  }
+
+  .table td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    display: block;
+    color: var(--secondary-text-color);
+    margin-bottom: 0.25rem;
+  }
+}

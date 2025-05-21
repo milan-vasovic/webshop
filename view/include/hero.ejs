@@ -1,31 +1,26 @@
-
-<% /*
-  Parametri koje ova hero sekcija prima (mogu biti definisani u kontroleru ili u glavnom EJS fajlu):
-  - orientation: string – "left-right", "right-left", "top-bottom", "bottom-top"
-  - title: string
-  - subtitle: string
-  - paragraphs: array of strings
-  - ctaLink: string
-  - ctaText: string
-  - imageSrc: string
-  - imageAlt: string
-*/ %>
 <div class="hero hero--<%= orientation %>">
-  <div class="hero__content">
-    <% if (title) { %><h1 class="hero__title"><%= title %></h1><% } %>
-    <% if (subtitle) { %><h2 class="hero__subtitle"><%= subtitle %></h2><% } %>
-    <% if (paragraphs?.length) { %>
-      <% paragraphs.forEach(par => { %>
-        <p class="hero__paragraph"><%= par %></p>
-      <% }) %>
-    <% } %>
-    <% if (ctaLink && ctaText) { %>
-      <a href="<%= ctaLink %>" class="btn-primary hero__cta"><%= ctaText %></a>
-    <% } %>
-  </div>
+  <div class="hero__container">
+    <!-- Content -->
+    <div class="hero__content">
+      <% if (title) { %><h1 class="heading-xl hero__title"><%= title %></h1><% } %>
+      <% if (subtitle) { %><h2 class="text-lead hero__subtitle"><%= subtitle %></h2><% } %>
 
-  <div class="hero__image">
-    <img src="<%= imageSrc %>" alt="<%= imageAlt %>">
+      <% if (ctaLink && ctaText) { %>
+        <a href="<%= ctaLink %>" class="button button--primary mt-3 hero__cta"><%= ctaText %></a>
+      <% } %>
+
+      <% if (paragraphs?.length) { %>
+        <div class="hero__paragraphs">
+          <% paragraphs.forEach(par => { %>
+            <p class="mb-2"><%= par %></p>
+          <% }) %>
+        </div>
+      <% } %>
+    </div>
+
+    <!-- Slika -->
+    <div class="hero__image">
+      <img src="<%= imageSrc %>" alt="<%= imageAlt %>" class="image--hero" />
+    </div>
   </div>
 </div>
-
