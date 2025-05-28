@@ -1,39 +1,45 @@
 <%- include('../../include/head.ejs') %>
 <%- include('../../include/navigation.ejs') %>
-<section class="container main__container">
-    <h1 class="main__title"><%= pageTitle %></h1>
-    <form class="width-100 flex flex-row" action="/admin/korisnici/pretraga" method="post">
-        <div class="main-form__group width-80">
-            <input class="main-form__input" type="text" name="search">
-            <input name="honeypot" type="hidden">
-            <input class="main-form__input" type="hidden" name="CSRFToken" value="<%= csrfToken %>">
-        </div>
-        <button type="submit" class="btn-secondary">Pretraga</button>
-    </form>
-    <%- include('../../include/table.ejs', {
-        items: users.users,
-        showId: true,
-        caption: "Korisnici",
-        hasActions: true,
-        hasFooter: true,
-        totals: false,
-        actions: [
-            {
-                type: 'link',
-                link: "/admin/korisnik-detalji/",
-                linkName: 'Detalji'
-            },
-            {
-                type: 'form',
-                formAction: "/admin/korisnik-brisanje",
-                buttonName: 'Izbriši'
-            }
-        ]
-    }) %>
-    <%- include('../../include/pagination.ejs', {
-        currentPage: currentPage,
-        totalPages: totalPages,
-        basePath: basePath
-    }) %>
+
+<section class="container section main__container">
+  <h1 class="main__title"><%= pageTitle %></h1>
+
+  <form class="form mb-4" action="/admin/korisnici/pretraga" method="post">
+    <div class="form__group">
+      <label class="form__label" for="search">Pretraga korisnika:</label>
+      <input class="form__input" id="search" type="text" name="search" placeholder="Unesite ime, email ili korisničko ime">
+    </div>
+    <input type="hidden" name="honeypot">
+    <input type="hidden" name="CSRFToken" value="<%= csrfToken %>">
+    <button type="submit" class="button button--secondary">Pretraži</button>
+  </form>
+
+  <%- include('../../include/table.ejs', {
+    items: users.users,
+    showId: true,
+    caption: "Korisnici",
+    hasActions: true,
+    hasFooter: true,
+    totals: false,
+    actions: [
+      {
+        type: 'link',
+        link: "/admin/korisnik-detalji/",
+        linkName: 'Detalji'
+      },
+      {
+        type: 'form',
+        formAction: "/admin/korisnik-brisanje",
+        buttonName: 'Izbriši'
+      }
+    ]
+  }) %>
+
+  <%- include('../../include/pagination.ejs', {
+    currentPage: currentPage,
+    totalPages: totalPages,
+    basePath: basePath
+  }) %>
 </section>
+
 <%- include('../../include/end.ejs') %>

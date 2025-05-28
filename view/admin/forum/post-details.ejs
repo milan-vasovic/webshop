@@ -1,52 +1,57 @@
 <%- include('../../include/head.ejs') %>
-<style>
-    .feature-image img {
-  max-width: 100%;
-  height: auto;
-  display: block;
-  margin: 0 auto; /* centriranje, opcionalno */
-  border-radius: var(--border-radius-normal); /* ako želite zaobljene ivice */
-  object-fit: cover; /* ako želite da slika popuni prostor bez distorzije */
-}
-
-</style>
 <%- include('../../include/navigation.ejs') %>
+
 <section class="container main__container">
-    <h1 class="main__title"><%= pageTitle %></h1>
-    <div class="column-row__container">
-        <div class="left__container-70">
-            <div class="feature-image">
-                <img src="/images/<%= post.Slika.value %>" alt="<%= post.Slika.Opis.value %>">
-            </div>
-            <div class="blog__content-container">
-                <% post.Sadržaj.value.forEach(content => { %>
-                    <%- content %>
-                <% }) %>
-            </div>
-            <p><%= post.Opis.value %></p>
-        </div>
-        <div class="right__container-30">
-            <div>
-                <h1>Kategorije:</h1>
-                <ul>
-                    <% post.Kategorije.value.forEach(c => { %>
-                        <li>
-                            <%= c %>
-                        </li>
-                    <% }) %>
-                </ul>
-            </div>
-            <div>
-                <h1>Tagovi:</h1>
-                <ul>
-                    <% post.Tagovi.value.forEach(t => { %>
-                        <li>
-                            <%= t %>
-                        </li>
-                    <% }) %>
-                </ul>
-            </div>
-        </div>
+  <h1 class="main__title"><%= pageTitle %></h1>
+
+  <!-- Responsive grid: main + sidebar -->
+  <div class="grid grid-cols-main-sidebar">
+
+    <!-- Glavni sadržaj -->
+    <div class="w-full">
+
+      <!-- Slika objave -->
+      <div class="feature-image">
+        <img src="/images/<%= post.Slika.value %>" alt="<%= post.Slika.Opis.value %>">
+      </div>
+
+      <!-- Kratak opis -->
+      <div class="section__block">
+        <p><%= post.Opis.value %></p>
+      </div>
+
+      <!-- Glavni sadržaj (HTML delovi) -->
+      <div class="section__block blog__content-container">
+        <% post.Sadržaj.value.forEach(content => { %>
+          <%- content %>
+        <% }) %>
+      </div>
     </div>
+
+    <!-- Sidebar: kategorije i tagovi -->
+    <aside class="w-full">
+      <div class="blog__sidebar">
+        <% if (post.Kategorije?.value?.length) { %>
+          <h2 class="blog__subtitle">Kategorije:</h2>
+          <ul class="blog__list">
+            <% post.Kategorije.value.forEach(c => { %>
+              <li><a class="blog__list-link" href="/forum/kategorija/<%= c %>"><%= c %></a></li>
+            <% }) %>
+          </ul>
+        <% } %>
+
+        <% if (post.Tagovi?.value?.length) { %>
+          <h2 class="blog__subtitle">Tagovi:</h2>
+          <ul class="blog__list">
+            <% post.Tagovi.value.forEach(t => { %>
+              <li><a class="blog__list-link" href="/forum/oznaka/<%= t %>"><%= t %></a></li>
+            <% }) %>
+          </ul>
+        <% } %>
+      </div>
+    </aside>
+
+  </div>
 </section>
+
 <%- include('../../include/end.ejs') %>

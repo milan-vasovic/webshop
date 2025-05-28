@@ -1,48 +1,54 @@
 <%- include('../../include/head.ejs') %>
 <%- include('../../include/navigation.ejs') %>
 
-<section class="container main__container">
+<section class="container section main__container">
   <h1 class="main__title break-all"><%= pageTitle %></h1>
 
-  <div class="flex flex-col gap-6 lg:flex-row">
+  <div class="d-flex flex-col gap-6 lg:flex-row">
     <!-- Leva kolona (informacije + potvrda) -->
-    <div class="w-full lg:w-1/3 flex flex-col gap-4">
+    <div class="w-full lg:w-1/3 d-flex flex-col gap-4">
       <form action="/admin/potvrda-porudzbine" method="post" class="form">
         <input type="hidden" name="token" value="<%= order.Token.value %>">
-        <input name="CSRFToken" type="hidden" value="<%= csrfToken %>">
-        <input name="honeypot" type="hidden">
-        <button type="submit" class="button button-primary">Potvrdi porudžbinu</button>
+        <input type="hidden" name="CSRFToken" value="<%= csrfToken %>">
+        <input type="hidden" name="honeypot">
+        <button type="submit" class="button button--primary">Potvrdi porudžbinu</button>
       </form>
 
-      <div class="flex flex-col gap-2">
-        <h2 class="break-all">Broj Porudžbine: <%= order.ID.value %></h2>
-        <h3>Datum: <%= order.Datum.value %></h3>
-        <h3>Status: Privremena</h3>
+      <div class="d-flex flex-col gap-2">
+        <h2 class="heading-md break-all">Broj Porudžbine: <%= order.ID.value %></h2>
+        <p>Datum: <strong><%= order.Datum.value %></strong></p>
+        <p>Status: <strong>Privremena</strong></p>
+
         <hr>
-        <h3>Kupac: <%= order.Kupac.Ime.value %> <%= order.Kupac.Prezime.value %></h3>
+
+        <h3 class="heading-sm">Kupac:</h3>
+        <p><strong><%= order.Kupac.Ime.value %> <%= order.Kupac.Prezime.value %></strong></p>
         <p>Email: <%= order.Kupac.Email.value %></p>
         <p>Telefon: <%= order.Telefon.value %></p>
-        <p>Adresa: <%= order.Adresa.Grad.value %>, <%= order.Adresa.Ulica.value %>, <%= order.Adresa.Broj.value %>, <%= order.Adresa["Poštanski Broj"].value %></p>
+        <p>Adresa: <%= order.Adresa.Grad.value %>, <%= order.Adresa.Ulica.value %> <%= order.Adresa.Broj.value %>, <%= order.Adresa["Poštanski Broj"].value %></p>
         <p>Napomena: <%= order.Napomena.value %></p>
+
         <hr>
-        <h3>Kupon:</h3>
-        <p>Kod: <strong><%= order.Kupon.Kod.value %></strong></p>
-        <p>Popust: <strong><%= order.Kupon.Popust.value %></strong></p>
+
+        <h3 class="heading-sm">Kupon:</h3>
+        <p>Kod: <strong><%= order.Kupon.Kod.value || "nema" %></strong></p>
+        <p>Popust: <strong><%= order.Kupon.Popust.value || "nema" %></strong></p>
         <p>Poštarina: <strong><%= order.Poštarina.value %> RSD</strong></p>
-        <h2>Ukupna Cena: <%= order["Ukupna Cena"].value %></h2>
+
+        <h2 class="heading-md">Ukupna Cena: <%= order["Ukupna Cena"].value %> RSD</h2>
       </div>
     </div>
 
     <!-- Desna kolona (artikli) -->
     <div class="w-full lg:w-2/3">
       <%- include('../../include/table.ejs', {
-          items: order.Artikli,
-          showId: false,
-          caption: 'Artikli',
-          hasActions: false,
-          hasFooter: false,
-          totals: false,
-          actions: []
+        items: order.Artikli,
+        showId: false,
+        caption: 'Artikli',
+        hasActions: false,
+        hasFooter: false,
+        totals: false,
+        actions: []
       }) %>
     </div>
   </div>

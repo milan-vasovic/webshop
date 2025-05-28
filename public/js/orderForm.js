@@ -1,62 +1,50 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // Selektuj dugme za upravljanje i formu
   const toggleButton = document.getElementById("toggleBtn");
-  const form = document.getElementById("statusForm"); // pretpostavljamo da je ovo tvoja forma
+  const form = document.getElementById("statusForm");
   const statusSelect = document.getElementById("statusSelect");
 
-  // Kreiraj element za unos novog ID-a porudžbine (sakriven na početku)
-  const newOrderFieldWrapper = document.createElement("div");
-  newOrderFieldWrapper.classList.add("main-form__group");
-  newOrderFieldWrapper.style.display = "none"; // sakriveno na početku
+  // Osiguraj da forma počne kao sakrivena
+  form?.classList.add("d-none");
+
+  // Dinamičko polje za "sent-exchange"
+  const newOrderWrapper = document.createElement("div");
+  newOrderWrapper.classList.add("form__group");
+  newOrderWrapper.classList.add("d-none");
 
   const newOrderLabel = document.createElement("label");
-  newOrderLabel.classList.add("main-form__label");
+  newOrderLabel.classList.add("form__label");
   newOrderLabel.setAttribute("for", "newOrderId");
   newOrderLabel.textContent = "Novi ID porudžbine:";
 
   const newOrderInput = document.createElement("input");
+  newOrderInput.classList.add("form__input");
   newOrderInput.type = "text";
   newOrderInput.id = "newOrderId";
   newOrderInput.name = "newOrderId";
-  newOrderInput.classList.add("main-form__input");
-  // Početno nema required – dodaćemo ga ako se izabere "sent-exchange"
   newOrderInput.required = false;
 
-  newOrderFieldWrapper.appendChild(newOrderLabel);
-  newOrderFieldWrapper.appendChild(newOrderInput);
+  newOrderWrapper.appendChild(newOrderLabel);
+  newOrderWrapper.appendChild(newOrderInput);
 
-  // Ubaci novo polje ispod select elementa
-  statusSelect.parentElement.appendChild(newOrderFieldWrapper);
+  // Ubaci novo polje ispod select-a
+  statusSelect?.parentElement?.insertAdjacentElement("afterend", newOrderWrapper);
 
-  // Funkcija za toggle prikaza forme
-  const toggleFormVisibility = () => {
-    if (form.style.display === "none" || form.style.display === "") {
-      form.style.display = "block";
+  // Toggle forma
+  toggleButton?.addEventListener("click", (e) => {
+    e.preventDefault();
+    form?.classList.toggle("d-none");
+  });
+
+  // Prikaz/skrivanje dodatnog polja za novi ID
+  statusSelect?.addEventListener("change", (e) => {
+    const selectedValue = e.target.value;
+    if (selectedValue === "sent-exchange") {
+      newOrderWrapper.classList.remove("d-none");
+      newOrderInput.required = true;
     } else {
-      form.style.display = "none";
+      newOrderWrapper.classList.add("d-none");
+      newOrderInput.required = false;
+      newOrderInput.value = "";
     }
-  };
-
-  // Dodaj event listener na dugme za upravljanje
-  if (toggleButton) {
-    toggleButton.addEventListener("click", (e) => {
-      e.preventDefault(); // spreči default ponašanje
-      toggleFormVisibility();
-    });
-  }
-
-  // Dodaj event listener na select za status
-  if (statusSelect) {
-    statusSelect.addEventListener("change", (e) => {
-      const selectedValue = e.target.value;
-      if (selectedValue === "sent-exchange") {
-        newOrderFieldWrapper.style.display = "block";
-        newOrderInput.required = true;
-      } else {
-        newOrderFieldWrapper.style.display = "none";
-        newOrderInput.required = false;
-        newOrderInput.value = ""; // očisti vrednost, kako bi browser ne smatrao da je prazan required field
-      }
-    });
-  }
+  });
 });

@@ -116,3 +116,21 @@
   border: 1px solid var(--color-border);
   border-radius: 0.4rem;
 }
+
+.form__file {
+  font-family: var(--primary-font-family);
+  font-size: var(--font-size-md);
+  padding: var(--space-2) var(--space-3);
+  border: var(--border-thin) solid var(--neutral-color);
+  border-radius: var(--radius-sm);
+  background-color: var(--primary-background-color);
+  color: var(--primary-text-color);
+  transition: border-color var(--transition-medium),
+    box-shadow var(--transition-medium);
+}
+
+.form__file:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.25);
+  outline: none;
+}

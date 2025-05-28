@@ -8,7 +8,7 @@
 .d-flex { display: flex; }
 .d-inline-flex { display: inline-flex; }
 .d-grid { display: grid; }
-.d-none { display: none; }
+.d-none { display: none !important; }
 
 /* ===============================
    🧱 Spacing Utilities (margin/padding)
