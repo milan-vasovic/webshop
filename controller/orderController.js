@@ -3,6 +3,9 @@ import sanitize from "mongo-sanitize";
 import mongoose from "mongoose";
 
 import OrderService from "../service/orderService.js";
+import UserService from "../service/userService.js";
+import CustomerService from "../service/customerService.js";
+import EmailService from "../service/emailService.js";
 
 async function getOrdersPage(req, res, next) {
   try {
@@ -22,6 +25,32 @@ async function getOrdersPage(req, res, next) {
       currentPage: page,
       totalPages: totalPages,
       basePath: `/admin/porudzbine`,
+      index: false,
+      featureImage: undefined,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function getTempOrdersPage(req, res, next) {
+  try {
+    const page = parseInt(sanitize(req.query.page)) || 1;
+    const limit = 10;
+
+    const orders = await OrderService.findTempOrders(limit, page);
+    const totalPages = Math.ceil(orders.totalCount / limit);
+
+    return res.render("admin/order/temp-orders", {
+      path: "/admin/privremene-porudzbine",
+      pageTitle: "Porudžbine",
+      pageDescription:
+        "Prikaz svih porudžbina za administratora sa mogućnošću pretrage!",
+      pageKeyWords: "Admin, Porudzbine, Pretraga, Informacije",
+      orders: orders,
+      currentPage: page,
+      totalPages: totalPages,
+      basePath: `/admin/pprivremene-orudzbine`,
       index: false,
       featureImage: undefined,
     });
@@ -69,6 +98,27 @@ async function getOrderDetailsPage(req, res, next) {
       pageTitle: "Porudžbina Detalji",
       pageDescription: "Prikaz svih detalja porudžbine!",
       pageKeyWords: "Admin, Porudzbina Detalji, Informacije",
+      order: order,
+      errorMessage: null,
+      index: false,
+      featureImage: undefined,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function getTempOrderDetailsPage(req, res, next) {
+  try {
+    const orderId = req.params.orderId;
+
+    const order = await OrderService.findTempOrderById(orderId);
+
+    return res.render("admin/order/temp-order-details", {
+      path: "/admin/privremene-porudzbina-detalji/" + orderId,
+      pageTitle: "Privremene Porudžbina Detalji",
+      pageDescription: "Prikaz svih detalja privremene porudžbine!",
+      pageKeyWords: "Admin, Privremena Porudzbina Detalji, Informacije",
       order: order,
       errorMessage: null,
       index: false,
@@ -142,10 +192,69 @@ async function postEditOrderStatus(req, res, next) {
   }
 }
 
+async function postAdminConfirmOrder(req, res, next) {
+  const session = await mongoose.startSession();
+  try {
+    session.startTransaction();
+    const { token } = req.body;
+    const tempOrder = await OrderService.validateTemporaryOrder(token);
+
+    let buyer, customer;
+
+    // Provera da li postoji korisnik sa tim emailom
+    const existingUser = await UserService.findUserByEmail(tempOrder.email);
+    if (existingUser) {
+      buyer = { type: 'User', ref: existingUser._id, firstName: tempOrder.buyer.firstName, lastName: tempOrder.buyer.lastName };
+    } else {
+      // Provera da li postoji gost kupac
+      customer = await CustomerService.registerNewCustomer(
+        tempOrder.buyer.firstName,
+        tempOrder.buyer.lastName,
+        tempOrder.email,
+        tempOrder.telephone,
+        tempOrder.address,
+        session
+      );
+      buyer = { type: 'Customer', ref: customer._id, firstName: tempOrder.buyer.firstName, lastName: tempOrder.buyer.lastName };
+    }
+
+    const newOrder = await OrderService.createNewOrder(
+      buyer,
+      tempOrder.email,
+      tempOrder.telephone,
+      tempOrder.address,
+      tempOrder.items,
+      tempOrder.totalPrice,
+      tempOrder.note,
+      session,
+      tempOrder.coupon
+    );
+
+    if (customer) {
+      await CustomerService.updateCustomerOrders(customer._id, newOrder._id, session);
+    }
+
+    await EmailService.sendOrderInfo(tempOrder.buyer.firstName, tempOrder.email, newOrder);
+    await OrderService.deleteTemporaryOrderById(tempOrder._id, session);
+
+    await session.commitTransaction();
+
+    return res.redirect(`/admin/porudzbina-detalji/${newOrder._id}`);
+  } catch (err) {
+    await session.abortTransaction();
+    next(err);
+  } finally {
+    session.endSession();
+  }
+}
+
 export default {
   getOrdersPage,
   getOrderDetailsPage,
   getSearchOrdersPage,
+  getTempOrdersPage,
+  getTempOrderDetailsPage,
   postOrderSearch,
   postEditOrderStatus,
+  postAdminConfirmOrder
 };

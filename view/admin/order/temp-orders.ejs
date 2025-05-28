@@ -1,0 +1,34 @@
+<%- include('../../include/head.ejs') %>
+<%- include('../../include/navigation.ejs') %>
+<section class="container main__container">
+    <h1 class="main__title"><%= pageTitle %></h1>
+    <form class="width-100 flex flex-row" action="/admin/privremene-porudzbine/pretraga" method="post">
+        <div class="main-form__group width-80">
+            <input class="main-form__input" type="text" name="search">
+            <input name="honeypot" type="hidden">
+            <input class="main-form__input" type="hidden" name="CSRFToken" value="<%= csrfToken %>">
+        </div>
+        <button type="submit" class="btn-secondary">Pretraga</button>
+    </form>
+    <%- include('../../include/table.ejs', {
+        items: orders.orders,
+        showId: true,
+        caption: "Porudžbine",
+        hasActions: true,
+        hasFooter: false,
+        totals: false,
+        actions: [
+            {
+                type: 'link',
+                link: "/admin/privremena-porudzbina-detalji/",
+                linkName: 'visibility'
+            }
+        ]
+    }) %>
+    <%- include('../../include/pagination.ejs', {
+        currentPage: currentPage,
+        totalPages: totalPages,
+        basePath: basePath
+    }) %>
+</section>
+<%- include('../../include/end.ejs') %>

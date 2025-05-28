@@ -1,11 +1,13 @@
 <%- include('../include/head.ejs') %>
 <%- include('../include/navigation.ejs') %>
-<section class="container main__container">
-    <h1 class="main__title"><%= pageTitle %></h1>
-    <div class="flex flex-column align-center">
-        <p><%= message %></p>
-        <a class="btn-primary" href="/">Početna</a>
-    </div>
+
+<section class="container section text-center">
+  <h1 class="heading-lg mb-4"><%= pageTitle %></h1>
+
+  <div class="flex-col-center gap-4">
+    <p class="text-md text-muted"><%= message %></p>
+    <a href="/" class="button button--primary">Početna</a>
+  </div>
 </section>
 
 <%- include('../include/end.ejs') %>

@@ -24,27 +24,14 @@ h6 {
   margin: 0 0 var(--space-3) 0;
   word-break: break-word;
   overflow-wrap: anywhere;
-
 }
 
-h1 {
-  font-size: var(--font-size-4xl);
-}
-h2 {
-  font-size: var(--font-size-3xl);
-}
-h3 {
-  font-size: var(--font-size-2xl);
-}
-h4 {
-  font-size: var(--font-size-xl);
-}
-h5 {
-  font-size: var(--font-size-lg);
-}
-h6 {
-  font-size: var(--font-size-md);
-}
+h1 { font-size: var(--font-size-4xl); }
+h2 { font-size: var(--font-size-3xl); }
+h3 { font-size: var(--font-size-2xl); }
+h4 { font-size: var(--font-size-xl); }
+h5 { font-size: var(--font-size-lg); }
+h6 { font-size: var(--font-size-md); }
 
 /* Paragraph */
 p {
@@ -59,14 +46,40 @@ small {
   color: var(--neutral-text-color);
 }
 
-/* Links */
+/* ===============================
+   🔗 Links
+   =============================== */
+
 a {
   color: var(--primary-color);
   text-decoration: underline;
-  transition: color var(--transition-medium);
+  transition: color 0.2s ease;
 }
-a:hover {
-  color: var(--primary-background-color);
+
+a:hover,
+a:focus,
+a:active {
+  color: var(--primary-hover-color);
+  text-decoration: underline;
+}
+
+a:visited {
+  color: var(--accent-hover-color);
+}
+
+/* Optional variant: link styled as button */
+.link-button {
+  display: inline-block;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-sm);
+  color: var(--primary-color);
+  background-color: transparent;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  text-decoration: none;
+}
+.link-button:hover {
+  background-color: var(--primary-hover-color);
+  color: var(--on-primary-text-color);
 }
 
 /* Emphasis */
@@ -103,10 +116,10 @@ pre {
 }
 
 /* ===============================
-     🎯 Utility Typography Classes
-     =============================== */
+   🎯 Utility Typography Classes
+   =============================== */
 
-/* Headings (can be used anywhere) */
+/* Headings (utility) */
 .heading-xl {
   font-family: var(--heading-font-family);
   font-size: var(--font-size-4xl);

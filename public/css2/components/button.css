@@ -22,7 +22,7 @@
   text-decoration: none;
 
   background-color: var(--neutral-color);
-  color: var(--on-neutral-text-color, #ffffff); /* fallback na belo */
+  color: var(--on-neutral-text-color, #ffffff);
 }
 
 .button:disabled {
@@ -50,6 +50,7 @@
 }
 .button--primary:hover {
   background-color: var(--primary-hover-color);
+  color: var(--on-primary-text-color, #ffffff);
 }
 
 /* ✅ Secondary */
@@ -59,6 +60,7 @@
 }
 .button--secondary:hover {
   background-color: var(--secondary-hover-color);
+  color: var(--on-secondary-text-color, #ffffff);
 }
 
 /* ✅ Neutral */
@@ -68,6 +70,7 @@
 }
 .button--neutral:hover {
   background-color: var(--neutral-hover-color);
+  color: var(--on-neutral-text-color, #ffffff);
 }
 
 /* ✅ Info */
@@ -76,7 +79,8 @@
   color: var(--on-info-text-color, #ffffff);
 }
 .button--info:hover {
-  background-color: var(--primary-color);
+  background-color: var(--info-hover-color, var(--primary-color));
+  color: var(--on-info-text-color, #ffffff);
 }
 
 /* ✅ Warning */
@@ -86,6 +90,7 @@
 }
 .button--warning:hover {
   background-color: var(--accent-hover-color);
+  color: var(--on-warning-text-color, #ffffff);
 }
 
 /* ✅ Danger */
@@ -94,7 +99,8 @@
   color: var(--on-danger-text-color, #ffffff);
 }
 .button--danger:hover {
-  background-color: var(--accent-hover-color);
+  background-color: var(--danger-hover-color, var(--accent-hover-color));
+  color: var(--on-danger-text-color, #ffffff);
 }
 
 /* ✅ Success */
@@ -104,6 +110,7 @@
 }
 .button--success:hover {
   background-color: var(--secondary-hover-color);
+  color: var(--on-success-text-color, #ffffff);
 }
 
 /* ✅ Accent */
@@ -113,6 +120,7 @@
 }
 .button--accent:hover {
   background-color: var(--accent-hover-color);
+  color: var(--on-accent-text-color, #ffffff);
 }
 
 /* ===============================

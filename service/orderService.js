@@ -196,6 +196,24 @@ class OrderService {
     }
   }
 
+  static async findTempOrders(limit = 10, page = 1) {
+    try {
+      const skip = (page - 1) * limit;
+      const tempOrders = await TemporaryOrderModel.find().sort({ date: -1 }).skip(skip).limit(limit);
+      if (!tempOrders) {
+        ErrorHelper.throwNotFoundError("Porudžbine");
+      }
+
+      const totalCount = await TemporaryOrderModel.countDocuments({});
+      return {
+        orders: this.mapOrders(tempOrders),
+        totalCount: totalCount
+      };
+    } catch (error) {
+      ErrorHelper.throwServerError(error);
+    }
+  }
+
   static async findOrdersBySearch(search, limit = 10, page = 1) {
     try {
       const skip = (page - 1) * limit;
@@ -299,6 +317,20 @@ class OrderService {
       }
 
       return this.mapOrderDetails(order);
+    } catch (error) {
+      ErrorHelper.throwServerError(error);
+    }
+  }
+
+  static async findTempOrderById(orderId) {
+    try {
+      const order = await TemporaryOrderModel.findById(orderId);
+
+      if (!order) {
+        ErrorHelper.throwNotFoundError("Porudžbina");
+      }
+
+      return this.mapTempOrderDetails(order);
     } catch (error) {
       ErrorHelper.throwServerError(error);
     }
@@ -582,6 +614,58 @@ class OrderService {
       Status: { value: order.status },
     };
   }
+
+  static mapTempOrderDetails(tempOrder) {
+  return {
+    ID: { value: tempOrder._id },
+    Token: { value: tempOrder.verificationToken },
+    Kupac: {
+      Tip: { value: tempOrder.buyer.type },
+      Ime: { value: tempOrder.buyer.firstName },
+      Prezime: {
+        value: CryptoService.decryptData(tempOrder.buyer.lastName),
+      },
+      Email: { value: tempOrder.email },
+    },
+    Datum: {
+      value: tempOrder.date.toLocaleDateString("sr-RS", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      }),
+    },
+    Poštarina: { value: tempOrder.shipping },
+    Kupon: {
+      Kod: { value: "Nema" },
+      Popust: { value: "0 %" },
+    },
+    "Ukupna Cena": { value: `${tempOrder.totalPrice} RSD` },
+    Artikli: tempOrder.items.map((item) => ({
+      Slika: { value: item.image },
+      Naziv: item.title,
+      Velicina: item.size,
+      Količina: item.amount,
+      Boja: item.color,
+    })),
+
+    Telefon: { value: CryptoService.decryptData(tempOrder.telephone) },
+    Adresa: {
+      Grad: { value: tempOrder.address.city },
+      Ulica: {
+        value: CryptoService.decryptData(tempOrder.address.street),
+      },
+      Broj: {
+        value: CryptoService.decryptData(tempOrder.address.number),
+      },
+      "Poštanski Broj": { value: tempOrder.address.postalCode },
+    },
+    Napomena: {
+      value: CryptoService.decryptData(tempOrder.note) || "Nema",
+    },
+    Status: { value: "Privremena" },
+  };
+}
+
 }
 
 export default OrderService;

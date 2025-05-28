@@ -652,7 +652,7 @@ class ItemService {
         img: featureImageFile ? featureImageFile.originalname : null,
         imgDesc: sanitize(body.featureImageDesc || ""),
     };
-    console.log("featureImage", featureImage);
+
     const slug = generateSlug(body.title);
     // Variations
     const variationImages = files.filter(file => file.fieldname.startsWith('variationImage'));

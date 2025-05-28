@@ -703,7 +703,7 @@ async function postConfirmOrder(req, res, next) {
                 await UserService.updateUserAfterOrder(userId, newOrder, session, newTelephoneUser, newAddressUser);
             }
 
-            message = "Hvala Vam, uspešno ste napravili porudžbinu, proverite vaš email i potvrdite istu. Sve inforamcije možete pronaći prijavom na vaš nalog vezano za porudžbinu!"
+            message = "Hvala Vam, uspešno ste napravili porudžbinu, proverite vaš email i POTVRDITE istu. Sve inforamcije možete pronaći prijavom na vaš nalog vezano za porudžbinu!"
         } else {
             // When there isn't loogedin user, its guest
             if (tempOrder.createNewAccount) {

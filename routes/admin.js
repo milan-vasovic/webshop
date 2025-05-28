@@ -74,9 +74,13 @@ router.get("/dodajte-objavu", isAuth, isAdmin, ForumController.getAddForumPostPa
 
 router.get('/porudzbine', isAuth, isAdmin, OrderController.getOrdersPage);
 
+router.get('/privremene-porudzbine', isAuth, isAdmin, OrderController.getTempOrdersPage);
+
 router.get('/porudzbine/pretraga/:search', isAuth, isAdmin, OrderController.getSearchOrdersPage);
 
 router.get('/porudzbina-detalji/:orderId', isAuth, isAdmin, OrderController.getOrderDetailsPage);
+
+router.get('/privremena-porudzbina-detalji/:orderId', isAuth, isAdmin, OrderController.getTempOrderDetailsPage);
 
 
 // POST
@@ -539,5 +543,7 @@ router.delete('/izbrisite-objavu', isAuth, isAdmin, ForumController.deletePostBy
 router.delete('/izbrisite-kupon', isAuth, isAdmin, CouponController.deleteCouponById);
 
 router.delete('/izbrisite-artikal', isAuth, isAdmin, ItemController.deleteItemById);
+
+router.post('/potvrda-porudzbine', OrderController.postAdminConfirmOrder);
 
 export default router;
