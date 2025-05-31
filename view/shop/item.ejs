@@ -80,14 +80,22 @@
         <h3 class="product__meta-title">Kategorije:</h3>
         <ul class="flex flex-wrap gap-2">
           <% item.Kategorije.value.forEach(c => { %>
-            <li><a href="/prodavnica/kategorija/<%= c %>" class="badge badge--primary"><%= c %></a></li>
+            <li>
+              <a href="/prodavnica/kategorija/<%= c.Slug %>" class="badge badge--primary">
+                <%= c.Naziv %>
+              </a>
+            </li>
           <% }) %>
         </ul>
 
         <h3 class="product__meta-title mt-4">Tagovi:</h3>
         <ul class="flex flex-wrap gap-2">
           <% item.Tagovi.value.forEach(t => { %>
-            <li><a href="/prodavnica/oznaka/<%= t %>" class="badge badge--neutral"><%= t %></a></li>
+            <li>
+              <a href="/prodavnica/oznaka/<%= t.Slug %>" class="badge badge--neutral">
+                <%= t.Naziv %>
+              </a>
+            </li>
           <% }) %>
         </ul>
       </div>
