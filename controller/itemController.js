@@ -75,6 +75,7 @@ async function getItemDetailsPage(req, res, next) {
 
     const item = await ItemService.findItemDetailsByIdForAdmin(itemId);
 
+    console.log(JSON.stringify(item));
     return res.render("admin/item/item-details", {
       path: "/admin/artikal-detalji",
       pageTitle: item.Nasolv,

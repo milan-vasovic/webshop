@@ -6,6 +6,8 @@ import ItemModel from "../model/item.js";
 
 import ErrorHelper from "../helper/errorHelper.js";
 import EmailService from "./emailService.js";
+import CategoryModel from "../model/category.js";
+import TagModel from "../model/tag.js";
 
 class ItemService {
   /**
@@ -16,50 +18,37 @@ class ItemService {
    * @returns {Promise<Array>} - A promise that resolves to an array of items.
    */
   static async findAllAdminAddItems(category = null, itemId = null) {
-    let categories;
-    try {
-      categories = category.split(",").map((category) => category.trim());
-    } catch (err) {
-      categories = category;
-    }
-
-    // If itemId is passed it means that we are looking for all other items with at least one same category, except the current one with itemId
-    if (itemId) {
-      const items = await ItemModel.find({
-        categories: { $in: categories },
-        _id: { $ne: itemId },
-      })
-        .select("id title")
-        .exec();
-
-      if (!items) {
-        return ErrorHelper.throwNotFoundError("Artikli");
-      }
-
-      return items.map((item) => ({
-        ID: { value: item._id },
-        Naziv: { value: item.title },
-      }));
-    }
-
+    let categorySlugs = [];
     if (category) {
-      const items = await ItemModel.find({ categories: { $in: categories } })
-        .select("id title")
-        .exec();
-
-      if (!items) {
-        return ErrorHelper.throwNotFoundError("Artikli");
+      try {
+        categorySlugs = category.split(",").map((c) => c.trim());
+      } catch (err) {
+        categorySlugs = [category];
       }
-
-      return items.map((item) => ({
-        ID: { value: item._id },
-        Naziv: { value: item.title },
-      }));
     }
 
-    const items = await ItemModel.find().select("id title").exec();
+    let categoryIds = [];
+    if (categorySlugs.length > 0) {
+      const foundCategories = await CategoryModel.find({
+        slug: { $in: categorySlugs },
+      }).select("_id");
 
-    if (!items) {
+      categoryIds = foundCategories.map((cat) => cat._id);
+    }
+
+    const query = {};
+
+    if (categoryIds.length > 0) {
+      query.categories = { $in: categoryIds };
+    }
+
+    if (itemId) {
+      query._id = { $ne: itemId };
+    }
+
+    const items = await ItemModel.find(query).select("id title").exec();
+
+    if (!items || items.length === 0) {
       return ErrorHelper.throwNotFoundError("Artikli");
     }
 
@@ -77,21 +66,29 @@ class ItemService {
    * @returns {Promise<Array>} - A promise that resolves to an array of items.
    */
   static async findAllAdminAddItemsByCategory(category, itemId) {
-    let categories;
+    let categorySlugs = [];
+
     try {
-      categories = category.split(",").map((category) => category.trim());
+      categorySlugs = category.split(",").map((c) => c.trim());
     } catch (err) {
-      categories = category;
+      categorySlugs = [category];
     }
 
+    // Pronađi ID-jeve kategorija na osnovu slugova
+    const foundCategories = await CategoryModel.find({
+      slug: { $in: categorySlugs },
+    }).select("_id");
+
+    const categoryIds = foundCategories.map((cat) => cat._id);
+
     const items = await ItemModel.find({
-      categories: { $ne: categories },
+      categories: { $nin: categoryIds },
       _id: { $ne: itemId },
     })
       .select("id title")
       .exec();
 
-    if (!items) {
+    if (!items || items.length === 0) {
       return ErrorHelper.throwNotFoundError("Artikli");
     }
 
@@ -106,52 +103,35 @@ class ItemService {
    *
    * @returns {Promise<Array>} - A promise that resolves to an array of categories.
    */
-  static async findAllCategories(tag = null) {
-    let filter = { status: { $ne: "not-published" } };
-  
-    if (tag) {
-      let tags;
-      try {
-        tags = tag.split(",").map((tag) => tag.trim());
-      } catch (err) {
-        tags = tag;
-      }
-  
-      filter.tags = { $in: tags };
-    }
-  
-    const categories = await ItemModel.distinct("categories", filter);
-  
+  static async findAllCategories() {
+    const categories = await CategoryModel.find()
+      .select("name slug")
+      .lean();
+
     return {
-      Kategorije: categories,
+      Kategorije: categories.map((cat) => ({
+        Naziv: cat.name,
+        Slug: cat.slug,
+      })),
     };
-  }  
+  }
+  
 
   /**
    * Finds all tags.
    *
    * @returns {Promise<Array>} - A promise that resolves to an array of tags.
    */
-  static async findAllTags(category = null) {
-    const filter = { status: { $ne: "not-published" } };
-  
-    if (category) {
-      let categories;
-      try {
-        categories = category.split(",").map((category) => category.trim());
-      } catch (err) {
-        categories = category;
-      }
-  
-      filter.categories = { $in: categories };
-    }
-  
-    const tags = await ItemModel.distinct("tags", filter);
-  
-    const sortedTags = tags.sort((a, b) => a.localeCompare(b, "sr", { sensitivity: 'base' }));
+  static async findAllTags() {
+    const tags = await TagModel.find()
+      .select("name slug")
+      .lean();
 
     return {
-      Tagovi: sortedTags,
+      Tagovi: tags.map((tag) => ({
+        Naziv: tag.name,
+        Slug: tag.slug,
+      })),
     };
   }  
 
@@ -167,6 +147,7 @@ class ItemService {
       .select(
         "title slug shortDescription price actionPrice categories tags featureImage status"
       )
+      .populate('categories tags')
       .skip(skip)
       .limit(limit)
       .lean();
@@ -192,11 +173,43 @@ class ItemService {
     };
 
     if (category) {
-      filter.categories = { $regex: category, $options: "i" };
+      let slugs = [];
+      try {
+        slugs = slugs.map((c) => {
+          if (typeof c === "string") return c;
+          if (typeof c === "object" && c.Slug) return c.Slug;
+          return "";
+        }).filter(Boolean);
+      } catch (err) {
+        slugs = [category];
+      }
+
+      const categoryDocs = await CategoryModel.find({
+        slug: { $in: slugs }
+      }).select("_id");
+
+      const categoryIds = categoryDocs.map((cat) => cat._id);
+      filter.categories = { $in: categoryIds };
     }
 
     if (tag) {
-      filter.tags = { $regex: tag, $options: "i" };
+      let slugs = [];
+      try {
+        slugs = slugs.map((t) => {
+          if (typeof t === "string") return t;
+          if (typeof t === "object" && t.Slug) return t.Slug;
+          return "";
+        }).filter(Boolean);
+      } catch (err) {
+        slugs = [tag];
+      }
+
+      const tagDocs = await TagModel.find({
+        slug: { $in: slugs }
+      }).select("_id");
+
+      const tagIds = tagDocs.map((tag) => tag._id);
+      filter.tags = { $in: tagIds };
     }
 
     const items = await ItemModel.find(filter)
@@ -204,15 +217,12 @@ class ItemService {
       .select(
         "title slug shortDescription categories tags price actionPrice featureImage status"
       )
+      .populate('categories tags')
       .skip(skip)
       .limit(limit)
       .lean();
 
-    if (!items) {
-      return []
-    }
-
-    return ItemService.mapItemsForShop(items);
+    return items ? ItemService.mapItemsForShop(items) : [];
   }
 
   /**
@@ -229,11 +239,43 @@ class ItemService {
     };    
 
     if (category) {
-      filter.categories = { $regex: category, $options: "i" };
+      let slugs = [];
+      try {
+        slugs = slugs.map((c) => {
+          if (typeof c === "string") return c;
+          if (typeof c === "object" && c.Slug) return c.Slug;
+          return "";
+        }).filter(Boolean);
+      } catch (err) {
+        slugs = [category];
+      }
+
+      const categoryDocs = await CategoryModel.find({
+        slug: { $in: slugs }
+      }).select("_id");
+
+      const categoryIds = categoryDocs.map((cat) => cat._id);
+      filter.categories = { $in: categoryIds };
     }
 
     if (tag) {
-      filter.tags = { $regex: tag, $options: "i" };
+      let slugs = [];
+      try {
+        slugs = slugs.map((t) => {
+          if (typeof t === "string") return t;
+          if (typeof t === "object" && t.Slug) return t.Slug;
+          return "";
+        }).filter(Boolean);
+      } catch (err) {
+        slugs = [tag];
+      }
+
+      const tagDocs = await TagModel.find({
+        slug: { $in: slugs }
+      }).select("_id");
+
+      const tagIds = tagDocs.map((tag) => tag._id);
+      filter.tags = { $in: tagIds };
     }
 
     const items = await ItemModel.find(filter)
@@ -241,6 +283,7 @@ class ItemService {
       .select(
         "title slug shortDescription categories tags price actionPrice featureImage status"
       )
+      .populate('categories')      
       .skip(skip)
       .limit(limit)
       .lean();
@@ -259,51 +302,93 @@ class ItemService {
    * @returns {Promise<Array>} - A promise that resolves to an array of items.
    */
   static async findItemsByCategory(
-    category,
-    status = null,
-    excludeStatus = null,
-    limit = 10,
-    skip = 0
-  ) {
-    const filter = {
-      categories: category
-    };
-  
-    // Uvek isključi not-published
-    const excluded = new Set();
-    if (excludeStatus) {
-      const excl = Array.isArray(excludeStatus) ? excludeStatus : [excludeStatus];
-      excl.forEach(e => excluded.add(e));
-    }
-    excluded.add("not-published");
-  
-    // Ako postoji status, koristi $in i $nin zajedno
-    if (status) {
-      const statuses = Array.isArray(status) ? status : [status];
-      filter.status = {
-        $in: statuses,
-        $nin: Array.from(excluded)
-      };
-    } else {
-      filter.status = { $nin: Array.from(excluded) };
-    }
-  
-    const [items, itemCount] = await Promise.all([
-      ItemModel.find(filter)
-        .sort({ soldCount: -1, _id: 1 })
-        .select("title slug shortDescription price actionPrice featureImage status")
-        .skip(skip)
-        .limit(limit)
-        .lean(),
-      ItemModel.countDocuments(filter)
-    ]);
-  
-    return {
-      items: ItemService.mapItemsForShop(items),
-      totalCount: itemCount
-    };
-  }  
+  category,
+  status = null,
+  excludeStatus = null,
+  limit = 10,
+  skip = 0
+) {
+  const filter = {};
 
+  // 1. Mapiraj slugove u ObjectId
+  let slugs = [];
+
+  try {
+    slugs = Array.isArray(category)
+      ? category
+      : category.split(",").map((c) => c.trim());
+  } catch (err) {
+    slugs = [category];
+  }
+
+  // Sanitize ako stigne objekat
+  slugs = slugs.map((c) => {
+    if (typeof c === "string") return c;
+    if (typeof c === "object" && c.Slug) return c.Slug;
+    return "";
+  }).filter(Boolean);
+
+  const categoryDocs = await CategoryModel.find({
+    slug: { $in: slugs }
+  }).select("_id");
+
+  const categoryIds = categoryDocs.map((cat) => cat._id);
+
+  if (!categoryIds.length) {
+    return {
+      items: [],
+      totalCount: 0
+    };
+  }
+
+  filter.categories = { $in: categoryIds };
+
+  // 2. Status filtering
+  const excluded = new Set();
+  if (excludeStatus) {
+    const excl = Array.isArray(excludeStatus)
+      ? excludeStatus
+      : [excludeStatus];
+    excl.forEach((e) => excluded.add(e));
+  }
+  excluded.add("not-published");
+
+  if (status) {
+    const statuses = Array.isArray(status) ? status : [status];
+    filter.status = {
+      $in: statuses,
+      $nin: Array.from(excluded)
+    };
+  } else {
+    filter.status = { $nin: Array.from(excluded) };
+  }
+
+  // 3. Dohvati artikle
+  const [items, itemCount] = await Promise.all([
+    ItemModel.find(filter)
+      .sort({ soldCount: -1, _id: 1 })
+      .select("title slug shortDescription price actionPrice categories tags featureImage status")
+      .populate("categories tags")
+      .skip(skip)
+      .limit(limit)
+      .lean(),
+    ItemModel.countDocuments(filter)
+  ]);
+
+  return {
+    items: ItemService.mapItemsForShop(items),
+    totalCount: itemCount,
+    metadata: {
+      metadata: {
+        title: categoryDocs[0]?.name || "",
+        description: categoryDocs[0]?.shortDescription || "",
+        longDescription: categoryDocs[0]?.longDescription || ""
+      }
+    }
+  };
+}
+
+  
   /**
    * Finds items by tag.
    *
@@ -317,19 +402,49 @@ class ItemService {
     limit = 10,
     skip = 0
   ) {
-    const filter = {
-      tags: tag
-    };
-  
-    // Uvek isključi not-published
+    const filter = {};
+
+    // 1. Mapiraj ulaz u niz slugova
+    let slugs = [];
+
+    try {
+      slugs = Array.isArray(tag)
+        ? tag
+        : tag.split(",").map((t) => t.trim());
+    } catch (err) {
+      slugs = [tag];
+    }
+
+    slugs = slugs.map((t) => {
+      if (typeof t === "string") return t.toLowerCase();
+      if (typeof t === "object" && t.slug) return t.slug.toLowerCase();
+      return "";
+    }).filter(Boolean);
+
+    // 2. Dohvati Tag dokumente
+    const tagDocs = await TagModel.find({
+      slug: { $in: slugs }
+    }).select("_id");
+
+    const tagIds = tagDocs.map((t) => t._id);
+
+    if (!tagIds.length) {
+      return {
+        items: [],
+        totalCount: 0
+      };
+    }
+
+    filter.tags = { $in: tagIds };
+
+    // 3. Status filtering
     const excluded = new Set();
     if (excludeStatus) {
       const excl = Array.isArray(excludeStatus) ? excludeStatus : [excludeStatus];
       excl.forEach(e => excluded.add(e));
     }
     excluded.add("not-published");
-  
-    // Ako postoji status, koristi $in i $nin zajedno
+
     if (status) {
       const statuses = Array.isArray(status) ? status : [status];
       filter.status = {
@@ -339,23 +454,29 @@ class ItemService {
     } else {
       filter.status = { $nin: Array.from(excluded) };
     }
-    
+
+    // 4. Dohvati artikle
     const [items, itemCount] = await Promise.all([
       ItemModel.find(filter)
         .sort({ soldCount: -1, _id: 1 })
-        .select("title slug shortDescription price actionPrice featureImage status")
+        .select("title slug shortDescription price actionPrice tags categories featureImage status")
+        .populate("tags categories")
         .skip(skip)
         .limit(limit)
         .lean(),
       ItemModel.countDocuments(filter)
     ]);
-  
+
     return {
       items: ItemService.mapItemsForShop(items),
-      totalCount: itemCount
+      totalCount: itemCount,
+      metadata: {
+        title: tagDocs[0]?.name || "",
+        description: tagDocs[0]?.shortDescription || "",
+        longDescription: tagDocs[0]?.longDescription || ""
+      }
     };
   }
-  
 
   /**
    * Finds items by search query.
@@ -365,15 +486,12 @@ class ItemService {
    */
   static async findItemsBySearch(search, limit = 10, page = 1, cond = false) {
     const skip = (page - 1) * limit;
-  
-    const filter = {
-      $and: []
-    };
-  
+    const filter = { $and: [] };
+
     if (!cond) {
       filter.$and.push({ status: { $ne: "not-published" } });
     }
-  
+
     if (search) {
       const searchNumber = parseFloat(search);
       const conditions = [
@@ -381,43 +499,89 @@ class ItemService {
         { slug: { $regex: search, $options: "i" } },
         { sku: { $regex: search, $options: "i" } },
         { status: { $elemMatch: { $regex: search, $options: "i" } } },
-        { categories: { $regex: search, $options: "i" } },
-        { tags: { $regex: search, $options: "i" } },
         { keyWords: { $regex: search, $options: "i" } }
       ];
-  
+
       if (!isNaN(searchNumber)) {
         conditions.push({ price: searchNumber });
         conditions.push({ actionPrice: searchNumber });
       }
-  
+
+      // Pretraga po kategorijama (slug ili title)
+      const matchingCategories = await CategoryModel.find({
+        $or: [
+          { title: { $regex: search, $options: "i" } },
+          { slug: { $regex: search, $options: "i" } }
+        ]
+      }).select("_id");
+
+      if (matchingCategories.length > 0) {
+        const categoryIds = matchingCategories.map((cat) => cat._id);
+        conditions.push({ categories: { $in: categoryIds } });
+      }
+
+      // NOVO: Pretraga po tagovima (slug ili name)
+      const matchingTags = await TagModel.find({
+        $or: [
+          { name: { $regex: search, $options: "i" } },
+          { slug: { $regex: search, $options: "i" } }
+        ]
+      }).select("_id");
+
+      if (matchingTags.length > 0) {
+        const tagIds = matchingTags.map((tag) => tag._id);
+        conditions.push({ tags: { $in: tagIds } });
+      }
+
       filter.$and.push({ $or: conditions });
     }
-  
-    // Ako je $and prazan, brišemo ga da ne bi pravio problem
+
     if (filter.$and.length === 0) {
       delete filter.$and;
     }
-  
+
     const [items, itemCount] = await Promise.all([
       ItemModel.find(filter)
         .sort({ soldCount: -1, _id: 1 })
         .select("title slug shortDescription price actionPrice status categories tags keyWords featureImage")
+        .populate("categories")
+        .populate("tags") // NOVO: populacija tagova
         .skip(skip)
         .limit(limit)
         .lean(),
       ItemModel.countDocuments(filter)
     ]);
-  
+
     if (!items || items.length === 0) {
       ErrorHelper.throwNotFoundError("Artikli");
     }
-  
+
+    let metadata = null;
+
+    const foundCategory = await CategoryModel.findOne({ slug: search }).lean();
+    if (foundCategory) {
+      metadata = {
+        title: foundCategory.name,
+        description: foundCategory.shortDescription,
+        longDescription: foundCategory.longDescription
+      };
+    }
+
+    const foundTag = await TagModel.findOne({ slug: search }).lean();
+    if (foundTag) {
+      metadata = {
+        title: foundTag.name,
+        description: foundTag.shortDescription,
+        longDescription: foundTag.longDescription
+      };
+    }
+
     return {
       items: ItemService.mapItemsForCard(items),
-      totalCount: itemCount
+      totalCount: itemCount,
+      metadata
     };
-  }  
+  }
 
   /**
    * Finds item details by ID or name.
@@ -429,7 +593,8 @@ class ItemService {
     if (itemSlug) {
       const item = await ItemModel.findOne({ slug: itemSlug }).select(
         "title slug keyWords shortDescription price actionPrice description categories tags featureImage video status backorder variations upSellItems crossSellItems wishlist"
-      );
+      )
+      .populate("categories tags");
 
       if (!item) {
         ErrorHelper.throwNotFoundError("Artikal");
@@ -440,7 +605,8 @@ class ItemService {
 
     const item = await ItemModel.findById(id).select(
       "title slug keyWords shortDescription price actionPrice description categories tags featureImage video status backorder variations upSellItems crossSellItems"
-    );
+    )
+    .populate("categories tags");
 
     if (!item) {
       ErrorHelper.throwNotFoundError("Artikal");
@@ -462,6 +628,7 @@ class ItemService {
       .select(
         "title slug shortDescription price actionPrice categories tags status sku featureImage"
       )
+      .populate("categories tags")
       .skip(skip)
       .limit(limit)
       .lean();
@@ -485,7 +652,7 @@ class ItemService {
    * @returns {Promise<Object>} - A promise that resolves to the item details.
    */
   static async findItemDetailsByIdForAdmin(id) {
-    const item = await ItemModel.findById(id);
+    const item = await ItemModel.findById(id).populate("categories tags");
 
     if (!item) {
       ErrorHelper.throwNotFoundError("Artikal");
@@ -647,110 +814,106 @@ class ItemService {
    * @returns {Promise<Object>} - A promise that resolves to the created item.
    */
   static async createNewItem(body, files) {
+    // --- [1] Feature image obrada ---
     const featureImageFile = files.find(file => file.fieldname === 'featureImage');
     const featureImage = {
-        img: featureImageFile ? featureImageFile.originalname : null,
-        imgDesc: sanitize(body.featureImageDesc || ""),
+      img: featureImageFile ? featureImageFile.originalname : null,
+      imgDesc: sanitize(body.featureImageDesc || ""),
     };
 
     const slug = generateSlug(body.title);
-    // Variations
+
+    // --- [2] Variations obrada ---
     const variationImages = files.filter(file => file.fieldname.startsWith('variationImage'));
     const variations = [];
 
     if (body.variations) {
-        body.variations.forEach((variation, index) => {
-            const variationImageFile = variationImages[index] || null;
-            variations.push({
-                size: sanitize(variation.size),
-                color: sanitize(variation.color),
-                amount: Number(sanitize(variation.amount)),
-                image: {
-                    img: variationImageFile ? variationImageFile.originalname : null,
-                    imgDesc: sanitize(variation.imgDesc || ""),
-                },
-                onAction: sanitize(variation.onAction) || false,
-            });
+      body.variations.forEach((variation, index) => {
+        const variationImageFile = variationImages[index] || null;
+        variations.push({
+          size: sanitize(variation.size),
+          color: sanitize(variation.color),
+          amount: Number(sanitize(variation.amount)),
+          image: {
+            img: variationImageFile ? variationImageFile.originalname : null,
+            imgDesc: sanitize(variation.imgDesc || ""),
+          },
+          onAction: sanitize(variation.onAction) || false,
         });
+      });
     }
 
-    let upSellItems = body.upSellItems ? sanitize(body.upSellItems) : [];
-    let upSellDetails = [];
+    // --- [3] UpSell i CrossSell obrada ---
+    const upSellItems = sanitize(body.upSellItems || []);
+    const upSellDetails = await Promise.all(
+      upSellItems.map(async id => {
+        const item = await this.findItemDetailsForUpCrossSell(id);
+        return {
+          itemId: item._id,
+          title: item.title,
+          shortDescription: item.shortDescription,
+          featureImage: item.featureImage,
+        };
+      })
+    );
 
-    if (upSellItems.length > 0) {
-      upSellDetails = await Promise.all(
-        upSellItems.map(async (id) => {
-          const item = await this.findItemDetailsForUpCrossSell(id);
-          return {
-            itemId: item._id,
-            title: item.title,
-            shortDescription: item.shortDescription,
-            featureImage: {
-              img: item.featureImage.img,
-              imgDesc: item.featureImage.imgDesc,
-            },
-          };
-        })
-      );
+    const crossSellItems = sanitize(body.crossSellItems || []);
+    const crossSellDetails = await Promise.all(
+      crossSellItems.map(async id => {
+        const item = await this.findItemDetailsForUpCrossSell(id);
+        return {
+          itemId: item._id,
+          title: item.title,
+          shortDescription: item.shortDescription,
+          featureImage: item.featureImage,
+        };
+      })
+    );
+
+    // --- ✅ [4] Mapiranje kategorija preko slug-ova u ObjectId ---
+    let categoryIds = [];
+    if (body.categories && body.categories.length > 0) {
+      const categorySlugs = Array.isArray(body.categories)
+        ? body.categories.map(c => sanitize(c))
+        : [sanitize(body.categories)];
+
+      const categoryDocs = await CategoryModel.find({
+        slug: { $in: categorySlugs },
+      }).select("_id");
+
+      categoryIds = categoryDocs.map(cat => cat._id);
     }
 
-    let crossSellItems = body.crossSellItems
-      ? sanitize(body.crossSellItems)
-      : [];
-    let crossSellDetails = [];
-
-    if (crossSellItems.length > 0) {
-      crossSellDetails = await Promise.all(
-        crossSellItems.map(async (id) => {
-          const item = await this.findItemDetailsForUpCrossSell(id);
-          return {
-            itemId: item._id,
-            title: item.title,
-            shortDescription: item.shortDescription,
-            featureImage: {
-              img: item.featureImage.img,
-              imgDesc: item.featureImage.imgDesc,
-            },
-          };
-        })
-      );
-    }
-
+    // --- [5] Kreiranje objekta ---
     const newItemData = {
       title: sanitize(body.title),
-      slug: slug,
+      slug,
       sku: sanitize(body.sku),
       price: sanitize(body.price),
       actionPrice: sanitize(body.actionPrice),
       shortDescription: sanitize(body.shortDescription),
       description: sanitize(body.description),
       keyWords: sanitize(body.keyWords || []),
-      categories: sanitize(body.categories || []),
+      categories: categoryIds, // ✅ lista ObjectId referenci
       tags: sanitize(body.tags || []),
       status: sanitize(body.status || "normal"),
       backorder: { isAllowed: sanitize(body.backorderAllowed === "on") },
       variations,
-      featureImage: {
-        img: featureImage.img,
-        imgDesc: featureImage.imgDesc,
-      },
-      upSellItems: upSellDetails || [],
-      crossSellItems: crossSellDetails || [],
+      featureImage,
+      upSellItems: upSellDetails,
+      crossSellItems: crossSellDetails,
     };
 
-    // Video
+    // --- [6] Video ako postoji ---
     const videoFile = files.find(file => file.fieldname === 'video');
-    let video;
     if (videoFile) {
-      video = {
-          vid: videoFile.originalname,
-          vidDesc: sanitize(body.videoDesc || null),
+      newItemData.video = {
+        vid: videoFile.originalname,
+        vidDesc: sanitize(body.videoDesc || null),
       };
-
-      newItemData.video = video;
     }
 
-    // Sačuvaj u bazu
+    // --- [7] Sačuvaj u bazu ---
     const newItem = new ItemModel(newItemData);
     return await newItem.save();
   }
@@ -764,64 +927,56 @@ class ItemService {
    */
   static async updateItem(itemId, body, files) {
     try {
-      // Pronađi postojeći artikal
       const existingItem = await ItemModel.findById(itemId);
       if (!existingItem) {
         ErrorHelper.throwNotFoundError("Artikal");
       }
+
       const slug = generateSlug(body.title);
 
-      // Obrada featureImage – ako je upload-ovana nova slika, ažuriraj, inače zadrži staru
+      // === FEATURE IMAGE ===
       const featureImageFile = files.find(file => file.fieldname === 'featureImage');
       if (files && featureImageFile) {
         existingItem.featureImage = {
-          img: featureImageFile ? featureImageFile.originalname : null,
+          img: featureImageFile.originalname,
           imgDesc: sanitize(body.featureImageDesc || ""),
         };
       }
 
+      // === VIDEO ===
       const videoFile = files.find(file => file.fieldname === 'video');
-      let video;
       if (videoFile) {
-        video = {
-            vid: videoFile.originalname,
-            vidDesc: sanitize(body.videoDesc || null),
+        existingItem.video = {
+          vid: videoFile.originalname,
+          vidDesc: sanitize(body.videoDesc || null),
         };
-
-        existingItem.video = video;
       }
 
-      // Obrada varijacija
+      // === VARIACIJE ===
       if (body.variations) {
         body.variations = body.variations.map((variation) => {
-          // Proveri da li je varijacija nova (privremeni ID)
-          const isNew = variation._id.startsWith("new-");
-      
-          // Pronađi postojeću varijaciju, ako postoji, koristeći _id (ako nije nova)
-          const existingVar = !isNew 
-            ? existingItem.variations.find(v => v._id.toString() === variation._id) 
+          const isNew = variation._id?.startsWith("new-");
+          const existingVar = !isNew
+            ? existingItem.variations.find(v => v._id.toString() === variation._id)
             : null;
-      
-          // Pokušaj da pronađeš fajl koji odgovara ovoj varijaciji
-          // Očekujemo da je file input ime formirano kao "variationImage_<variation._id>"
+
           const file = files ? files.find(f => f.fieldname === `variationImage_${variation._id}`) : null;
-      
-          // Kreiraj objekt varijacije; ako varijacija nije nova, zadrži _id, a ako jeste, ne postavljaj _id
+
           const varObj = {
             size: variation.size,
             color: variation.color,
-            amount: Number(variation.amount) || (existingVar ? existingVar.amount : 0),
+            amount: Number(variation.amount) || (existingVar?.amount || 0),
             image: {
-              img: file ? file.originalname : (existingVar && existingVar.image && existingVar.image.img) || "",
-              imgDesc: variation.imgDesc || (existingVar && existingVar.image && existingVar.image.imgDesc) || ""
+              img: file ? file.originalname : existingVar?.image?.img || "",
+              imgDesc: variation.imgDesc || existingVar?.image?.imgDesc || "",
             },
-            onAction: variation.onAction || (existingVar ? existingVar.onAction : false),
+            onAction: variation.onAction ?? existingVar?.onAction ?? false,
           };
-      
+
           if (!isNew) {
             varObj._id = variation._id;
           }
-          
+
           return varObj;
         });
       } else {
@@ -829,33 +984,50 @@ class ItemService {
       }
       existingItem.variations = body.variations;
 
-      // Ažuriraj ostale podatke
+      // === OSNOVNA POLJA ===
       existingItem.title = body.title || existingItem.title;
       existingItem.slug = slug || existingItem.slug;
       existingItem.sku = body.sku || existingItem.sku;
-      existingItem.shortDescription =
-        body.shortDescription || existingItem.shortDescription;
+      existingItem.shortDescription = body.shortDescription || existingItem.shortDescription;
       existingItem.description = body.description || existingItem.description;
       existingItem.keyWords = body.keyWords || existingItem.keyWords;
-      existingItem.categories = body.categories || existingItem.categories;
+
+      // === KATEGORIJE ===
+      if (body.categories && body.categories.length > 0) {
+        const categorySlugs = Array.isArray(body.categories)
+          ? body.categories.map(c => sanitize(c))
+          : [sanitize(body.categories)];
+
+        const categoryDocs = await CategoryModel.find({
+          slug: { $in: categorySlugs },
+        }).select("_id");
+
+        const categoryIds = categoryDocs.map(cat => cat._id);
+        existingItem.categories = categoryIds;
+      } else {
+        existingItem.categories = existingItem.categories;
+      }
+
+      // === TAGOVI ===
       existingItem.tags = body.tags || existingItem.tags;
 
-      // Pretvaranje statusa u niz (ako već nije niz)
+      // === STATUS + NOTIFIKACIJA ===
       const newStatus = Array.isArray(body.status) ? body.status : [body.status];
       const existingStatus = Array.isArray(existingItem.status) ? existingItem.status : [existingItem.status];
 
-      // Provera da li je "action" dodat u novim statusima, a prethodno nije bio prisutan
       if (newStatus.includes("action") && !existingStatus.includes("action")) {
         await EmailService.notifyUsersFromItemWishlist(existingItem._id);
       }
 
       existingItem.status = body.status || existingItem.status;
 
+      // === CENE, BACKORDER, UPSELL, CROSSSELL ===
       existingItem.price = body.price || existingItem.price;
       existingItem.actionPrice = body.actionPrice || [];
+
       existingItem.upSellItems = body.upSellItems || [];
-      existingItem.crossSellItems =
-        body.crossSellItems || existingItem.crossSellItems;
+      existingItem.crossSellItems = body.crossSellItems || existingItem.crossSellItems;
+
       existingItem.backorder.isAllowed =
         body.backorderAllowed === "on" || existingItem.backorder.isAllowed;
 
@@ -1086,7 +1258,12 @@ class ItemService {
       Link: { value: item.slug },
       Opis: { value: item.shortDescription },
       Status: { value: item.status.join(", ") },
-      Kategorije: { value: item.categories },
+      Kategorije: {
+        value: item.categories.map(cat => ({
+          Naziv: cat.name,
+          Slug: cat.slug
+        }))
+      },
       Tagovi: { value: item.tags },
       Slika: {
         value: item.featureImage.img,
@@ -1104,8 +1281,18 @@ class ItemService {
       Link: { value: item.slug },
       Opis: { value: item.shortDescription },
       Status: { value: item.status.join(", ") },
-      Kategorije: { value: item.categories },
-      Tagovi: { value: item.tags },
+      Kategorije: {
+        value: item.categories.map(cat => ({
+          Naziv: cat.name,
+          Slug: cat.slug
+        }))
+      },
+      Tagovi: {
+        value: item.tags.map(tag => ({
+          Naziv: tag.name,
+          Slug: tag.slug
+        }))
+      },
       Slika: {
         value: item.featureImage.img,
         Opis: item.featureImage.imgDesc,
@@ -1122,7 +1309,12 @@ class ItemService {
       SKU: { value: item.sku },
       Naziv: { value: item.title },
       Status: { value: item.status.join(", ") },
-      Kategorije: { value: item.categories.join(", ") },
+      Kategorije: {
+        value: item.categories.map(cat => ({
+          Naziv: cat.name,
+          Slug: cat.slug
+        }))
+      },
       Slika: {
         value: item.featureImage.img,
         Opis: item.featureImage.imgDesc,
@@ -1162,8 +1354,18 @@ class ItemService {
         URL: item.video?.vid || "",
         Opis: item.video?.vidDesc || "",
       },
-      Kategorije: { value: item.categories },
-      Tagovi: { value: item.tags },
+      Kategorije: {
+        value: item.categories.map(cat => ({
+          Naziv: cat.name,
+          Slug: cat.slug
+        }))
+      },
+      Tagovi: {
+        value: item.tags.map(tag => ({
+          Naziv: tag.name,
+          Slug: tag.slug
+        }))
+      },
       Status: { value: item.status },
       Backorder: {
         Dozvoljeno: item.backorder.isAllowed,
@@ -1222,8 +1424,18 @@ class ItemService {
         URL: item.video?.vid || "",
         Opis: item.video?.vidDesc || "",
       },
-      Kategorije: { value: item.categories.join(", ") },
-      Tagovi: { value: item.tags.join(", ") },
+      Kategorije: {
+        value: item.categories.map(cat => ({
+          Naziv: cat.name,
+          Slug: cat.slug
+        }))
+      },
+      Tagovi: {
+        value: item.tags.map(tag => ({
+          Naziv: tag.name,
+          Slug: tag.slug
+        }))
+      },
       Status: { value: item.status.join(", ") },
       Backorder: {
         Dozvoljeno: item.backorder.isAllowed,

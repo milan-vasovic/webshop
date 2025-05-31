@@ -20,7 +20,7 @@ class ShopService {
 
             const itemsByCategory = await Promise.all(
                 categories.Kategorije.map(async (category) => {
-                    const items = await ItemService.findItemsByCategory(category, null, ['action','featured'], 6);
+                    const items = await ItemService.findItemsByCategory(category.Slug, null, ['action','featured'], 6);
 
                     return {
                         Kategorija: { value: category },
@@ -60,7 +60,7 @@ class ShopService {
                 
             const otherCategoryItems = await ItemService.findItemsByCategory(category, null, ['featured', 'action'], limit, skip);
 
-            const tags = await ItemService.findAllTags(category);
+            const tags = await ItemService.findAllTags();
             
             const result = {
                 Tagovi: { value: tags.Tagovi },
@@ -92,7 +92,7 @@ class ShopService {
             
             const otherTagItems = await ItemService.findItemsByTag(tag, null, ['featured', 'action'], limit, skip);
 
-            const categories = await ItemService.findAllCategories(tag);
+            const categories = await ItemService.findAllCategories();
 
             const result = {
                 Kategorije: { value: categories.Kategorije },

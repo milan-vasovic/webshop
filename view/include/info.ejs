@@ -12,7 +12,11 @@
                 <% } else if (Array.isArray(item[key])) { %>
                   <ul class="info-block__list">
                     <% item[key].forEach((listItem) => { %>
-                      <li class="info-block__list-item"><%= listItem %></li>
+                      <% if (typeof listItem === 'object' && listItem.Naziv) { %>
+                        <li class="info-block__list-item"><%= listItem.Naziv %></li>
+                      <% } else { %>
+                        <li class="info-block__list-item"><%= listItem %></li>
+                      <% } %>
                     <% }); %>
                   </ul>
                 <% } else { %>

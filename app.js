@@ -17,7 +17,8 @@ import helmet from 'helmet';
 import crypto from "crypto";
 import mongoSanitize from 'express-mongo-sanitize';
 import methodOverride from 'method-override';
-
+import ItemModel from './model/item.js';
+import TagModel from './model/tag.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -152,6 +153,9 @@ app.use(async (req, res, next) => {
   next();
 });
 
+// app.use(async (req, res, next) => {
+
+// })
 app.use(authRoutes);
 app.use(defaultRoutes);
 app.use(forumRoutes)

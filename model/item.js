@@ -63,13 +63,15 @@ const itemSchema = new Schema({
     },
 
     categories: [{
-        type: String,
+        type: Schema.Types.ObjectId,
+        ref: 'Category',
         required: true
     }],
 
     tags: [{
-        type: String,
-        required: true
+    type: Schema.Types.ObjectId,
+    ref: "Tag",
+    required: true
     }],
 
     status: [{

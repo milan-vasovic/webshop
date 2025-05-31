@@ -149,7 +149,7 @@ async function getFeautredShopPage(req, res, next) {
         const limit = 9;
         const shop = await ShopService.findFeaturedItems(page, limit);
         const totalPages = Math.ceil(shop.Ukupno / limit);
-     
+        const meta = shop.metadata || {};
         const breadcrumbs = buildBreadcrumbs({
             mode: "featured",
             type: "item"
@@ -157,8 +157,8 @@ async function getFeautredShopPage(req, res, next) {
 
         return res.render("shop/shop", {
             path: "/prodavnica/istaknuto",
-            pageTitle: "Istaknuti Proizvodi – Prodavnica",
-            pageDescription: "Pogledajte naše najtraženije i najprodavanije proizvode. Izaberite između pažljivo odabranih artikala iz naše ponude helanki i sportske odeće.",
+            pageTitle: `Rezultati pretrage za: ${meta.title || search}`,
+            pageDescription: meta.shortDescription || `Pronađite proizvode koji odgovaraju pojmu "${search}"...`,
             pageKeyWords: "istaknuto, popularno, top proizvodi, helanke, odeća, prodaja, webshop, TopHelanke",
             index: true,
             featureImage: undefined,

@@ -58,7 +58,7 @@
         <% shop["Artikli Po Kategorijama"].forEach(item => { %>
           <div class="shop-featured mb-10">
             <h2 class="heading-md mb-4">
-              <a href="/prodavnica/kategorija/<%= item.Kategorija.value %>"><%= item.Kategorija.value %> <span class="material-symbols-outlined">arrow_forward</span></a>
+              <a href="/prodavnica/kategorija/<%= item.Kategorija.value.Slug %>"><%= item.Kategorija.value.Naziv %> <span class="material-symbols-outlined">arrow_forward</span></a>
             </h2>
             <div class="cards__container grid grid-1 grid-md-3 gap-6">
               <% item.Artikli.forEach(a => { %>
@@ -104,7 +104,7 @@
           <h2 class="heading-md mb-2">Kategorije</h2>
           <ul class="grid grid-2">
             <% shop.Kategorije.value.forEach(k => { %>
-              <li><a href="/prodavnica/kategorija/<%= k %>"><%= k %></a></li>
+              <li><a href="/prodavnica/kategorija/<%= k.Slug %>"><%= k.Naziv %></a></li>
             <% }) %>
           </ul>
         </div>
@@ -115,7 +115,7 @@
           <h2 class="heading-md mb-2">Tagovi</h2>
           <ul class="grid grid-2">
             <% shop.Tagovi.value.forEach(t => { %>
-              <li><a href="/prodavnica/oznaka/<%= encodeURIComponent(t) %>"><%= t %></a></li>
+              <li><a href="/prodavnica/oznaka/<%= t.Slug %>"><%= t.Naziv %></a></li>
             <% }) %>
           </ul>
         </div>

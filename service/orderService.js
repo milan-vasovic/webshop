@@ -396,8 +396,9 @@ class OrderService {
         case "refund-period":
           const today = new Date();
           const futureDate = new Date();
-          futureDate.setDate(today.getDate() + 7);
+          futureDate.setDate(today.getDate() + 14);
           order.refundDate = futureDate;
+          break;
         case "fulfilled":
           order.refundDate = undefined;
 
