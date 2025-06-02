@@ -6,6 +6,8 @@ import mongoose from "mongoose";
 import ErrorHelper from "../helper/errorHelper.js";
 import ItemService from "../service/itemService.js";
 import UserService from "../service/userService.js";
+import CategoriesService from "../service/categoriesService.js";
+import tagsService from "../service/tagService.js";
 
 /**
  * Renders the items page for the admin.
@@ -23,6 +25,7 @@ async function getItemsPage(req, res, next) {
     const items = await ItemService.findAdminItems(limit, page);
 
     const totalPages = Math.ceil(items.totalCount / limit);
+
     return res.render("admin/item/items", {
       path: "/admin/artikli",
       pageTitle: "Admin Artikli",
@@ -36,6 +39,7 @@ async function getItemsPage(req, res, next) {
       featureImage: undefined,
     });
   } catch (error) {
+    console.error(error)
     next(error);
   }
 }
@@ -94,8 +98,20 @@ async function getItemDetailsPage(req, res, next) {
  */
 async function getAddItemPage(req, res, next) {
   try {
-    const allUpsellItems = await ItemService.findAllAdminAddItems("");
-    const allCrosselItems = await ItemService.findAllAdminAddItemsByCategory("");
+    const allUpsellItems = await ItemService.findItemsForAdminSelection({
+      includeCategories: true,
+      categorySlugs: [],
+      excludeItemId: null
+    });
+
+    const allCrosselItems = await ItemService.findItemsForAdminSelection({
+      includeCategories: false,
+      categorySlugs: [],
+      excludeItemId: null
+    });
+
+    const allCategories = await CategoriesService.findAllCategoriesForItems();
+    const allTags = await tagsService.findAllTagsForItems();
 
     return res.render("admin/item/add-item", {
       path: "/admin/add-item",
@@ -105,8 +121,10 @@ async function getAddItemPage(req, res, next) {
       editing: false,
       existingData: null,
       errorMessage: "",
-      allUpsellItems: allUpsellItems,
-      allCrosselItems: allCrosselItems,
+      allUpsellItems,
+      allCrosselItems,
+      allCategories,
+      allTags,
       index: false,
       featureImage: undefined,
     });
@@ -122,15 +140,22 @@ async function getEditItemPage(req, res, next) {
   try {
     const itemId = req.params.itemId;
     const item = await ItemService.findItemDetailsByIdForAdmin(itemId);
-    const allUpsellItems = await ItemService.findAllAdminAddItems(
-      item.Kategorije.value,
-      itemId
-    );
-    const allCrosselItems = await ItemService.findAllAdminAddItemsByCategory(
-      item.Kategorije.value,
-      itemId
-    );
 
+    const allUpsellItems = await ItemService.findItemsForAdminSelection({
+      includeCategories: true,
+      categorySlugs: [],
+      excludeItemId: null
+    });
+
+    const allCrosselItems = await ItemService.findItemsForAdminSelection({
+      includeCategories: false,
+      categorySlugs: [],
+      excludeItemId: null
+    });
+
+    const allCategories = await CategoriesService.findAllCategoriesForItems();
+    const allTags = await tagsService.findAllTagsForItems();
+ 
     return res.render("admin/item/add-item", {
       path: "/admin/add-item",
       pageTitle: "Izmenite Artikal",
@@ -139,8 +164,10 @@ async function getEditItemPage(req, res, next) {
       errorMessage: "",
       editing: true,
       existingData: item,
-      allUpsellItems: allUpsellItems,
-      allCrosselItems: allCrosselItems,
+      allUpsellItems,
+      allCrosselItems,
+      allCategories,
+      allTags,
       index: false,
       featureImage: undefined,
     });
@@ -149,44 +176,37 @@ async function getEditItemPage(req, res, next) {
   }
 }
 
-async function getAllCrosSellItems(req, res, next) {
+// controllers/ItemController.js
+
+async function getAllUpSellItems(req, res, next) {
   try {
-    const categories = req.query.categories ? req.query.categories : "";
-    const itemId = req.query.itemId ? req.query.itemId : "undefined";
-    if (itemId === "undefined") {
-      const items = await ItemService.findAllAdminAddItemsByCategory(
-        categories
-      );
-      return res.json(items);
-    }
+    const categoryIds = req.query.categories?.split(",") || [];
+    const itemId = req.query.itemId !== "undefined" ? req.query.itemId : null;
 
-    const items = await ItemService.findAllAdminAddItemsByCategory(
-      categories,
-      itemId
-    );
+    const items = await ItemService.findItemsForAdminSelection({
+      includeCategories: true, // up-sell → iste kategorije
+      categoryIds,
+      excludeItemId: itemId
+    });
 
-    res.json(items);
+    return res.json(items);
   } catch (error) {
     next(error);
   }
 }
 
-async function getAllUpSellItems(req, res, next) {
+async function getAllCrossSellItems(req, res, next) {
   try {
-    const categories = req.query.categories ? req.query.categories : "";
-    const itemId = req.query.itemId ? req.query.itemId : "";
+    const categoryIds = req.query.categories?.split(",") || [];
+    const itemId = req.query.itemId !== "undefined" ? req.query.itemId : null;
 
-    if (itemId === "undefined") {
-      const allUpsellItems = await ItemService.findAllAdminAddItems(categories);
-      return res.json(allUpsellItems);
-    }
+    const items = await ItemService.findItemsForAdminSelection({
+      includeCategories: false, // cross-sell → različite kategorije
+      categoryIds,
+      excludeItemId: itemId
+    });
 
-    const allUpsellItems = await ItemService.findAllAdminAddItems(
-      categories,
-      itemId
-    );
-
-    return res.json(allUpsellItems);
+    return res.json(items);
   } catch (error) {
     next(error);
   }
@@ -202,14 +222,20 @@ async function postAddItem(req, res, next) {
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      const allUpsellItems = await ItemService.findAllAdminAddItems(
-        body.categories,
-        body.itemId
-      );
-      const allCrosselItems = await ItemService.findAllAdminAddItemsByCategory(
-        body.categories,
-        body.itemId
-      );
+      const allUpsellItems = await ItemService.findItemsForAdminSelection({
+        includeCategories: true,
+        categorySlugs: [],
+        excludeItemId: null
+      });
+
+      const allCrosselItems = await ItemService.findItemsForAdminSelection({
+        includeCategories: false,
+        categorySlugs: [],
+        excludeItemId: null
+      });
+
+      const allCategories = await CategoriesService.findAllCategoriesForItems();
+      const allTags = await tagsService.findAllTagsForItems();
 
       return res.render("admin/item/add-item", {
         path: "/admin/add-item",
@@ -249,8 +275,10 @@ async function postAddItem(req, res, next) {
           "CrossSell Artikli": { value: body.crossSellItems },
         },
         editing: false,
-        allUpsellItems: allUpsellItems,
-        allCrosselItems: allCrosselItems,
+        allUpsellItems,
+        allCrosselItems,
+        allCategories,
+        allTags,
         index: false,
         featureImage: undefined,
       });
@@ -276,7 +304,7 @@ async function postEditItem(req, res, next) {
     const body = sanitize(req.body);
     const files = sanitize(req.files);
 
-    // Sanitizacija osnovnih podataka
+    // Sanitize osnovnih polja
     body.title = sanitizeHtml(body.title);
     body.sku = sanitizeHtml(body.sku);
     body.shortDescription = sanitizeHtml(body.shortDescription);
@@ -284,40 +312,46 @@ async function postEditItem(req, res, next) {
     body.featureImageDesc = sanitizeHtml(body.featureImageDesc);
     body.videoDesc = sanitizeHtml(body.videoDesc);
 
-    // Sanitizacija nizova
-    if (body.keyWords) {
-      body.keyWords = body.keyWords.map((keyword) => sanitizeHtml(keyword));
+    // Sanitize nizova
+    if (Array.isArray(body.keyWords)) {
+      body.keyWords = body.keyWords.map(k => sanitizeHtml(k));
     }
-    if (body.categories) {
-      body.categories = body.categories.map((category) =>
-        sanitizeHtml(category)
-      );
+    if (Array.isArray(body.categories)) {
+      body.categories = body.categories.map(c => sanitizeHtml(c));
     }
-    if (body.tags) {
-      body.tags = body.tags.map((tag) => sanitizeHtml(tag));
+    if (Array.isArray(body.tags)) {
+      body.tags = body.tags.map(t => sanitizeHtml(t));
     }
-    // Sanitizacija varijacija – svaka varijacija ima i skriveno polje variationId
+
+    // Sanitize varijacija
     if (body.variations) {
       body.variations = body.variations.map((variation) => ({
-        _id: sanitize(variation.variationId), // može biti privremeni ID (npr. "new-12345") ili postojeći ObjectId
+        _id: sanitize(variation.variationId),
         size: sanitizeHtml(variation.size),
         color: sanitizeHtml(variation.color),
-        amount: variation.amount,
+        amount: parseInt(variation.amount),
         imgDesc: sanitizeHtml(variation.imgDesc),
       }));
     }
 
     const itemId = body.itemId;
     const errors = validationResult(req);
+
     if (!errors.isEmpty()) {
-      const allUpsellItems = await ItemService.findAllAdminAddItems(
-        body.categories,
-        itemId
-      );
-      const allCrosselItems = await ItemService.findAllAdminAddItemsByCategory(
-        body.categories,
-        itemId
-      );
+      const allUpsellItems = await ItemService.findItemsForAdminSelection({
+        includeCategories: true,
+        categorySlugs: [],
+        excludeItemId: null,
+      });
+
+      const allCrosselItems = await ItemService.findItemsForAdminSelection({
+        includeCategories: false,
+        categorySlugs: [],
+        excludeItemId: null,
+      });
+
+      const allCategories = await CategoriesService.findAllCategoriesForItems();
+      const allTags = await tagsService.findAllTagsForItems();
 
       return res.render("admin/item/add-item", {
         path: "/admin/add-item",
@@ -335,9 +369,7 @@ async function postEditItem(req, res, next) {
           Cena: { value: body.price },
           "Akcijska Cena": { value: body.actionPrice },
           Slike: {
-            "Istaknuta Slika": {
-              Opis: body.featureImageDesc,
-            },
+            "Istaknuta Slika": { Opis: body.featureImageDesc },
           },
           Video: {
             Opis: { value: body.videoDesc },
@@ -345,58 +377,72 @@ async function postEditItem(req, res, next) {
           Kategorije: { value: body.categories },
           Tagovi: { value: body.tags },
           Status: { value: body.status },
-          Varijacije: body.variations.map((variation) => ({
+          Varijacije: body.variations.map(variation => ({
             Veličina: { value: variation.size },
             Boja: variation.color,
             Količina: variation.amount,
-            Slika: {
-              Opis: variation.imgDesc,
-            },
+            Slika: { Opis: variation.imgDesc },
+            ID: variation._id,
           })),
-          "UpSell Artikli": { value: body.upSellItems },
-          "CrossSell Artikli": { value: body.crossSellItems },
+          "UpSell Artikli": body.upSellItems?.map(id => ({
+            ID: { value: id },
+            Naziv: { value: "Nepoznat (ID: " + id + ")" },
+          })) || [],
+          "CrossSell Artikli": body.crossSellItems?.map(id => ({
+            ID: { value: id },
+            Naziv: { value: "Nepoznat (ID: " + id + ")" },
+          })) || [],
         },
         editing: true,
-        allUpsellItems: allUpsellItems,
-        allCrosselItems: allCrosselItems,
+        allUpsellItems,
+        allCrosselItems,
+        allCategories,
+        allTags,
         index: false,
         featureImage: undefined,
       });
     }
 
-    if (body.upSellItems) {
-        body.upSellItems = await Promise.all(
-            body.upSellItems.map(async (itemId) => {
-                const item = await ItemService.findUpCrossSellItems(itemId);
-                return {
-                    itemId: item._id,
-                    title: item.title,
-                    shortDescription: item.shortDescription,
-                    featureImage: {img: item.featureImage.img, imgDesc: item.featureImage.imgDesc}
-                };
-            })
-        );
+    // UpSell i CrossSell: obogaćivanje
+    if (Array.isArray(body.upSellItems)) {
+      body.upSellItems = await Promise.all(
+        body.upSellItems.map(async (itemId) => {
+          const item = await ItemService.findUpCrossSellItems(itemId);
+          return {
+            itemId: item._id,
+            title: item.title,
+            shortDescription: item.shortDescription,
+            featureImage: {
+              img: item.featureImage.img,
+              imgDesc: item.featureImage.imgDesc,
+            },
+          };
+        })
+      );
     }
 
-    if (body.crossSellItems) {
-        body.crossSellItems = await Promise.all(
-            body.crossSellItems.map(async (itemId) => {
-                const item = await ItemService.findUpCrossSellItems(itemId);
-                return {
-                    itemId: item._id,
-                    title: item.title,
-                    shortDescription: item.shortDescription,
-                    featureImage: {img: item.featureImage.img, imgDesc: item.featureImage.imgDesc},
-                };
-            })
-        );
+    if (Array.isArray(body.crossSellItems)) {
+      body.crossSellItems = await Promise.all(
+        body.crossSellItems.map(async (itemId) => {
+          const item = await ItemService.findUpCrossSellItems(itemId);
+          return {
+            itemId: item._id,
+            title: item.title,
+            shortDescription: item.shortDescription,
+            featureImage: {
+              img: item.featureImage.img,
+              imgDesc: item.featureImage.imgDesc,
+            },
+          };
+        })
+      );
     }
 
-    // Pozovi updateItem funkciju iz servisa – sve logičke provere i mapiranje obavi se tamo
     const updatedItem = await ItemService.updateItem(itemId, body, files);
     if (!updatedItem) {
       ErrorHelper.throwConflictError("Nije uspelo ažuriranje artikla");
     }
+
     return res.redirect("/admin/artikal-detalji/" + itemId);
   } catch (error) {
     next(error);
@@ -485,7 +531,7 @@ export default {
   getAddItemPage,
   getEditItemPage,
   postAddItem,
-  getAllCrosSellItems,
+  getAllCrossSellItems,
   getAllUpSellItems,
   postEditItem,
   postAddUserToItemWishlist,

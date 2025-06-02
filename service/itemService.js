@@ -1,7 +1,7 @@
 import { ObjectId } from "mongodb";
 import sanitize from "mongo-sanitize";
 import { generateSlug } from "../helper/slugHelper.js";
-
+import mongoose from "mongoose";
 import ItemModel from "../model/item.js";
 
 import ErrorHelper from "../helper/errorHelper.js";
@@ -17,36 +17,24 @@ class ItemService {
    * @param {string|null} itemId - The ID of the item to exclude from the results.
    * @returns {Promise<Array>} - A promise that resolves to an array of items.
    */
-  static async findAllAdminAddItems(category = null, itemId = null) {
-    let categorySlugs = [];
-    if (category) {
-      try {
-        categorySlugs = category.split(",").map((c) => c.trim());
-      } catch (err) {
-        categorySlugs = [category];
-      }
-    }
-
-    let categoryIds = [];
-    if (categorySlugs.length > 0) {
-      const foundCategories = await CategoryModel.find({
-        slug: { $in: categorySlugs },
-      }).select("_id");
-
-      categoryIds = foundCategories.map((cat) => cat._id);
-    }
-
+  static async findItemsForAdminSelection({ includeCategories = true, categoryIds = [], excludeItemId = null }) {
     const query = {};
 
     if (categoryIds.length > 0) {
-      query.categories = { $in: categoryIds };
+      const objectIds = categoryIds.map(id => new mongoose.Types.ObjectId(id));
+
+      if (includeCategories) {
+        query.categories = { $in: objectIds };
+      } else {
+        query.categories = { $nin: objectIds };
+      }
     }
 
-    if (itemId) {
-      query._id = { $ne: itemId };
+    if (excludeItemId && mongoose.Types.ObjectId.isValid(excludeItemId)) {
+      query._id = { $ne: new mongoose.Types.ObjectId(excludeItemId) };
     }
 
-    const items = await ItemModel.find(query).select("id title").exec();
+    const items = await ItemModel.find(query).select("title").lean();
 
     if (!items || items.length === 0) {
       return ErrorHelper.throwNotFoundError("Artikli");
@@ -54,47 +42,7 @@ class ItemService {
 
     return items.map((item) => ({
       ID: { value: item._id },
-      Naziv: { value: item.title },
-    }));
-  }
-
-  /**
-   * Finds all admin add items based on category and itemId.
-   *
-   * @param {string|null} category - The category or categories to filter items by.
-   * @param {string|null} itemId - The ID of the item to exclude from the results.
-   * @returns {Promise<Array>} - A promise that resolves to an array of items.
-   */
-  static async findAllAdminAddItemsByCategory(category, itemId) {
-    let categorySlugs = [];
-
-    try {
-      categorySlugs = category.split(",").map((c) => c.trim());
-    } catch (err) {
-      categorySlugs = [category];
-    }
-
-    // Pronađi ID-jeve kategorija na osnovu slugova
-    const foundCategories = await CategoryModel.find({
-      slug: { $in: categorySlugs },
-    }).select("_id");
-
-    const categoryIds = foundCategories.map((cat) => cat._id);
-
-    const items = await ItemModel.find({
-      categories: { $nin: categoryIds },
-      _id: { $ne: itemId },
-    })
-      .select("id title")
-      .exec();
-
-    if (!items || items.length === 0) {
-      return ErrorHelper.throwNotFoundError("Artikli");
-    }
-
-    return items.map((item) => ({
-      ID: { value: item._id },
-      Naziv: { value: item.title },
+      Naziv: { value: item.title }
     }));
   }
 
@@ -115,7 +63,6 @@ class ItemService {
       })),
     };
   }
-  
 
   /**
    * Finds all tags.
@@ -147,7 +94,8 @@ class ItemService {
       .select(
         "title slug shortDescription price actionPrice categories tags featureImage status"
       )
-      .populate('categories tags')
+      .populate('categories')
+      .populate('tags')
       .skip(skip)
       .limit(limit)
       .lean();
@@ -545,7 +493,7 @@ class ItemService {
         .sort({ soldCount: -1, _id: 1 })
         .select("title slug shortDescription price actionPrice status categories tags keyWords featureImage")
         .populate("categories")
-        .populate("tags") // NOVO: populacija tagova
+        .populate("tags")
         .skip(skip)
         .limit(limit)
         .lean(),
@@ -623,12 +571,14 @@ class ItemService {
    */
   static async findAdminItems(limit = 10, page = 1) {
     const skip = (page - 1) * limit;
+
     const items = await ItemModel.find()
       .sort({ soldCount: -1, _id: 1 })
       .select(
         "title slug shortDescription price actionPrice categories tags status sku featureImage"
       )
-      .populate("categories tags")
+      .populate("categories")
+      .populate("tags")
       .skip(skip)
       .limit(limit)
       .lean();
@@ -814,7 +764,6 @@ class ItemService {
    * @returns {Promise<Object>} - A promise that resolves to the created item.
    */
   static async createNewItem(body, files) {
-    // --- [1] Feature image obrada ---
     const featureImageFile = files.find(file => file.fieldname === 'featureImage');
     const featureImage = {
       img: featureImageFile ? featureImageFile.originalname : null,
@@ -823,7 +772,6 @@ class ItemService {
 
     const slug = generateSlug(body.title);
 
-    // --- [2] Variations obrada ---
     const variationImages = files.filter(file => file.fieldname.startsWith('variationImage'));
     const variations = [];
 
@@ -838,12 +786,11 @@ class ItemService {
             img: variationImageFile ? variationImageFile.originalname : null,
             imgDesc: sanitize(variation.imgDesc || ""),
           },
-          onAction: sanitize(variation.onAction) || false,
+          onAction: sanitize(variation.onAction) === "true",
         });
       });
     }
 
-    // --- [3] UpSell i CrossSell obrada ---
     const upSellItems = sanitize(body.upSellItems || []);
     const upSellDetails = await Promise.all(
       upSellItems.map(async id => {
@@ -870,33 +817,26 @@ class ItemService {
       })
     );
 
-    // --- ✅ [4] Mapiranje kategorija preko slug-ova u ObjectId ---
-    let categoryIds = [];
-    if (body.categories && body.categories.length > 0) {
-      const categorySlugs = Array.isArray(body.categories)
-        ? body.categories.map(c => sanitize(c))
-        : [sanitize(body.categories)];
+    const categoryIds = Array.isArray(body.categories)
+      ? body.categories.map(id => sanitize(id))
+      : [sanitize(body.categories)];
 
-      const categoryDocs = await CategoryModel.find({
-        slug: { $in: categorySlugs },
-      }).select("_id");
+    const tagIds = Array.isArray(body.tags)
+      ? body.tags.map(id => sanitize(id))
+      : [sanitize(body.tags)];
 
-      categoryIds = categoryDocs.map(cat => cat._id);
-    }
-
-    // --- [5] Kreiranje objekta ---
     const newItemData = {
       title: sanitize(body.title),
       slug,
       sku: sanitize(body.sku),
-      price: sanitize(body.price),
-      actionPrice: sanitize(body.actionPrice),
+      price: Number(sanitize(body.price)),
+      actionPrice: Number(sanitize(body.actionPrice)),
       shortDescription: sanitize(body.shortDescription),
       description: sanitize(body.description),
       keyWords: sanitize(body.keyWords || []),
-      categories: categoryIds, // ✅ lista ObjectId referenci
-      tags: sanitize(body.tags || []),
-      status: sanitize(body.status || "normal"),
+      categories: categoryIds,
+      tags: tagIds,
+      status: Array.isArray(body.status) ? body.status : [body.status],
       backorder: { isAllowed: sanitize(body.backorderAllowed === "on") },
       variations,
       featureImage,
@@ -904,7 +844,6 @@ class ItemService {
       crossSellItems: crossSellDetails,
     };
 
-    // --- [6] Video ako postoji ---
     const videoFile = files.find(file => file.fieldname === 'video');
     if (videoFile) {
       newItemData.video = {
@@ -913,7 +852,6 @@ class ItemService {
       };
     }
 
-    // --- [7] Sačuvaj u bazu ---
     const newItem = new ItemModel(newItemData);
     return await newItem.save();
   }
@@ -926,116 +864,89 @@ class ItemService {
    * @returns {Promise<Object>} - A promise that resolves to the updated item.
    */
   static async updateItem(itemId, body, files) {
-    try {
-      const existingItem = await ItemModel.findById(itemId);
-      if (!existingItem) {
-        ErrorHelper.throwNotFoundError("Artikal");
-      }
-
-      const slug = generateSlug(body.title);
-
-      // === FEATURE IMAGE ===
-      const featureImageFile = files.find(file => file.fieldname === 'featureImage');
-      if (files && featureImageFile) {
-        existingItem.featureImage = {
-          img: featureImageFile.originalname,
-          imgDesc: sanitize(body.featureImageDesc || ""),
-        };
-      }
-
-      // === VIDEO ===
-      const videoFile = files.find(file => file.fieldname === 'video');
-      if (videoFile) {
-        existingItem.video = {
-          vid: videoFile.originalname,
-          vidDesc: sanitize(body.videoDesc || null),
-        };
-      }
-
-      // === VARIACIJE ===
-      if (body.variations) {
-        body.variations = body.variations.map((variation) => {
-          const isNew = variation._id?.startsWith("new-");
-          const existingVar = !isNew
-            ? existingItem.variations.find(v => v._id.toString() === variation._id)
-            : null;
-
-          const file = files ? files.find(f => f.fieldname === `variationImage_${variation._id}`) : null;
-
-          const varObj = {
-            size: variation.size,
-            color: variation.color,
-            amount: Number(variation.amount) || (existingVar?.amount || 0),
-            image: {
-              img: file ? file.originalname : existingVar?.image?.img || "",
-              imgDesc: variation.imgDesc || existingVar?.image?.imgDesc || "",
-            },
-            onAction: variation.onAction ?? existingVar?.onAction ?? false,
-          };
-
-          if (!isNew) {
-            varObj._id = variation._id;
-          }
-
-          return varObj;
-        });
-      } else {
-        body.variations = existingItem.variations;
-      }
-      existingItem.variations = body.variations;
-
-      // === OSNOVNA POLJA ===
-      existingItem.title = body.title || existingItem.title;
-      existingItem.slug = slug || existingItem.slug;
-      existingItem.sku = body.sku || existingItem.sku;
-      existingItem.shortDescription = body.shortDescription || existingItem.shortDescription;
-      existingItem.description = body.description || existingItem.description;
-      existingItem.keyWords = body.keyWords || existingItem.keyWords;
-
-      // === KATEGORIJE ===
-      if (body.categories && body.categories.length > 0) {
-        const categorySlugs = Array.isArray(body.categories)
-          ? body.categories.map(c => sanitize(c))
-          : [sanitize(body.categories)];
-
-        const categoryDocs = await CategoryModel.find({
-          slug: { $in: categorySlugs },
-        }).select("_id");
-
-        const categoryIds = categoryDocs.map(cat => cat._id);
-        existingItem.categories = categoryIds;
-      } else {
-        existingItem.categories = existingItem.categories;
-      }
-
-      // === TAGOVI ===
-      existingItem.tags = body.tags || existingItem.tags;
-
-      // === STATUS + NOTIFIKACIJA ===
-      const newStatus = Array.isArray(body.status) ? body.status : [body.status];
-      const existingStatus = Array.isArray(existingItem.status) ? existingItem.status : [existingItem.status];
-
-      if (newStatus.includes("action") && !existingStatus.includes("action")) {
-        await EmailService.notifyUsersFromItemWishlist(existingItem._id);
-      }
-
-      existingItem.status = body.status || existingItem.status;
-
-      // === CENE, BACKORDER, UPSELL, CROSSSELL ===
-      existingItem.price = body.price || existingItem.price;
-      existingItem.actionPrice = body.actionPrice || [];
-
-      existingItem.upSellItems = body.upSellItems || [];
-      existingItem.crossSellItems = body.crossSellItems || existingItem.crossSellItems;
-
-      existingItem.backorder.isAllowed =
-        body.backorderAllowed === "on" || existingItem.backorder.isAllowed;
-
-      const updatedItem = await existingItem.save();
-      return updatedItem;
-    } catch (error) {
-      ErrorHelper.throwServerError(error);
+    const existingItem = await ItemModel.findById(itemId);
+    if (!existingItem) {
+      ErrorHelper.throwNotFoundError("Artikal");
     }
+
+    const slug = generateSlug(body.title);
+
+    const featureImageFile = files.find(file => file.fieldname === 'featureImage');
+    if (featureImageFile) {
+      existingItem.featureImage = {
+        img: featureImageFile.originalname,
+        imgDesc: sanitize(body.featureImageDesc || ""),
+      };
+    }
+
+    const videoFile = files.find(file => file.fieldname === 'video');
+    if (videoFile) {
+      existingItem.video = {
+        vid: videoFile.originalname,
+        vidDesc: sanitize(body.videoDesc || null),
+      };
+    }
+
+    if (body.variations) {
+      body.variations = body.variations.map(variation => {
+        const isNew = variation._id?.startsWith("new-");
+        const existingVar = !isNew
+          ? existingItem.variations.find(v => v._id.toString() === variation._id)
+          : null;
+
+        const file = files.find(f => f.fieldname === `variationImage_${variation._id}`) || null;
+
+        const varObj = {
+          size: variation.size,
+          color: variation.color,
+          amount: Number(variation.amount) || (existingVar?.amount || 0),
+          image: {
+            img: file ? file.originalname : existingVar?.image?.img || "",
+            imgDesc: variation.imgDesc || existingVar?.image?.imgDesc || "",
+          },
+          onAction: variation.onAction === "true",
+        };
+
+        if (!isNew) varObj._id = variation._id;
+        return varObj;
+      });
+      existingItem.variations = body.variations;
+    }
+
+    existingItem.title = body.title || existingItem.title;
+    existingItem.slug = slug || existingItem.slug;
+    existingItem.sku = body.sku || existingItem.sku;
+    existingItem.shortDescription = body.shortDescription || existingItem.shortDescription;
+    existingItem.description = body.description || existingItem.description;
+    existingItem.keyWords = body.keyWords || existingItem.keyWords;
+
+    // ✅ Kategorije i Tagovi kao ObjectId
+    existingItem.categories = Array.isArray(body.categories)
+      ? body.categories.map(id => sanitize(id))
+      : [sanitize(body.categories)];
+
+    existingItem.tags = Array.isArray(body.tags)
+      ? body.tags.map(id => sanitize(id))
+      : [sanitize(body.tags)];
+
+    // ✅ Status
+    const newStatus = Array.isArray(body.status) ? body.status : [body.status];
+    const existingStatus = Array.isArray(existingItem.status) ? existingItem.status : [existingItem.status];
+    if (newStatus.includes("action") && !existingStatus.includes("action")) {
+      await EmailService.notifyUsersFromItemWishlist(existingItem._id);
+    }
+    existingItem.status = newStatus;
+
+    // ✅ Ostala polja
+    existingItem.price = Number(body.price);
+    existingItem.actionPrice = Number(body.actionPrice);
+
+    existingItem.upSellItems = body.upSellItems || [];
+    existingItem.crossSellItems = body.crossSellItems || [];
+
+    existingItem.backorder.isAllowed = body.backorderAllowed === "on";
+
+    return await existingItem.save();
   }
 
   static async findUsersFromWishlist(itemId) {
@@ -1227,6 +1138,50 @@ class ItemService {
     return item;
   }
 
+  static async removeCategoryFromItems(categoryId, session) {
+    const filter = {
+      categories: categoryId
+    };
+
+    const update = {
+      $pull: { categories: categoryId }
+    };
+
+    const options = {};
+    if (session) {
+      options.session = session;
+    }
+
+    try {
+      const result = await ItemModel.updateMany(filter, update, options);
+      return result;
+    } catch (error) {
+      ErrorHelper.throwServerError(error);
+    }
+  }
+
+    static async removeTagFromItems(tagId, session) {
+    const filter = {
+      tags: tagId
+    };
+
+    const update = {
+      $pull: { tags: tagId }
+    };
+
+    const options = {};
+    if (session) {
+      options.session = session;
+    }
+
+    try {
+      const result = await ItemModel.updateMany(filter, update, options);
+      return result;
+    } catch (error) {
+      ErrorHelper.throwServerError(error);
+    }
+  }
+
   /**
    * Deletes an item by its ID.
    *
@@ -1313,6 +1268,12 @@ class ItemService {
         value: item.categories.map(cat => ({
           Naziv: cat.name,
           Slug: cat.slug
+        }))
+      },
+      Tagovi: {
+        value: item.tags.map(tag => ({
+          Naziv: tag.name,
+          Slug: tag.slug
         }))
       },
       Slika: {
@@ -1426,12 +1387,14 @@ class ItemService {
       },
       Kategorije: {
         value: item.categories.map(cat => ({
+          ID: cat._id,
           Naziv: cat.name,
           Slug: cat.slug
         }))
       },
       Tagovi: {
         value: item.tags.map(tag => ({
+          ID: tag._id,
           Naziv: tag.name,
           Slug: tag.slug
         }))

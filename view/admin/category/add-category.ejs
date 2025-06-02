@@ -1,0 +1,62 @@
+<%- include('../../include/head.ejs') %>
+<%- include('../../include/navigation.ejs') %>
+
+<section class="container main__container section md-6">
+  <div class="form__wrapper">
+    <h1 class="form__title"><%= pageTitle %></h1>
+    
+    <form action="<% if (editing) { %>/admin/kategorija-izmena<% } else { %>/admin/kategorija-dodavanje<% } %>" 
+          method="POST" enctype="multipart/form-data" class="form width-100">
+          
+      <% if (errorMessage) { %>
+        <div class="form__error-message"><%= errorMessage %></div>
+      <% } %>
+
+      <div class="form__group">
+        <label for="name" class="form__label">Naziv:</label>
+        <input type="text" id="name" name="name" class="form__input" 
+               value="<%= existingData ? existingData.Naziv.value : '' %>" required>
+      </div>
+      
+      <!-- Kratak opis -->
+      <div class="form__group">
+        <label for="shortDescription" class="form__label">Kratak opis:</label>
+        <textarea id="shortDescription" name="shortDescription" rows="3" 
+                  class="form__textarea" required><% if(existingData) { %><%= existingData["Kratak Opis"].value %><% } %></textarea>
+      </div>
+      
+      <!-- Opis -->
+      <div class="form__group">
+        <label for="longDescription" class="form__label">Opis:</label>
+        <textarea id="longDescription" name="longDescription" rows="5" class="form__textarea" required><% if(existingData) { %><%= existingData.Opis.value %><% } %></textarea>
+      </div>
+
+      <!-- Glavna slika -->
+      <div class="form__group">
+        <label for="featureImage" class="form__label">Glavna slika:</label>
+        <input type="file" id="featureImage" name="featureImage" accept="image/*" class="form__file" <% if (!editing) { %>required<% } %>>
+        <label for="featureImageDesc" class="form__label">Opis glavne slike:</label>
+        <input type="text" id="featureImageDesc" name="featureImageDesc" class="form__input"
+               value="<%= existingData ? existingData.Slika.Opis : '' %>" <% if (!editing) { %>required<% } %>>
+      </div>
+
+      <% if (editing && existingData) { %>
+        <input class="form__input" type="hidden" name="categoryId" value="<%= existingData.ID.value ? existingData.ID.value : existingData.ID %>">
+      <% } %>
+      <input type="hidden" name="honeypot">
+      <input type="hidden" name="CSRFToken" value="<%= csrfToken %>" required>
+
+      <div class="form__group">
+        <button type="submit" class="button button--primary">
+          <% if (editing) { %>Izmenite Kategoriju<% } else { %>Dodajte Kategoriju<% } %>
+        </button>
+      </div>
+
+      <% if (errorMessage) { %>
+        <p class="user-message--error"><%= errorMessage %></p>
+      <% } %>
+    </form>
+  </div>
+</section>
+
+<%- include('../../include/end.ejs') %>

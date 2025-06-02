@@ -13,6 +13,8 @@ import HistoryController from '../controller/historyController.js';
 import OrderController from '../controller/orderController.js';
 import UserController from '../controller/userController.js';
 import ItemController from '../controller/itemController.js';
+import CategoryController from "../controller/categoryController.js";
+import TagController from "../controller/tagController.js";
 
 const router = Router();
 
@@ -58,7 +60,7 @@ router.get("/izmenite-artikal/:itemId", isAuth, isAdmin, ItemController.getEditI
 
 router.get("/upsell-artikli", isAuth, isAdmin, ItemController.getAllUpSellItems);
 
-router.get("/crosssell-artikli", isAuth, isAdmin, ItemController.getAllCrosSellItems);
+router.get("/crosssell-artikli", isAuth, isAdmin, ItemController.getAllCrossSellItems);
 
 router.get("/istorija", isAuth, isAdmin, HistoryController.getHistoryPage);
 
@@ -82,6 +84,25 @@ router.get('/porudzbina-detalji/:orderId', isAuth, isAdmin, OrderController.getO
 
 router.get('/privremena-porudzbina-detalji/:orderId', isAuth, isAdmin, OrderController.getTempOrderDetailsPage);
 
+router.get('/kategorije', isAuth, isAdmin, CategoryController.getCategoriesPage);
+
+router.get('/kategorija-detalji/:categoryId', isAuth, isAdmin, CategoryController.getCategoryDetailsPage);
+
+router.get('/dodajte-kategoriju', isAuth, isAdmin, CategoryController.getAddCategoryPage);
+
+router.get('/izmenite-kategoriju/:categoryId', isAuth, isAdmin, CategoryController.getEditCategoryPage);
+
+router.get('/kategorije/pretraga/:search', isAuth, isAdmin, CategoryController.getSearchCategoriesPage);
+
+router.get('/oznake', isAuth, isAdmin, TagController.getTagsPage);
+
+router.get('/oznaka-detalji/:tagId', isAuth, isAdmin, TagController.getTagDetailsPage);
+
+router.get('/dodajte-oznaku', isAuth, isAdmin, TagController.getAddTagPage);
+
+router.get('/izmenite-oznaku/:tagId', isAuth, isAdmin, TagController.getEditTagPage);
+
+router.get('/oznake/pretraga/:search', isAuth, isAdmin, TagController.getSearchTagPage);
 
 // POST
 router.post("/artikal-dodavanje", [
@@ -545,5 +566,145 @@ router.delete('/izbrisite-kupon', isAuth, isAdmin, CouponController.deleteCoupon
 router.delete('/izbrisite-artikal', isAuth, isAdmin, ItemController.deleteItemById);
 
 router.post('/potvrda-porudzbine', OrderController.postAdminConfirmOrder);
+
+router.post("/kategorija-dodavanje", [
+    body("name")
+        .notEmpty()
+        .withMessage("Name is required.")
+        .isString()
+        .withMessage("Name must be a string."),
+
+    body("shortDescription")
+        .notEmpty()
+        .withMessage("Short description is required.")
+        .isString()
+        .withMessage("Short description must be a string."),
+
+    body("longDescription")
+        .notEmpty()
+        .withMessage("Description is required.")
+        .isString()
+        .withMessage("Description must be a string."),
+
+    body("featureImageDesc")
+        .notEmpty()
+        .withMessage("Feature image description is required."),
+
+    body("honeypot")
+        .custom((value) => {
+        if (value) {
+            throw new Error("Spam detektovan.");
+        }
+        return true;
+        })
+], isAuth, isAdmin, CategoryController.postAddCategory);
+
+router.post("/kategorija-izmena", [
+    body("name")
+        .optional()
+        .notEmpty()
+        .withMessage("Name is required.")
+        .isString()
+        .withMessage("Name must be a string."),
+
+    body("shortDescription")
+        .optional()
+        .notEmpty()
+        .withMessage("Short description is required.")
+        .isString()
+        .withMessage("Short description must be a string."),
+
+    body("longDescription")
+        .optional()
+        .notEmpty()
+        .withMessage("Description is required.")
+        .isString()
+        .withMessage("Description must be a string."),
+
+    body("featureImage.img")
+        .optional()
+        .notEmpty()
+        .withMessage("Feature image is required if provided."),
+
+    body("featureImage.imgDesc")
+        .optional()
+        .notEmpty()
+        .withMessage("Feature image description is required if provided."),
+    
+    body("honeypot")
+        .custom((value) => {
+        if (value) {
+            throw new Error("Spam detektovan.");
+        }
+        return true;
+        })
+], isAuth, isAdmin, CategoryController.postEditCategory);
+
+router.delete('/izbrisite-kategoriju', isAuth, isAdmin, CategoryController.deleteCategoryById);
+
+router.post("/oznaka-dodavanje", [
+    body("name")
+        .notEmpty()
+        .withMessage("Name is required.")
+        .isString()
+        .withMessage("Name must be a string."),
+
+    body("shortDescription")
+        .notEmpty()
+        .withMessage("Short description is required.")
+        .isString()
+        .withMessage("Short description must be a string."),
+
+    body("longDescription")
+        .notEmpty()
+        .withMessage("Description is required.")
+        .isString()
+        .withMessage("Description must be a string."),
+
+    body("honeypot")
+        .custom((value) => {
+        if (value) {
+            throw new Error("Spam detektovan.");
+        }
+        return true;
+        })
+], isAuth, isAdmin, TagController.postAddTag);
+
+router.post("/oznaka-izmena", [
+    body("name")
+        .optional()
+        .notEmpty()
+        .withMessage("Name is required.")
+        .isString()
+        .withMessage("Name must be a string."),
+
+    body("shortDescription")
+        .optional()
+        .notEmpty()
+        .withMessage("Short description is required.")
+        .isString()
+        .withMessage("Short description must be a string."),
+
+    body("longDescription")
+        .optional()
+        .notEmpty()
+        .withMessage("Description is required.")
+        .isString()
+        .withMessage("Description must be a string."),
+    
+    body("honeypot")
+        .custom((value) => {
+        if (value) {
+            throw new Error("Spam detektovan.");
+        }
+        return true;
+        })
+], isAuth, isAdmin, TagController.postEditTag);
+
+router.post('/oznake/pretraga', [], isAuth, isAdmin, TagController.postSearchTag);
+
+router.post('/kategorije/pretraga', [], isAuth, isAdmin, CategoryController.postSearchCategory);
+
+router.delete('/izbrisite-oznaku', isAuth, isAdmin, TagController.deleteTagById);
 
 export default router;

@@ -33,6 +33,10 @@
       <% if (role === "admin") { %>
         <li class="mobile-nav__item"><a href="/admin/artikli" class="<%= path === '/admin/artikli' ? 'active' : '' %>">Artikli</a></li>
         <li class="mobile-nav__item"><a href="/admin/dodajte-artikal" class="<%= path === '/admin/dodajte-artikal' ? 'active' : '' %>">Dodajte Artikal</a></li>
+        <li class="mobile-nav__item"><a href="/admin/kategorije" class="<%= path === '/admin/kategorije' ? 'active' : '' %>">Kategorije</a></li>
+        <li class="mobile-nav__item"><a href="/admin/dodajte-kategoriju" class="<%= path === '/admin/dodajte-kategoriju' ? 'active' : '' %>">Dodajte Kategoriju</a></li>
+        <li class="mobile-nav__item"><a href="/admin/oznake" class="<%= path === '/admin/oznake' ? 'active' : '' %>">Oznake</a></li>
+        <li class="mobile-nav__item"><a href="/admin/dodajte-oznaku" class="<%= path === '/admin/dodajte-oznaku' ? 'active' : '' %>">Dodajte Oznaku</a></li>                
         <li class="mobile-nav__item"><a href="/admin/korisnici" class="<%= path === '/admin/korisnici' ? 'active' : '' %>">Korisnici</a></li>
         <li class="mobile-nav__item"><a href="/admin/kupci" class="<%= path === '/admin/kupci' ? 'active' : '' %>">Kupci</a></li>
         <li class="mobile-nav__item"><a href="/admin/kuponi" class="<%= path === '/admin/kuponi' ? 'active' : '' %>">Kuponi</a></li>
@@ -42,6 +46,9 @@
         <li class="mobile-nav__item"><a href="/admin/objave" class="<%= path === '/admin/objave' ? 'active' : '' %>">Objave</a></li>
         <li class="mobile-nav__item"><a href="/admin/dodajte-objavu" class="<%= path === '/admin/dodajte-objavu' ? 'active' : '' %>">Dodajte Objavu</a></li>
         <li class="mobile-nav__item"><a href="/admin/kontakti" class="<%= path === '/admin/kontakti' ? 'active' : '' %>">Kontakti</a></li>
+        <br>
+        <br>
+        <br>
         <br>
       <% } %>
     <% } %>
@@ -82,6 +89,22 @@
             <div class="dropdown__menu">
               <a href="/admin/artikli" class="<%= path === '/admin/artikli' ? 'active' : '' %>">Prikaz svih</a>
               <a href="/admin/dodajte-artikal" class="<%= path === '/admin/dodajte-artikal' ? 'active' : '' %>">Dodajte Artikal</a>
+            </div>
+          </li>
+
+          <li class="main-header__item dropdown">
+            <span class="dropdown__toggle">Kategorije <span class="dropdown__arrow">▼</span></span>
+            <div class="dropdown__menu">
+              <a href="/admin/kategorije" class="<%= path === '/admin/kategorije' ? 'active' : '' %>">Prikaz svih</a>
+              <a href="/admin/dodajte-kategoriju" class="<%= path === '/admin/dodajte-kategoriju' ? 'active' : '' %>">Dodajte Kategoriju</a>
+            </div>
+          </li>
+
+          <li class="main-header__item dropdown">
+            <span class="dropdown__toggle">Oznake <span class="dropdown__arrow">▼</span></span>
+            <div class="dropdown__menu">
+              <a href="/admin/oznake" class="<%= path === '/admin/oznake' ? 'active' : '' %>">Prikaz svih</a>
+              <a href="/admin/dodajte-oznaku" class="<%= path === '/admin/dodajte-oznaku' ? 'active' : '' %>">Dodajte Oznaku</a>
             </div>
           </li>
 

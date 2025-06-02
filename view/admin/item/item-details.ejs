@@ -1,104 +1,120 @@
 <%- include('../../include/head.ejs') %>
 <%- include('../../include/navigation.ejs') %>
+
 <section class="container main__container">
-    <h1 class="main__title"><%= item.Naziv.value %></h1>
-    <div class="column-row__container">
-        <div class="left__container-30">
-            <a class="btn-secondary" href="/admin/izmenite-artikal/<%= item.ID.value %>">
-                Izmenite
-            </a>
-            <%- include('../../include/galery.ejs', {
-                images: item.Slike.Slike,
-                selectedImage: item.Slike["Istaknuta Slika"],
-                video: item.Video
-            }) %>
+  <h1 class="main__title"><%= item.Naziv.value %></h1>
+
+  <div class="grid grid-cols-main-sidebar gap-6">
+    
+    <!-- ✅ Desna kolona (75%) – Glavne informacije i tabele -->
+    <div class="w-full flex flex-col gap-6 order-md-2">
+
+      <%- include('../../include/info.ejs', {
+          data: [
+              { "Opis": item.Opis.value },
+              { "Ključne Reči": item["Ključne Reči"].value },
+              { "Status" : item.Status.value },
+              { "Kategorije": item.Kategorije.value },
+              { "Tagovi": item.Tagovi.value },
+              { "Cena": item.Cena.value },
+              { "Akcijska Cena": item["Akcijska Cena"].value },
+              { "Backorder": item.Backorder.Dozvoljeno },
+              { "Broj Prodatih": item["Broj Prodatih"].value },
+              { "Broj Vraćenih": item["Broj Vraćenih"].value }
+          ]
+      }) %>
+
+      <div class="tabs-header">
+        <button class="tab-btn active" data-tab="Varijacije">Varijacije</button>
+        <% if (item.Backorder.Dozvoljeno) { %>
+          <button class="tab-btn" data-tab="Backorder">Backorder</button>
+        <% } %>
+        <button class="tab-btn" data-tab="UpSell Artikli">UpSell Artikli</button>
+        <button class="tab-btn" data-tab="CrossSell Artikli">CrossSell Artikli</button>
+        <button class="tab-btn" data-tab="Partneri">Partneri</button>
+      </div>
+
+      <div class="tabs-content">
+        <div class="tab-content active" data-tab="Varijacije">
+          <%- include('../../include/table.ejs', {
+              items: item.Varijacije,
+              showId: false,
+              caption: 'Varijacije',
+              hasActions: false,
+              hasFooter: true,
+              totals: false,
+              actions: []
+          }) %>
         </div>
-        <div class="right__container-70">
-            <%- include('../../include/info.ejs', {
-                data: [
-                    { "Opis": item.Opis.value },
-                    { "Ključne Reči": item["Ključne Reči"].value },
-                    { "Status" : item.Status.value },
-                    { "Kategorije": item.Kategorije.value },
-                    { "Tagovi": item.Tagovi.value },
-                    { "Cena": item.Cena.value },
-                    { "Akcijska Cena": item["Akcijska Cena"].value },
-                    { "Backorder": item.Backorder.Dozvoljeno },
-                    { "Broj Prodatih": item["Broj Prodatih"].value },
-                    { "Broj Vraćenih": item["Broj Vraćenih"].value }
-                ]
+
+        <% if (item.Backorder.Dozvoljeno) { %>
+          <div class="tab-content" data-tab="Backorder">
+            <%- include('../../include/table.ejs', {
+                items: item.Backorder.Naručeno,
+                showId: false,
+                caption: 'Backorder',
+                hasActions: false,
+                hasFooter: false,
+                totals: false,
+                actions: []
             }) %>
-            <br>
-            <div class="tabs-header">
-                <button class="tab-btn active" data-tab="Varijacije">Varijacije</button>
-                <% if (item.Backorder.Dozvoljeno) { %>
-                    <button class="tab-btn" data-tab="Backorder">Backorder</button>
-                <% } %>
-                <button class="tab-btn" data-tab="UpSell Artikli">UpSell Artikli</button>
-                <button class="tab-btn" data-tab="CrossSell Artikli">CrossSell Artikli</button>
-                <button class="tab-btn" data-tab="Partneri">Partneri</button>
-            </div>
-            <div class="tabs-content">
-                <div class="tab-content active" data-tab="Varijacije">
-                    <%- include('../../include/table.ejs', {
-                        items: item.Varijacije,
-                        showId: false,
-                        caption: 'Varijacije',
-                        hasActions: false,
-                        hasFooter: true,
-                        totals: false,
-                        actions: []
-                    }) %>
-                </div>
-                <% if (item.Backorder.Dozvoljeno) { %>
-                    <div class="tab-content" data-tab="Backorder">
-                        <%- include('../../include/table.ejs', {
-                            items: item.Backorder.Naručeno,
-                            showId: false,
-                            caption: 'Backorder',
-                            hasActions: false,
-                            hasFooter: false,
-                            totals: false,
-                            actions: []
-                        }) %>
-                    </div>
-                <% } %>
-                <div class="tab-content" data-tab="UpSell Artikli">
-                    <%- include('../../include/table.ejs', {
-                        items: item["UpSell Artikli"],
-                        showId: false,
-                        caption: 'UpSell Artikli',
-                        hasActions: false,
-                        hasFooter: true,
-                        totals: false,
-                        actions: []
-                    }) %>
-                </div>
-                <div class="tab-content" data-tab="CrossSell Artikli">
-                    <%- include('../../include/table.ejs', {
-                        items: item["CrossSell Artikli"],
-                        showId: false,
-                        caption: 'CrossSell Artikli',
-                        hasActions: false,
-                        hasFooter: true,
-                        totals: false,
-                        actions: []
-                    }) %>
-                </div>
-                <div class="tab-content" data-tab="Partneri">
-                    <%- include('../../include/table.ejs', {
-                        items: item.Partneri,
-                        showId: false,
-                        caption: 'Partneri',
-                        hasActions: false,
-                        hasFooter: true,
-                        totals: false,
-                        actions: []
-                    }) %>
-                </div>
-            </div>
+          </div>
+        <% } %>
+
+        <div class="tab-content" data-tab="UpSell Artikli">
+          <%- include('../../include/table.ejs', {
+              items: item["UpSell Artikli"],
+              showId: false,
+              caption: 'UpSell Artikli',
+              hasActions: false,
+              hasFooter: true,
+              totals: false,
+              actions: []
+          }) %>
         </div>
+
+        <div class="tab-content" data-tab="CrossSell Artikli">
+          <%- include('../../include/table.ejs', {
+              items: item["CrossSell Artikli"],
+              showId: false,
+              caption: 'CrossSell Artikli',
+              hasActions: false,
+              hasFooter: true,
+              totals: false,
+              actions: []
+          }) %>
+        </div>
+
+        <div class="tab-content" data-tab="Partneri">
+          <%- include('../../include/table.ejs', {
+              items: item.Partneri,
+              showId: false,
+              caption: 'Partneri',
+              hasActions: false,
+              hasFooter: true,
+              totals: false,
+              actions: []
+          }) %>
+        </div>
+      </div>
+
     </div>
+
+    <!-- ✅ Leva kolona (25%) – Galerija i dugme za izmenu -->
+    <div class="w-full flex flex-col gap-4 order-md-1">
+      <a class="button button--secondary" href="/admin/izmenite-artikal/<%= item.ID.value %>">
+        Izmenite
+      </a>
+
+      <%- include('../../include/galery.ejs', {
+          images: item.Slike.Slike,
+          selectedImage: item.Slike["Istaknuta Slika"],
+          video: item.Video
+      }) %>
+    </div>
+
+  </div>
 </section>
+
 <script src="/js/tabs.js"></script>
 <%- include('../../include/end.ejs') %>

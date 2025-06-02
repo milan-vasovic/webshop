@@ -3,37 +3,24 @@
 
 <section class="container main__container">
   <h1 class="main__title"><%= pageTitle %></h1>
-  
-  <!-- Kontejner za detalje kontakta -->
-  <div class="contact-details">
-    <div class="field">
-      <span class="label">ID:</span>
-      <span class="value"><%= contact.ID.value %></span>
-    </div>
-    <div class="field">
-      <span class="label">Ime:</span>
-      <span class="value"><%= contact.Ime.value %></span>
-    </div>
-    <div class="field">
-      <span class="label">Email:</span>
-      <span class="value"><%= contact.Email.value %></span>
-    </div>
-    <div class="field">
-      <span class="label">Broj Telefona:</span>
-      <span class="value"><%= contact["Broj Telefona"].value %></span>
-    </div>
-    <div class="field">
-      <span class="label">Naslov:</span>
-      <span class="value"><%= contact.Naslov.value %></span>
-    </div>
-    <div class="field">
-      <span class="label">Poruka:</span>
-      <span class="value"><%= contact.Poruka.value %></span>
-    </div>
-    <div class="field">
-      <span class="label">Datum:</span>
-      <span class="value"><%= contact.Datum.value %></span>
-    </div>
+
+  <div class="contact__details-wrapper flex flex-col gap-4">
+    <% const fields = [
+      { label: 'ID', value: contact.ID.value },
+      { label: 'Ime', value: contact.Ime.value },
+      { label: 'Email', value: contact.Email.value },
+      { label: 'Broj Telefona', value: contact["Broj Telefona"].value },
+      { label: 'Naslov', value: contact.Naslov.value },
+      { label: 'Poruka', value: contact.Poruka.value },
+      { label: 'Datum', value: contact.Datum.value }
+    ]; %>
+
+    <% fields.forEach(field => { %>
+      <div class="form__group contact__field">
+        <label class="form__label"><%= field.label %>:</label>
+        <div class="form__input contact__value"><%= field.value %></div>
+      </div>
+    <% }) %>
   </div>
 </section>
 

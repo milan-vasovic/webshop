@@ -94,79 +94,72 @@
         <label for="videoDesc" class="form__label">Opis videa:</label>
         <input type="text" id="videoDesc" name="videoDesc" class="form__input" value="<%= existingData ? existingData.Video.Opis : '' %>">
       </div>
-      
       <!-- Kategorije -->
       <div class="form__group" id="categoriesContainer">
         <label class="form__label">Kategorije:</label>
-        <% 
-          const allCategories = [
-            "Odeća", "Helanke", "Trenerke", "Fitness", "Kompleti", 
-            "Majice", "Farmerice", "Pantalone", "Šorc", "Haljine", 
-            "Suknje", "Kardigani", "Jakne", "Muško", "Žensko", 
-            "Kupaći Kostimi Jednodelni", "Kupaći Kostimi Dvodelni", 
-            "Zimsko", "Letnje", "Prolećno", "Jesenje", "Veš"
-          ];
-          let selectedCategories = [];
-          if (existingData && existingData.Kategorije) {
-            if (typeof existingData.Kategorije.value === 'string') {
-              selectedCategories = existingData.Kategorije.value.split(',').map(cat => cat.trim());
-            } else if (Array.isArray(existingData.Kategorije.value)) {
-              selectedCategories = existingData.Kategorije.value;
-            }
-          }
-        %>
+        <% let selectedCategories = existingData?.Kategorije?.value || []; %>
+        <% if (!Array.isArray(selectedCategories)) selectedCategories = [selectedCategories]; %>
+
         <% if (selectedCategories.length > 0) { %>
-          <% selectedCategories.forEach((category, index) => { %>
+          <% selectedCategories.forEach((selectedCategory, index) => { %>
             <div class="form__group-inline">
               <select id="categories<%= index %>" name="categories[]" class="form__select" required>
                 <% allCategories.forEach(cat => { %>
-                  <option value="<%= cat %>" <%= cat === category ? 'selected' : '' %>><%= cat %></option>
-                <% }); %>
+                  <option value="<%= cat.ID.value %>" 
+                    <%= String(cat.ID.value) === String(selectedCategory?.ID || selectedCategory) ? 'selected' : '' %>>
+                    <%= cat.Naziv.value %>
+                  </option>
+                <% }) %>
               </select>
               <button type="button" class="button button--danger removeField">Izbriši</button>
             </div>
-          <% }); %>
+          <% }) %>
         <% } else { %>
           <div class="form__group-inline">
             <select id="categories0" name="categories[]" class="form__select" required>
               <% allCategories.forEach(cat => { %>
-                <option value="<%= cat %>"><%= cat %></option>
-              <% }); %>
+                <option value="<%= cat.ID.value %>"><%= cat.Naziv.value %></option>
+              <% }) %>
             </select>
             <button type="button" class="button button--danger removeField">Izbriši</button>
           </div>
         <% } %>
       </div>
       <button id="addCategory" type="button" class="button button--secondary">Dodajte</button>
+
       <!-- Tagovi -->
       <div class="form__group" id="tagsContainer">
         <label class="form__label">Tagovi:</label>
-        <% 
-          let tagsArray = [];
-          if (existingData && existingData.Tagovi) {
-            if (typeof existingData.Tagovi.value === 'string') {
-              tagsArray = existingData.Tagovi.value.split(',').map(tag => tag.trim());
-            } else if (Array.isArray(existingData.Tagovi.value)) {
-              tagsArray = existingData.Tagovi.value;
-            }
-          }
-        %>
-        <% if (tagsArray.length > 0) { %>
-          <% tagsArray.forEach((tag, index) => { %>
+        <% let selectedTags = existingData?.Tagovi?.value || []; %>
+        <% if (!Array.isArray(selectedTags)) selectedTags = [selectedTags]; %>
+
+        <% if (selectedTags.length > 0) { %>
+          <% selectedTags.forEach((selectedTag, index) => { %>
             <div class="form__group-inline">
-              <input type="text" id="tags<%= index %>" name="tags[]" class="form__input" value="<%= tag %>" required>
+              <select id="tags<%= index %>" name="tags[]" class="form__select" required>
+                <% allTags.forEach(tag => { %>
+                  <option value="<%= tag.ID.value %>"
+                    <%= String(tag.ID.value) === String(selectedTag.ID?.toString?.() || selectedTag.ID) ? 'selected' : '' %>>
+                    <%= tag.Naziv.value %>
+                  </option>
+                <% }) %>
+              </select>
               <button type="button" class="button button--danger removeField">Izbriši</button>
             </div>
-          <% }); %>
+          <% }) %>
         <% } else { %>
           <div class="form__group-inline">
-            <input type="text" id="tags0" name="tags[]" class="form__input" required>
+            <select id="tags0" name="tags[]" class="form__select" required>
+              <% allTags.forEach(tag => { %>
+                <option value="<%= tag.ID.value %>"><%= tag.Naziv.value %></option>
+              <% }) %>
+            </select>
             <button type="button" class="button button--danger removeField">Izbriši</button>
           </div>
         <% } %>
       </div>
       <button id="addTag" type="button" class="button button--secondary">Dodajte</button>
-      
+
       <!-- Status -->
       <div class="form__group" id="statusContainer">
         <label class="form__label">Status:</label>
@@ -278,22 +271,30 @@
       <!-- UpSell Artikli -->
       <div id="upSellItems-container" class="form__group">
         <h3 class="form__subtitle">UpSell Artikli:</h3>
-        <% if (existingData && existingData["UpSell Artikli"] && existingData["UpSell Artikli"].length > 0) { %>
-          <% existingData["UpSell Artikli"].forEach((item, index) => { %>
-            <div class="dynamic-group">
-              <label class="form__label" for="upSellItems<%= index %>">Odaberite artikal:</label>
+        <% 
+          let selectedUpSell = existingData?.["UpSell Artikli"] || []; 
+          if (!Array.isArray(selectedUpSell)) selectedUpSell = [selectedUpSell];
+        %>
+
+        <% if (selectedUpSell.length > 0) { %>
+          <% selectedUpSell.forEach((item, index) => { 
+            const itemId = typeof item === 'string' ? item : item?.ID?.toString?.() || item?.ID?.value?.toString?.();
+          %>
+            <div class="form__group-inline dynamic-group">
               <select id="upSellItems<%= index %>" name="upSellItems[]" class="form__select" required>
-                <option value="<%= item.ID %>" selected><%= item.Naziv %></option>
-                <% allUpsellItems.forEach(optionItem => { %>
-                  <option value="<%= optionItem.ID.value %>" <%= optionItem.ID.value === item.ID.value ? 'selected' : '' %>><%= optionItem.Naziv.value %></option>
+                <% allUpsellItems.forEach(optionItem => { 
+                    const optionId = optionItem.ID.value.toString();
+                %>
+                  <option value="<%= optionId %>" <%= optionId === itemId ? 'selected' : '' %>>
+                    <%= optionItem.Naziv.value %>
+                  </option>
                 <% }) %>
               </select>
               <button type="button" class="button button--danger removeField">Izbriši</button>
             </div>
           <% }) %>
         <% } else { %>
-          <div class="dynamic-group">
-            <label class="form__label" for="upSellItems0">Odaberite artikal:</label>
+          <div class="form__group-inline dynamic-group">
             <select id="upSellItems0" name="upSellItems[]" class="form__select" required>
               <% allUpsellItems.forEach(item => { %>
                 <option value="<%= item.ID.value %>"><%= item.Naziv.value %></option>
@@ -308,23 +309,31 @@
       <!-- CrossSell Artikli -->
       <div id="crossSellItems-container" class="form__group">
         <h3 class="form__subtitle">CrossSell Artikli:</h3>
-        <% if (existingData && existingData["CrossSell Artikli"] && existingData["CrossSell Artikli"].length > 0) { %>
-          <% existingData["CrossSell Artikli"].forEach((item, index) => { %>
-            <div class="dynamic-group">
-              <label class="form__label" for="crossSellItems<%= index %>">Odaberite artikal:</label>
-              <select id="crossSellItems<%= index %>" name="crossSellItems[]" class="form__select" <%= editing ? 'required' : '' %>>
-                <option value="<%= item.ID %>" selected><%= item.Naziv %></option>
-                <% allCrosselItems.forEach(optionItem => { %>
-                  <option value="<%= optionItem.ID.value %>" <%= optionItem.ID.value === item.ID.value ? 'selected' : '' %>><%= optionItem.Naziv.value %></option>
+        <% 
+          let selectedCrossSell = existingData?.["CrossSell Artikli"] || []; 
+          if (!Array.isArray(selectedCrossSell)) selectedCrossSell = [selectedCrossSell];
+        %>
+
+        <% if (selectedCrossSell.length > 0) { %>
+          <% selectedCrossSell.forEach((item, index) => {
+            const itemId = typeof item === 'string' ? item : item?.ID?.toString?.() || item?.ID?.value?.toString?.();
+          %>
+            <div class="form__group-inline dynamic-group">
+              <select id="crossSellItems<%= index %>" name="crossSellItems[]" class="form__select" required>
+                <% allCrosselItems.forEach(optionItem => { 
+                    const optionId = optionItem.ID.value.toString();
+                %>
+                  <option value="<%= optionId %>" <%= optionId === itemId ? 'selected' : '' %>>
+                    <%= optionItem.Naziv.value %>
+                  </option>
                 <% }) %>
               </select>
               <button type="button" class="button button--danger removeField">Izbriši</button>
             </div>
           <% }) %>
         <% } else { %>
-          <div class="dynamic-group">
-            <label class="form__label" for="crossSellItems0">Odaberite artikal:</label>
-            <select id="crossSellItems0" name="crossSellItems[]" class="form__select" <%= editing ? 'required' : '' %>>
+          <div class="form__group-inline dynamic-group">
+            <select id="crossSellItems0" name="crossSellItems[]" class="form__select" required>
               <% allCrosselItems.forEach(item => { %>
                 <option value="<%= item.ID.value %>"><%= item.Naziv.value %></option>
               <% }) %>
@@ -334,6 +343,7 @@
         <% } %>
       </div>
       <button id="addCrossSellItem" type="button" class="button button--secondary">Dodajte</button>
+
 
       <% if (editing && existingData) { %>
         <input class="form__input" type="hidden" name="itemId" value="<%= existingData.ID.value ? existingData.ID.value : existingData.ID %>">

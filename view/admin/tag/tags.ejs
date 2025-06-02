@@ -1,0 +1,47 @@
+<%- include('../../include/head.ejs') %>
+<%- include('../../include/navigation.ejs') %>
+
+<section class="container section main__container md-6">
+  <h1 class="main__title"><%= pageTitle %></h1>
+
+  <!-- 🔍 Pretraga forma -->
+  <form class="form mb-4" action="/admin/oznake/pretraga" method="post">
+    <div class="form__group">
+      <label class="form__label" for="search">Pretraga Oznaka:</label>
+      <input class="form__input" id="search" type="text" name="search" placeholder="Unesite naziv ili slug">
+    </div>
+    <input type="hidden" name="honeypot">
+    <input type="hidden" name="CSRFToken" value="<%= csrfToken %>">
+    <button type="submit" class="button button--secondary">Pretraži</button>
+  </form>
+
+  <%- include('../../include/table.ejs', {
+    items: tags.tags,
+    showId: true,
+    caption: "Oznake",
+    hasActions: true,
+    hasFooter: true,
+    totals: false,
+    actions: [
+      {
+        type: 'link',
+        link: "/admin/oznaka-detalji/",
+        linkName: 'visibility'
+      },
+      {
+        type: 'form',
+        formAction: "/admin/izbrisite-oznaku",
+        buttonName: 'delete'
+      }
+    ]
+  }) %>
+
+  <!-- 📄 Paginacija -->
+  <%- include('../../include/pagination.ejs', {
+    currentPage: currentPage,
+    totalPages: totalPages,
+    basePath: basePath
+  }) %>
+</section>
+
+<%- include('../../include/end.ejs') %>

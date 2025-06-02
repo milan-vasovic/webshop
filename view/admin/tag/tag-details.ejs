@@ -1,0 +1,22 @@
+<%- include('../../include/head.ejs') %>
+<%- include('../../include/navigation.ejs') %>
+<section class="container main__container">
+    <h1 class="main__title"><%= tag.Naziv.value %></h1>
+    <div class="column-row__container">
+        <div class="left__container-30">
+            <a class="button button--secondary" href="/admin/izmenite-oznaku/<%= tag.ID.value %>">
+                Izmenite
+            </a>
+        </div>
+        <div class="right__container-70">
+            <%- include('../../include/info.ejs', {
+                data: [
+                    { "Slug": tag.Slug.value },
+                    { "Kratak Opis": tag['Kratak Opis'].value },
+                    { "Opis": tag.Opis.value }
+                ]
+            }) %>
+        </div>
+    </div>
+</section>
+<%- include('../../include/end.ejs') %>

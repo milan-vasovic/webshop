@@ -1,0 +1,27 @@
+<%- include('../../include/head.ejs') %>
+<%- include('../../include/navigation.ejs') %>
+<section class="container main__container">
+    <h1 class="main__title"><%= category.Naziv.value %></h1>
+    <div class="column-row__container">
+        <div class="left__container-30">
+            <a class="button button--secondary" href="/admin/izmenite-kategoriju/<%= category.ID.value %>">
+                Izmenite
+            </a>
+            <%- include('../../include/galery.ejs', {
+                images: [category.Slika],
+                selectedImage: category.Slika,
+                video: null
+            }) %>
+        </div>
+        <div class="right__container-70">
+            <%- include('../../include/info.ejs', {
+                data: [
+                    { "Slug": category.Slug.value },
+                    { "Kratak Opis": category['Kratak Opis'].value },
+                    { "Opis": category.Opis.value }
+                ]
+            }) %>
+        </div>
+    </div>
+</section>
+<%- include('../../include/end.ejs') %>

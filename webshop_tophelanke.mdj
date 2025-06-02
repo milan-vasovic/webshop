@@ -83190,7 +83190,7 @@
 											"top": 676,
 											"width": 364.73974609375,
 											"height": 13,
-											"text": "«HTTP GET»+getAllCrosSellItems(req, res, next)",
+											"text": "«HTTP GET»+getAllCrossSellItems(req, res, next)",
 											"horizontalAlignment": 0
 										},
 										{
@@ -94871,7 +94871,7 @@
 							"_parent": {
 								"$ref": "AAAAAAGVfBmd/FU/vhE="
 							},
-							"name": "getAllCrosSellItems",
+							"name": "getAllCrossSellItems",
 							"stereotype": "HTTP GET",
 							"parameters": [
 								{

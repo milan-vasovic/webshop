@@ -24,7 +24,8 @@
 
 .form__input,
 .form__textarea,
-.form__select {
+.form__select,
+.form__file {
   font-family: var(--primary-font-family);
   font-size: var(--font-size-md);
   padding: var(--space-2) var(--space-3);
@@ -38,7 +39,8 @@
 
 .form__input:focus,
 .form__textarea:focus,
-.form__select:focus {
+.form__select:focus,
+.form__file:focus {
   border-color: var(--primary-color);
   box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.25);
   outline: none;
@@ -84,6 +86,7 @@
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
 .variation__container {
   border: 1px solid var(--color-border);
   padding: 1rem;
@@ -109,27 +112,20 @@
   flex-direction: column;
 }
 
-.variation__file input[type="file"] {
-  padding: 0.4rem 0;
-  font-size: 0.95rem;
-  background-color: var(--color-bg-light);
-  border: 1px solid var(--color-border);
-  border-radius: 0.4rem;
-}
-
-.form__file {
-  font-family: var(--primary-font-family);
-  font-size: var(--font-size-md);
+/* Global style for all file inputs with the form__file class */
+input[type="file"].form__file {
   padding: var(--space-2) var(--space-3);
+  font-size: var(--font-size-md);
+  font-family: var(--primary-font-family);
+  background-color: var(--primary-background-color);
   border: var(--border-thin) solid var(--neutral-color);
   border-radius: var(--radius-sm);
-  background-color: var(--primary-background-color);
   color: var(--primary-text-color);
   transition: border-color var(--transition-medium),
     box-shadow var(--transition-medium);
 }
 
-.form__file:focus {
+input[type="file"].form__file:focus {
   border-color: var(--primary-color);
   box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.25);
   outline: none;
