@@ -18,6 +18,14 @@
                value="<%= existingData ? existingData.Naziv.value : '' %>" required>
       </div>
       
+      <div class="form__group">
+        <label for="kind" class="form__label">Tip:</label>
+        <select name="kind" id="kindSelect" class="form__select" required>
+          <option value="item" <% if (existingData && existingData.Tip.value === 'item') { %>selected<% } %>>Artikli</option>
+          <option value="post" <% if (existingData && existingData.Tip.value === 'post') { %>selected<% } %>>Objave</option>
+        </select>
+      </div>
+
       <!-- Kratak opis -->
       <div class="form__group">
         <label for="shortDescription" class="form__label">Kratak opis:</label>

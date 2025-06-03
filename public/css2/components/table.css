@@ -30,13 +30,16 @@
   caption-side: top;
 }
 
+.table th {
+  word-break: break-word;
+}
+
 .table th,
 .table td {
   padding: var(--space-3) var(--space-4);
   border: var(--border-thin) solid var(--neutral-color);
   text-align: left;
   vertical-align: middle;
-  word-break: break-word;
 }
 
 .table thead {
@@ -53,6 +56,12 @@
 
 .table tbody tr:hover {
   background-color: var(--secondary-background-color);
+}
+
+.table td:first-child {
+  word-break: break-all;
+  white-space: normal;
+  max-width: 200px;
 }
 
 /* 📷 Image Cell */

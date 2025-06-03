@@ -1265,16 +1265,10 @@ class ItemService {
       Naziv: { value: item.title },
       Status: { value: item.status.join(", ") },
       Kategorije: {
-        value: item.categories.map(cat => ({
-          Naziv: cat.name,
-          Slug: cat.slug
-        }))
+        value: item.categories.map(cat => cat.name).join(", ")
       },
       Tagovi: {
-        value: item.tags.map(tag => ({
-          Naziv: tag.name,
-          Slug: tag.slug
-        }))
+        value: item.tags.map(tag => tag.name).join(", ")
       },
       Slika: {
         value: item.featureImage.img,

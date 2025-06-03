@@ -563,7 +563,7 @@ class OrderService {
         }),
       },
       "Ukupna Cena": { value: `${order.totalPrice} RSD` },
-      Status: { value: order.status },
+      Status: { value: order.status ? order.status : "Privremena" },
     }));
   }
 

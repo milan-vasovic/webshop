@@ -63,9 +63,9 @@ a:active {
   text-decoration: underline;
 }
 
-a:visited {
+/* a:visited {
   color: var(--accent-hover-color);
-}
+} */
 
 /* Optional variant: link styled as button */
 .link-button {
@@ -181,4 +181,31 @@ pre {
   font-family: var(--code-font-family);
   font-size: var(--font-size-sm);
   color: var(--accent-color);
+}
+
+/* ===============================
+   📱 Mobile Font Size Adjustments
+   =============================== */
+@media screen and (max-width: 480px) {
+  h1 { font-size: var(--font-size-3xl); }
+  h2 { font-size: var(--font-size-2xl); }
+  h3 { font-size: var(--font-size-xl); }
+  h4 { font-size: var(--font-size-lg); }
+  h5 { font-size: var(--font-size-md); }
+  h6 { font-size: var(--font-size-sm); }
+
+  p,
+  .text-lead,
+  .text-muted,
+  .text-caption,
+  .text-info,
+  .text-code {
+    font-size: var(--font-size-sm);
+  }
+
+  .heading-xl { font-size: var(--font-size-3xl); }
+  .heading-lg { font-size: var(--font-size-2xl); }
+  .heading-md { font-size: var(--font-size-xl); }
+  .heading-sm { font-size: var(--font-size-md); }
+  .heading-xs { font-size: var(--font-size-sm); }
 }

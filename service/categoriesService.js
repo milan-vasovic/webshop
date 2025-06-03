@@ -23,6 +23,7 @@ class CategoriesService {
             const newCategory = new CategoryModel({
                 name: sanitize(body.name),
                 slug: slug,
+                kind: sanitize(body.kind),
                 shortDescription: sanitize(body.shortDescription),
                 longDescription: sanitize(body.longDescription),
                 featureImage: featureImage
@@ -47,6 +48,7 @@ class CategoriesService {
 
             existingCategory.name = sanitize(body.name) || existingCategory.name;
             existingCategory.slug = slug || existingCategory.slug;
+            existingCategory.kind = sanitize(body.kind) || existingCategory.kind;
             existingCategory.shortDescription = sanitize(body.shortDescription) || existingCategory.shortDescription;
             existingCategory.longDescription = sanitize(body.longDescription) || existingCategory.longDescription;
             existingCategory.featureImage = {
@@ -67,7 +69,7 @@ class CategoriesService {
             const [categories, totalCount] = await Promise.all([
                 CategoryModel.find()
                     .sort({ _id: -1 })
-                    .select("name slug shortDescription featureImage")
+                    .select("name slug kind shortDescription featureImage")
                     .skip(skip)
                     .limit(limit),
 
@@ -173,6 +175,7 @@ class CategoriesService {
             ID: { value: category._id },
             Naziv: { value: category.name },
             Slug: { value: category.slug },
+            Tip: { value: category.kind },
             Opis: { value: category.shortDescription },
             Slika: {
                 value: category.featureImage.img,
@@ -187,6 +190,7 @@ class CategoriesService {
             ID: { value: category._id },
             Naziv: { value: category.name },
             Slug: { value: category.slug },
+            Tip: { value: category.kind },
             'Kratak Opis': { value: category.shortDescription },
             Opis: { value: category.longDescription },
             Slika: {

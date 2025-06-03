@@ -17,6 +17,7 @@ class tagsService {
             const newtag = new TagModel({
                 name: sanitize(body.name),
                 slug: slug,
+                kind: sanitize(body.kind),
                 shortDescription: sanitize(body.shortDescription),
                 longDescription: sanitize(body.longDescription),
             });
@@ -39,6 +40,7 @@ class tagsService {
 
             existingTag.name = sanitize(body.name) || existingTag.name;
             existingTag.slug = slug || existingTag.slug;
+            existingTag.kind = sanitize(body.kind) || existingTag.kind,
             existingTag.shortDescription = sanitize(body.shortDescription) || existingTag.shortDescription;
             existingTag.longDescription = sanitize(body.longDescription) || existingTag.longDescription;
 
@@ -55,7 +57,7 @@ class tagsService {
             const [tags, totalCount] = await Promise.all([
                 TagModel.find()
                     .sort({ _id: -1 })
-                    .select("name slug shortDescription")
+                    .select("name slug kind shortDescription")
                     .skip(skip)
                     .limit(limit),
 
@@ -161,6 +163,7 @@ class tagsService {
             ID: { value: tag._id },
             Naziv: { value: tag.name },
             Slug: { value: tag.slug },
+            Tip: { value: tag.kind },
             Opis: { value: tag.shortDescription },
             })
         )
@@ -171,6 +174,7 @@ class tagsService {
             ID: { value: tag._id },
             Naziv: { value: tag.name },
             Slug: { value: tag.slug },
+            Tip: { value: tag.kind },
             'Kratak Opis': { value: tag.shortDescription },
             Opis: { value: tag.longDescription },
         }
