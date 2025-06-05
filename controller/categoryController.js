@@ -159,7 +159,7 @@ async function postAddCategory(req, res, next) {
             });
         }
 
-        await CategoriesService.creatCategory(body, files)
+        await CategoriesService.createCategory(body, files)
 
         return res.redirect("/admin/kategorije");
 

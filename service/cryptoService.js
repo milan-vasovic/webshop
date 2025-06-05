@@ -14,12 +14,6 @@ class CryptoService {
         this.aesIv = Buffer.from(process.env.AES_IV, 'hex');
     }
 
-    /**
-     * Hashes a password using bcrypt.
-     * 
-     * @param {string} password - The password to hash.
-     * @returns {Promise<string>} - A promise that resolves to the hashed password.
-     */
     async hashPassword(password) {
         try {
             return await bcrypt.hash(password, 12);
@@ -28,13 +22,6 @@ class CryptoService {
         }
     }
 
-    /**
-     * Compares a plain text password with a hashed password.
-     * 
-     * @param {string} password - The plain text password.
-     * @param {string} hashedPassword - The hashed password.
-     * @returns {Promise<boolean>} - A promise that resolves to a boolean indicating if the passwords match.
-     */
     async compareUserPasswords(password, hashedPassword) {
         try {
             return await bcrypt.compare(password, hashedPassword);
@@ -43,11 +30,6 @@ class CryptoService {
         }
     }
 
-    /**
-     * Creates a reset token using crypto.
-     * 
-     * @returns {Promise<string>} - A promise that resolves to the generated reset token.
-     */
     async createToken() {
         try {
             return crypto.randomBytes(32).toString("hex");
@@ -56,12 +38,6 @@ class CryptoService {
         }
     }
 
-    /**
-     * Encrypts data using AES-256-CBC.
-     * 
-     * @param {string} text - The text to encrypt.
-     * @returns {string} - The encrypted text.
-     */
     encryptData(text) {
         try {
             const cipher = crypto.createCipheriv('aes-256-cbc', this.aesKey, this.aesIv);
@@ -73,12 +49,6 @@ class CryptoService {
         }
     }
 
-    /**
-     * Decrypts data using AES-256-CBC.
-     * 
-     * @param {string} encryptedText - The encrypted text to decrypt.
-     * @returns {string} - The decrypted text.
-     */
     decryptData(encryptedText) {
         try {
             const decipher = crypto.createDecipheriv('aes-256-cbc', this.aesKey, this.aesIv);

@@ -2,14 +2,6 @@ import sanitize from 'mongo-sanitize';
 
 import CustomerService from '../service/customerService.js';
 
-/**
- * Renders the customers page for the admin.
- * 
- * @param {Object} req - The request object.
- * @param {Object} res - The response object.
- * @param {Function} next - The next middleware function.
- * @returns {Promise<void>}
- */
 async function getCustomersPage(req, res, next) {
     try {
         const page = parseInt(sanitize(req.query.page)) || 1;

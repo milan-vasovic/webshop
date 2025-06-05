@@ -32,11 +32,13 @@ const forumSchema = new Schema({
         }
     },
     categories: [{
-        type: String,
+        type: Schema.Types.ObjectId,
+        ref: "Category",
         required: true
     }],
     tags: [{
-        type: String,
+        type: Schema.Types.ObjectId,
+        ref: "Tag",
         required: true
     }],
     description: {

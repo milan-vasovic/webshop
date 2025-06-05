@@ -17,23 +17,26 @@ let transporter = nodemailer.createTransport({
 });
 
 const styles = {
-    bodyFontFamily: "'Verdana', Helvetica, Arial, sans-serif",
-    bodyBackground: "#f4f4f4",
-    containerBackground: "#ffffff",
-    containerPadding: "20px",
-    containerBorderRadius: "8px",
-    containerBoxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-    headingColor: "#e62485",
-    headingMarginBottom: "20px",
-    textColor: "#333333",
-    textFontSize: "16px",
-    textMarginBottom: "30px",
-    buttonPadding: "12px 24px",
-    buttonBackground: "#e62485",
-    buttonTextColor: "#fff",
-    buttonBorderRadius: "4px",
-    buttonFontSize: "16px",
-    buttonTransition: "background-color 0.3s"
+  bodyFontFamily: "'Inter', sans-serif",
+  bodyBackground: "#f9fafb",             // --primary-background-color
+  containerBackground: "#ffffff",        // --white-color
+  containerPadding: "1rem",              // --space-4
+  containerBorderRadius: "0.5rem",       // --radius-lg
+  containerBoxShadow: "0 4px 8px rgba(0, 0, 0, 0.05)",
+
+  headingColor: "#2563eb",               // --primary-color
+  headingMarginBottom: "1rem",           // --space-4
+
+  textColor: "#1e293b",                  // --primary-text-color
+  textFontSize: "1rem",                  // --font-size-md
+  textMarginBottom: "1.5rem",            // --space-6
+
+  buttonPadding: "0.75rem 1.25rem",      // --space-3 --space-5
+  buttonBackground: "#2563eb",           // --primary-color
+  buttonTextColor: "#ffffff",            // --on-primary-text-color
+  buttonBorderRadius: "0.375rem",        // --radius-md
+  buttonFontSize: "1rem",                // --font-size-md
+  buttonTransition: "background-color 0.3s ease"
 };
 
 class EmailService {

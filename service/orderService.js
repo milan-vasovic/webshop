@@ -7,21 +7,8 @@ import ItemService from "./itemService.js";
 import ErrorHelper from "../helper/errorHelper.js";
 import EmailService from "./emailService.js";
 import UserService from "./userService.js";
-import CustomerService from "./customerService.js";
 
 class OrderService {
-  /**
-   * Creates a new order.
-   *
-   * @param {Object} buyer - The buyer information.
-   * @param {string} telephone - The buyer's telephone number.
-   * @param {Object} address - The shipping address.
-   * @param {Array<Object>} items - The items in the order.
-   * @param {number} totalPrice - The total price of the order.
-   * @param {Object} session - The mongoose session object.
-   * @param {Object} [coupon] - The coupon applied to the order (optional).
-   * @returns {Promise<Object>} - A promise that resolves to the created order.
-   */
   static async createNewOrder(
     buyer,
     email,
@@ -169,14 +156,6 @@ class OrderService {
     }
   }
 
-  /**
-   * Finds orders based on a search query, with pagination.
-   *
-   * @param {string|null} [search] - The search query to filter orders by (optional).
-   * @param {number} [limit=10] - The maximum number of orders to return.
-   * @param {number} [skip=0] - The number of orders to skip.
-   * @returns {Promise<Array>} - A promise that resolves to an array of orders.
-   */
   static async findOrders(limit = 10, page = 1) {
     try {
       const skip = (page - 1) * limit;
@@ -302,12 +281,6 @@ class OrderService {
     }
   }
 
-  /**
-   * Finds an order by its ID.
-   *
-   * @param {string} orderId - The ID of the order to find.
-   * @returns {Promise<Object>} - A promise that resolves to the order details.
-   */
   static async findOrderById(orderId) {
     try {
       const order = await OrderModel.findById(orderId);
@@ -336,13 +309,6 @@ class OrderService {
     }
   }
 
-  /**
-   * Finds the details of a user's order by order ID and user ID.
-   *
-   * @param {string} orderId - The ID of the order to find.
-   * @param {string} userId - The ID of the user to verify ownership.
-   * @returns {Promise<Object>} - A promise that resolves to the order details.
-   */
   static async findUserOrderDetails(orderId, userId) {
     try {
       const order = await OrderModel.findById(orderId);
@@ -544,12 +510,6 @@ class OrderService {
     }
   }
 
-  /**
-   * Maps orders to a specific format for display.
-   *
-   * @param {Array<Object>} orders - The array of orders to map.
-   * @returns {Array<Object>} - An array of mapped orders.
-   */
   static mapOrders(orders) {
     return orders.map((order) => ({
       ID: { value: order._id },
@@ -566,13 +526,7 @@ class OrderService {
       Status: { value: order.status ? order.status : "Privremena" },
     }));
   }
-
-  /**
-   * Maps order details to a specific format for display.
-   *
-   * @param {Object} order - The order object to map.
-   * @returns {Object} - The mapped order details.
-   */
+  
   static mapOrderDetails(order) {
     return {
       ID: { value: order._id },

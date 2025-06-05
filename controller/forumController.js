@@ -29,8 +29,8 @@ async function getForumPage(req, res, next) {
         const posts = await ForumService.findPosts(limit, page);
         const totalPages = Math.ceil(posts.totalPosts / limit);
 
-        const categories = await ForumService.findPostsCategires();
-        const tags = await ForumService.findPostsTags();
+        const categories = await ForumService.findAllCategories();
+        const tags = await ForumService.findAllTags();
 
         const breadcrumbs = buildBreadcrumbs({
             type: "post"
@@ -66,6 +66,7 @@ async function getForumPageByCategory(req, res, next) {
 
         const posts = await ForumService.findPostsByCategory(category, limit, page);
         const totalPages = Math.ceil(posts.totalPosts / limit);
+
         const tags = await ForumService.findPostsTags(category);
 
         const breadcrumbs = buildBreadcrumbs({
@@ -93,7 +94,6 @@ async function getForumPageByCategory(req, res, next) {
     } catch (error) {
         next(error);
     }
-    
 }
 
 async function getForumPageByTags(req, res, next) {
@@ -104,7 +104,8 @@ async function getForumPageByTags(req, res, next) {
 
         const posts = await ForumService.findPostsByTags(tag, limit, page);
         const totalPages = Math.ceil(posts.totalPosts / limit);
-        const categories = await ForumService.findPostsCategires(tag);
+
+        const categories = await ForumService.findPostsCategories(tag);
 
         const breadcrumbs = buildBreadcrumbs({
             mode: "tag",
@@ -130,7 +131,7 @@ async function getForumPageByTags(req, res, next) {
         });
     } catch (error) {
         next(error);
-    }   
+    }
 }
 
 async function getSearchForumsPage(req, res, next) {

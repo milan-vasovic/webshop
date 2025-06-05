@@ -54,23 +54,23 @@
         <%- include('../include/newsletter.ejs', { from: path }) %>
       <% } %>
 
-      <% if (categories?.length) { %>
+      <% if (categories?.Kategorije?.length) { %>
         <div class="sidebar-block">
           <h2 class="heading-md mb-2">Kategorije</h2>
           <ul class="grid grid-2">
-            <% categories.forEach(c => { %>
-              <li><a href="/forum/kategorija/<%= encodeURIComponent(c) %>"><%= c %></a></li>
+            <% categories.Kategorije.forEach(c => { %>
+              <li><a href="/forum/kategorija/<%= c.Slug %>"><%= c.Naziv %></a></li>
             <% }) %>
           </ul>
         </div>
       <% } %>
 
-      <% if (tags?.length) { %>
+      <% if (tags?.Tagovi?.length) { %>
         <div class="sidebar-block">
           <h2 class="heading-md mb-2">Tagovi</h2>
           <ul class="grid grid-2">
-            <% tags.forEach(t => { %>
-              <li><a href="/forum/oznaka/<%= encodeURIComponent(t) %>"><%= t %></a></li>
+            <% tags.Tagovi.forEach(t => { %>
+              <li><a href="/forum/oznaka/<%= t.Slug %>"><%= t.Naziv %></a></li>
             <% }) %>
           </ul>
         </div>

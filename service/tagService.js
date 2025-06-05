@@ -17,6 +17,7 @@ class tagsService {
             const newtag = new TagModel({
                 name: sanitize(body.name),
                 slug: slug,
+                type: sanitize(body.type),
                 kind: sanitize(body.kind),
                 shortDescription: sanitize(body.shortDescription),
                 longDescription: sanitize(body.longDescription),
@@ -40,6 +41,7 @@ class tagsService {
 
             existingTag.name = sanitize(body.name) || existingTag.name;
             existingTag.slug = slug || existingTag.slug;
+            existingTag.type = sanitize(body.type) || existingTag.type;
             existingTag.kind = sanitize(body.kind) || existingTag.kind,
             existingTag.shortDescription = sanitize(body.shortDescription) || existingTag.shortDescription;
             existingTag.longDescription = sanitize(body.longDescription) || existingTag.longDescription;
@@ -57,7 +59,7 @@ class tagsService {
             const [tags, totalCount] = await Promise.all([
                 TagModel.find()
                     .sort({ _id: -1 })
-                    .select("name slug kind shortDescription")
+                    .select("name slug type kind shortDescription")
                     .skip(skip)
                     .limit(limit),
 
@@ -89,6 +91,15 @@ class tagsService {
             }
 
             return this.mapTag(tag);
+        } catch (error) {
+            ErrorHelper.throwServerError(error);
+        }
+    }
+
+    static async findTagsByIds(ids = []) {
+        try {
+            if (!ids.length) return [];
+            return await TagModel.find({ _id: { $in: ids } }).select("name slug").lean();
         } catch (error) {
             ErrorHelper.throwServerError(error);
         }
@@ -131,19 +142,56 @@ class tagsService {
 
     static async findAllTagsForItems() {
         try {
-            const tags = await TagModel.find().select("name").lean();
-    
-            if (!tags) {
-                return [];
-            }
-            
-            return tags.map((tag) => ({
-                ID: { value: tag._id },
-                Naziv: { value: tag.name }
-            }));
+            const tags = await TagModel.find({ kind: "item" })
+            .select("name slug type kind")
+            .sort({ type: 1, kind: 1, name: 1 })
+            .lean();
+
+            if (!tags) return [];
+
+            return tags;
         } catch (error) {
             ErrorHelper.throwServerError(error);
         }
+    }
+
+    static async findAllTagsForPosts() {
+        try {
+            const tags = await TagModel.find({ kind: "post" })
+            .select("name slug type kind")
+            .sort({ type: 1, kind: 1, name: 1 })
+            .lean();
+
+            if (!tags) return [];
+
+            return tags;
+        } catch (error) {
+            ErrorHelper.throwServerError(error);
+        }
+    }
+
+    static async findTagsBySlugs(slugs = [], { returnIdsOnly = false } = {}) {
+        try {
+            const tags = await TagModel.find({ slug: { $in: slugs } }).select("_id").lean();
+            return returnIdsOnly ? tags.map(tag => tag._id) : tags;
+        } catch (error) {
+            ErrorHelper.throwServerError(error);
+        }
+    }
+
+    static async findTagBySlug(slug) {
+      return await TagModel.findOne({ slug }).lean();
+    }
+
+    static async searchTagIdsByTerm(term) {
+        const results = await TagModel.find({
+            $or: [
+            { name: { $regex: term, $options: "i" } },
+            { slug: { $regex: term, $options: "i" } }
+            ]
+        }).select("_id").lean();
+
+        return results.map(tag => tag._id);
     }
 
     static async removeTagById(tagId, session) {
@@ -164,6 +212,7 @@ class tagsService {
             Naziv: { value: tag.name },
             Slug: { value: tag.slug },
             Tip: { value: tag.kind },
+            Vrsta: { value: tag.type },
             Opis: { value: tag.shortDescription },
             })
         )
@@ -175,6 +224,7 @@ class tagsService {
             Naziv: { value: tag.name },
             Slug: { value: tag.slug },
             Tip: { value: tag.kind },
+            Vrsta: { value: tag.type },
             'Kratak Opis': { value: tag.shortDescription },
             Opis: { value: tag.longDescription },
         }

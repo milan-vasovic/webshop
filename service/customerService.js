@@ -8,12 +8,6 @@ import mongoose from "mongoose";
 import UserService from "./userService.js";
 
 class CustomerService {
-  /**
-   * Finds customers based on a search query.
-   *
-   * @param {string} [search] - The search query to filter customers by (optional).
-   * @returns {Promise<Array>} - A promise that resolves to an array of customers.
-   */
   static async findCustomers(limit = 10, page = 1) {
     try {
       const skip = (page - 1) * limit;
@@ -88,12 +82,6 @@ class CustomerService {
     }
   }
 
-  /**
-   * Finds a customer by their ID.
-   *
-   * @param {string} customerId - The ID of the customer to find.
-   * @returns {Promise<Object>} - A promise that resolves to the customer details.
-   */
   static async findCustomerById(customerId) {
     try {
       const customer = await CustomerModel.findById(customerId).populate({
@@ -164,17 +152,7 @@ class CustomerService {
       ErrorHelper.throwServerError(error);
     }
   }
-  /**
-   * Creates a new customer.
-   *
-   * @param {Object} customerData - The data of the customer to create.
-   * @param {string} customerData.firstName - The first name of the customer.
-   * @param {string} customerData.lastName - The last name of the customer.
-   * @param {string} customerData.email - The email of the customer.
-   * @param {string} customerData.password - The password of the customer.
-   * @param {Array<Object>} [customerData.address] - The addresses of the customer (optional).
-   * @returns {Promise<Object>} - A promise that resolves to the created customer.
-   */
+
   static async registerNewCustomer(
     firstName,
     lastName,
@@ -241,14 +219,6 @@ class CustomerService {
     }
   }
 
-  /**
-   * Updates the orders of a customer.
-   *
-   * @param {string} customerId - The ID of the customer to update.
-   * @param {string} orderId - The ID of the order to add to the customer's orders.
-   * @param {Object} session - The mongoose session object.
-   * @returns {Promise<Object>} - A promise that resolves to the updated customer or an error message.
-   */
   static async updateCustomerOrders(customerId, orderId, session) {
     try {
       const customer = await CustomerModel.findById(customerId)
@@ -278,12 +248,6 @@ class CustomerService {
     }
   }
 
-  /**
-   * Maps customers to a specific format.
-   *
-   * @param {Array} customers - The array of customers to map.
-   * @returns {Array} - An array of mapped customers.
-   */
   static mapCustomers(customers) {
     return customers.map((customer) => ({
       ID: { value: customer._id },
@@ -297,12 +261,6 @@ class CustomerService {
     }));
   }
 
-  /**
-   * Maps customer details to a specific format.
-   *
-   * @param {Object} customer - The customer object to map.
-   * @returns {Object} - The mapped customer details.
-   */
   static mapCustomerDetails(customer) {
     return {
       ID: { value: customer._id },

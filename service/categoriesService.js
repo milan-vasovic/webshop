@@ -4,7 +4,7 @@ import { generateSlug } from "../helper/slugHelper.js";
 import sanitize from "mongo-sanitize";
 
 class CategoriesService {
-    static async creatCategory(body, files) {
+    static async createCategory(body, files) {
         try {
             const slug = generateSlug(sanitize(body.name));
 
@@ -101,7 +101,8 @@ class CategoriesService {
             if (search) {
                 filter.$or = [
                     { name: { $regex: search, $options: "i" } },
-                    { slug: { $regex: search, $options: "i" } }
+                    { slug: { $regex: search, $options: "i" } },
+                    { kind: { $regex: search, $options: "i" } }
                 ];
             }
 
@@ -127,6 +128,17 @@ class CategoriesService {
         }
     }
 
+    static async searchCategoryIdsByTerm(term) {
+        const results = await CategoryModel.find({
+            $or: [
+            { name: { $regex: term, $options: "i" } },
+            { slug: { $regex: term, $options: "i" } }
+            ]
+        }).select("_id").lean();
+
+        return results.map(cat => cat._id);
+    }
+
     static async findCategoryById(id) {
         try {
             const category = await CategoryModel.findById(id)
@@ -141,18 +153,57 @@ class CategoriesService {
         }
     }
 
+    static async findCategoriesByIds(ids = []) {
+        try {
+            if (!ids.length) return [];
+            return await CategoryModel.find({ _id: { $in: ids } }).select("name slug").lean();
+        } catch (error) {
+            ErrorHelper.throwServerError(error);
+        }
+    }
+
+    static async findCategoryBySlug(slug) {
+        return await CategoryModel.findOne({ slug }).lean();
+    }
+
+    // Chage it to use new logic
     static async findAllCategoriesForItems() {
         try {
-            const categories = await CategoryModel.find().select("name").lean();
+            const categories = await CategoryModel.find({kind: "item"}).select("name slug").lean();
 
             if (!categories) {
                 return [];
             }
             
-            return categories.map((category) => ({
-                ID: { value: category._id },
-                Naziv: { value: category.name }
-            }));
+            return categories;
+        } catch (error) {
+            ErrorHelper.throwServerError(error);
+        }
+    }
+
+    static async findAllCategoriesForPosts() {
+        try {
+            const categories = await CategoryModel.find({kind: 'post'}).select('name slug').lean();
+
+            if (!categories) {
+                return [];
+            }
+
+            return categories;
+        } catch (error) {
+            ErrorHelper.throwServerError(error);
+        }
+    }
+
+    static async findCategoriesBySlugs(slugs = [], { returnIdsOnly = false } = {}) {
+        try {
+            const categories = await CategoryModel.find({ slug: { $in: slugs } }).select("_id").lean();
+
+            if (returnIdsOnly) {
+            return categories.map(cat => cat._id);
+            }
+
+            return categories;
         } catch (error) {
             ErrorHelper.throwServerError(error);
         }

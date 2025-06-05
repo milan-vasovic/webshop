@@ -2,14 +2,6 @@ import sanitize from 'mongo-sanitize';
 
 import ContactService from '../service/contactService.js';
 
-/**
- * Renders the contacts page.
- * 
- * @param {Object} req - The request object.
- * @param {Object} res - The response object.
- * @param {Function} next - The next middleware function.
- * @returns {Promise<void>}
- */
 async function getContactsPage(req, res, next) {
     try {
         const page = parseInt(sanitize(req.query.page)) || 1;

@@ -12,13 +12,6 @@ import OrderService from "./orderService.js";
 class UserService {
   /**
    * Checks the user's information for validity.
-   *
-   * @param {Object} userInfo - The user information to check.
-   * @param {string} userInfo.email - The user's email address.
-   * @param {string} userInfo.password - The user's password.
-   * @param {string} [userInfo.firstName] - The user's first name (optional).
-   * @param {string} [userInfo.lastName] - The user's last name (optional).
-   * @returns {Promise<Object>} - A promise that resolves to an object containing the validation results.
    */
   static async validateUserInfo(email, password) {
     const userExist = await UserModel.findOne({ email: email }).select(
@@ -54,9 +47,6 @@ class UserService {
 
   /**
    * Validates a user and sends a password reset token.
-   *
-   * @param {string} email - The email of the user to validate.
-   * @returns {Promise<void>}
    */
   static async validateUserAndSendResetToken(email) {
     const session = await mongoose.startSession();
@@ -112,9 +102,6 @@ class UserService {
 
   /**
    * Validates a password reset token.
-   *
-   * @param {string} token - The password reset token to validate.
-   * @returns {Promise<Object>} - A promise that resolves to the user associated with the token.
    */
   static async validateResetToken(token) {
     try {
@@ -233,9 +220,6 @@ class UserService {
 
   /**
    * Finds users based on a search query.
-   *
-   * @param {string} [search] - The search query to filter users by (optional).
-   * @returns {Promise<Array>} - A promise that resolves to an array of users.
    */
   static async findUsers(userId, limit = 10, page = 1) {
     try {
@@ -313,9 +297,6 @@ class UserService {
 
   /**
    * Finds a user by their ID.
-   *
-   * @param {string} userId - The ID of the user to find.
-   * @returns {Promise<Object>} - A promise that resolves to the user details.
    */
   static async findUserById(userId) {
     const user = await UserModel.findById(userId)
@@ -335,9 +316,6 @@ class UserService {
 
   /**
    * Finds a user for session management.
-   *
-   * @param {string} userId - The ID of the user to find.
-   * @returns {Promise<Object>} - A promise that resolves to the user details for session management.
    */
   static async findUserForSession(userId) {
     const user = await UserModel.findById(userId).select(
@@ -353,13 +331,6 @@ class UserService {
 
   /**
    * Register a new user.
-   *
-   * @param {Object} userData - The data of the user to create.
-   * @param {string} userData.email - The email of the user.
-   * @param {string} userData.password - The password of the user.
-   * @param {string} userData.firstName - The first name of the user.
-   * @param {string} userData.lastName - The last name of the user.
-   * @returns {Promise<Object>} - A promise that resolves to the created user.
    */
   static async registerNewUser(
     email,
@@ -485,10 +456,6 @@ class UserService {
 
   /**
    * Adds a phone number to a user.
-   *
-   * @param {string} userId - The ID of the user to add the phone number to.
-   * @param {string} phoneNumber - The phone number to add.
-   * @returns {Promise<Object>} - A promise that resolves to the updated user.
    */
   static async addPhoneNumberToUser(phoneNumber, userId) {
     try {
@@ -575,9 +542,6 @@ class UserService {
 
   /**
    * Finds the cart of a user.
-   *
-   * @param {string} userId - The ID of the user to find the cart for.
-   * @returns {Promise<Object>} - A promise that resolves to the user's cart.
    */
   static async findUserCart(userId) {
     try {
@@ -611,9 +575,6 @@ class UserService {
 
   /**
    * Finds user information by their ID.
-   *
-   * @param {string} userId - The ID of the user to find.
-   * @returns {Promise<Object>} - A promise that resolves to the user information.
    */
   static async findUserInfoById(userId) {
     try {
@@ -685,10 +646,6 @@ class UserService {
 
   /**
    * Deletes a phone number from a user.
-   *
-   * @param {string} userId - The ID of the user to delete the phone number from.
-   * @param {string} phoneNumber - The phone number to delete.
-   * @returns {Promise<Object>} - A promise that resolves to the updated user.
    */
   static async deletePhoneNumberFromUser(numberId, userId) {
     try {
@@ -720,14 +677,6 @@ class UserService {
 
   /**
    * Deletes an address from a user.
-   *
-   * @param {string} userId - The ID of the user to delete the address from.
-   * @param {Object} address - The address to delete.
-   * @param {string} address.city - The city of the address.
-   * @param {string} address.street - The street of the address.
-   * @param {string} address.number - The number of the address.
-   * @param {string} address.postalCode - The postal code of the address.
-   * @returns {Promise<Object>} - A promise that resolves to the updated user.
    */
   static async deleteAddressFromUser(addressId, userId) {
     try {
@@ -759,13 +708,6 @@ class UserService {
 
   /**
    * Adds an item to a user's cart.
-   *
-   * @param {string} userId - The ID of the user to add the item to.
-   * @param {Object} item - The item to add to the cart.
-   * @param {string} item.itemId - The ID of the item.
-   * @param {string} item.variationId - The ID of the variation of the item.
-   * @param {number} item.quantity - The quantity of the item.
-   * @returns {Promise<Object>} - A promise that resolves to the updated user cart.
    */
   static async addItemToUserCart(userId, item) {
     try {
@@ -785,10 +727,6 @@ class UserService {
 
   /**
    * Updates a user's cart with the session cart.
-   *
-   * @param {string} userId - The ID of the user to update the cart for.
-   * @param {Array<Object>} sessionCart - The session cart to update the user's cart with.
-   * @returns {Promise<Object>} - A promise that resolves to the updated user cart.
    */
   static async updateCartWithSessionCart(userId, sessionCart) {
     try {
@@ -810,11 +748,6 @@ class UserService {
 
   /**
    * Removes an item from a user's cart.
-   *
-   * @param {string} userId - The ID of the user to remove the item from.
-   * @param {string} itemId - The ID of the item to remove.
-   * @param {string} [variationId] - The ID of the variation of the item to remove (optional).
-   * @returns {Promise<Object>} - A promise that resolves to the updated user cart.
    */
   static async removeItemFromCart(userId, cartItemId) {
     try {
@@ -855,9 +788,6 @@ class UserService {
 
   /**
    * Uklanja artikal iz svih korisničkih korpi.
-   * @param {string} itemId - ID artikla koji se uklanja
-   * @param {Object} session - Mongoose transakcija
-   * @returns {Promise<void>}
    */
   static async removeItemFromCarts(itemId, session) {
     await UserModel.updateMany(
@@ -869,9 +799,6 @@ class UserService {
 
   /**
    * Uklanja artikal iz svih ponuda partnera.
-   * @param {string} itemId - ID artikla koji se uklanja
-   * @param {Object} session - Mongoose transakcija
-   * @returns {Promise<void>}
    */
   static async removeItemFromPartnerOffers(itemId, session) {
     await UserModel.updateMany(
@@ -883,11 +810,6 @@ class UserService {
 
   /**
    * Updates a user's information after an order is placed.
-   *
-   * @param {string} userId - The ID of the user to update.
-   * @param {Object} orderData - The data of the order placed.
-   * @param {Object} session - The mongoose session object.
-   * @returns {Promise<Object>} - A promise that resolves to the updated user.
    */
   static async updateUserAfterOrder(
     userId,
@@ -945,9 +867,6 @@ class UserService {
 
   /**
    * Maps user details to a specific format.
-   *
-   * @param {Object} user - The user object to map.
-   * @returns {Object} - The mapped user details.
    */
   static mapUserDetails(user) {
     user.lastName = CryptoService.decryptData(user.lastName);

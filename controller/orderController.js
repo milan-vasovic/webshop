@@ -201,12 +201,10 @@ async function postAdminConfirmOrder(req, res, next) {
 
     let buyer, customer;
 
-    // Provera da li postoji korisnik sa tim emailom
     const existingUser = await UserService.findUserByEmail(tempOrder.email);
     if (existingUser) {
       buyer = { type: 'User', ref: existingUser._id, firstName: tempOrder.buyer.firstName, lastName: tempOrder.buyer.lastName };
     } else {
-      // Provera da li postoji gost kupac
       customer = await CustomerService.registerNewCustomer(
         tempOrder.buyer.firstName,
         tempOrder.buyer.lastName,

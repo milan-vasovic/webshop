@@ -5,8 +5,6 @@ import ErrorHelper from "../helper/errorHelper.js";
 class ShopService {
     /**
     * Finds items for the shop, including categories, tags, featured items, action items, and items by category.
-    * 
-    * @returns {Promise<Object>} - A promise that resolves to an object containing all the shop items and metadata.
     */
     static async findItemsForShop() {
         try {
@@ -47,9 +45,6 @@ class ShopService {
 
     /**
     * Finds items by category, including featured items, action items, and other items within the category.
-    * 
-    * @param {string} category - The category to filter items by.
-    * @returns {Promise<Object>} - A promise that resolves to an object containing items by category and their tags.
     */
     static async findItemsByCategory(category, page = 1, limit = 10) {
         try {
@@ -79,9 +74,6 @@ class ShopService {
 
     /**
     * Finds items by tags.
-    * 
-    * @param {Array<string>} tags - The tags to filter items by.
-    * @returns {Promise<Array>} - A promise that resolves to an array of items.
     */
     static async findItemsByTags(tag, page = 1, limit = 10) {
         try {
@@ -111,9 +103,6 @@ class ShopService {
 
     /**
     * Finds items by search query.
-    * 
-    * @param {string} search - The search query to filter items by.
-    * @returns {Promise<Array>} - A promise that resolves to an array of items.
     */
     static async findItemsBySearch(search, page = 1, limit = 10) {
         try {
@@ -132,9 +121,6 @@ class ShopService {
 
     /**
     * Finds an item by its name.
-    * 
-    * @param {string} name - The name of the item to find.
-    * @returns {Promise<Object>} - A promise that resolves to the item details.
     */
     static async findItemBySlug(itemSlug) {
         try {

@@ -11,6 +11,8 @@ const tagSchema = new Schema({
 
   slug: String,
 
+  type: String,
+  
   kind: String,
 
   shortDescription: String,

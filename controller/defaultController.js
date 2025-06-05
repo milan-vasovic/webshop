@@ -7,14 +7,6 @@ import ItemService from '../service/itemService.js';
 import ForumService from '../service/forumService.js';
 import NewsletterService from '../service/newsletterService.js';
 
-/**
- * Renders the home page.
- * 
- * @param {Object} req - The request object.
- * @param {Object} res - The response object.
- * @param {Function} next - The next middleware function.
- * @returns {Promise<void>}
- */
 async function getHomePage(req, res, next) {
     try {
         const featuredItems = await ItemService.findFeaturedItems(null,null, 3);
@@ -211,7 +203,6 @@ async function postNewsletter(req, res, next) {
     next(error);
   }
 }
-
 
 export default {
     getHomePage,

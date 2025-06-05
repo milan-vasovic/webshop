@@ -6,17 +6,11 @@ import ItemModel from "../model/item.js";
 
 import ErrorHelper from "../helper/errorHelper.js";
 import EmailService from "./emailService.js";
-import CategoryModel from "../model/category.js";
-import TagModel from "../model/tag.js";
+import CategoriesService from "./categoriesService.js";
+import TagService from "./tagService.js";
 
 class ItemService {
-  /**
-   * Finds all admin add items based on category and itemId.
-   *
-   * @param {string|null} category - The category or categories to filter items by.
-   * @param {string|null} itemId - The ID of the item to exclude from the results.
-   * @returns {Promise<Array>} - A promise that resolves to an array of items.
-   */
+
   static async findItemsForAdminSelection({ includeCategories = true, categoryIds = [], excludeItemId = null }) {
     const query = {};
 
@@ -46,48 +40,31 @@ class ItemService {
     }));
   }
 
-  /**
-   * Finds all categories.
-   *
-   * @returns {Promise<Array>} - A promise that resolves to an array of categories.
-   */
   static async findAllCategories() {
-    const categories = await CategoryModel.find()
-      .select("name slug")
-      .lean();
+    const categories = await CategoriesService.findAllCategoriesForItems();
 
-    return {
-      Kategorije: categories.map((cat) => ({
-        Naziv: cat.name,
-        Slug: cat.slug,
-      })),
+    return {  
+      Kategorije: categories.map((category) => ({
+        ID: category._id ,
+        Naziv: category.name,
+        Slug: category.slug
+      }))
     };
   }
 
-  /**
-   * Finds all tags.
-   *
-   * @returns {Promise<Array>} - A promise that resolves to an array of tags.
-   */
   static async findAllTags() {
-    const tags = await TagModel.find()
-      .select("name slug")
-      .lean();
+    const tags = await TagService.findAllTagsForItems()
 
     return {
       Tagovi: tags.map((tag) => ({
         Naziv: tag.name,
+        Tip: tag.kind,
+        Vrsta: tag.type,
         Slug: tag.slug,
       })),
     };
   }  
 
-  /**
-   * Finds all items.
-   *
-   * @returns {Promise<Array>} - A promise that resolves to an array of items.
-   * This is curently unused!
-   */
   static async findAllItems(limit = 10, skip = 0) {
     const items = await ItemModel.find()
       .sort({ soldCount: -1, _id: 1  })
@@ -107,11 +84,6 @@ class ItemService {
     return ItemService.mapItemsForCard(items);
   }
 
-  /**
-   * Finds featured items.
-   *
-   * @returns {Promise<Array>} - A promise that resolves to an array of featured items.
-   */
   static async findFeaturedItems(category = null, tag = null, limit = 10, skip = 0) {
     const filter = { 
       status: { 
@@ -132,9 +104,7 @@ class ItemService {
         slugs = [category];
       }
 
-      const categoryDocs = await CategoryModel.find({
-        slug: { $in: slugs }
-      }).select("_id");
+      const categoryDocs = await CategoriesService.findCategoriesBySlugs(slugs, { returnIdsOnly: true });
 
       const categoryIds = categoryDocs.map((cat) => cat._id);
       filter.categories = { $in: categoryIds };
@@ -152,9 +122,7 @@ class ItemService {
         slugs = [tag];
       }
 
-      const tagDocs = await TagModel.find({
-        slug: { $in: slugs }
-      }).select("_id");
+      const tagDocs = await TagService.findTagsBySlugs(slugs, { returnIdsOnly: true });
 
       const tagIds = tagDocs.map((tag) => tag._id);
       filter.tags = { $in: tagIds };
@@ -173,11 +141,6 @@ class ItemService {
     return items ? ItemService.mapItemsForShop(items) : [];
   }
 
-  /**
-   * Finds action items.
-   *
-   * @returns {Promise<Array>} - A promise that resolves to an array of action items.
-   */
   static async findActionItems(category = null, tag = null, limit = 10, skip = 0) {
     const filter = {
       status: {
@@ -198,9 +161,7 @@ class ItemService {
         slugs = [category];
       }
 
-      const categoryDocs = await CategoryModel.find({
-        slug: { $in: slugs }
-      }).select("_id");
+      const categoryDocs = await CategoriesService.findCategoriesBySlugs(slugs, { returnIdsOnly: true });
 
       const categoryIds = categoryDocs.map((cat) => cat._id);
       filter.categories = { $in: categoryIds };
@@ -218,9 +179,7 @@ class ItemService {
         slugs = [tag];
       }
 
-      const tagDocs = await TagModel.find({
-        slug: { $in: slugs }
-      }).select("_id");
+      const tagDocs = await TagService.findTagsBySlugs(slugs, { returnIdsOnly: true });
 
       const tagIds = tagDocs.map((tag) => tag._id);
       filter.tags = { $in: tagIds };
@@ -243,167 +202,84 @@ class ItemService {
     return ItemService.mapItemsForShop(items);
   }
 
-  /**
-   * Finds items by category.
-   *
-   * @param {string} category - The category to filter items by.
-   * @returns {Promise<Array>} - A promise that resolves to an array of items.
-   */
-  static async findItemsByCategory(
-  category,
-  status = null,
-  excludeStatus = null,
-  limit = 10,
-  skip = 0
-) {
-  const filter = {};
-
-  // 1. Mapiraj slugove u ObjectId
-  let slugs = [];
-
-  try {
-    slugs = Array.isArray(category)
-      ? category
-      : category.split(",").map((c) => c.trim());
-  } catch (err) {
-    slugs = [category];
-  }
-
-  // Sanitize ako stigne objekat
-  slugs = slugs.map((c) => {
-    if (typeof c === "string") return c;
-    if (typeof c === "object" && c.Slug) return c.Slug;
-    return "";
-  }).filter(Boolean);
-
-  const categoryDocs = await CategoryModel.find({
-    slug: { $in: slugs }
-  }).select("_id");
-
-  const categoryIds = categoryDocs.map((cat) => cat._id);
-
-  if (!categoryIds.length) {
-    return {
-      items: [],
-      totalCount: 0
-    };
-  }
-
-  filter.categories = { $in: categoryIds };
-
-  // 2. Status filtering
-  const excluded = new Set();
-  if (excludeStatus) {
-    const excl = Array.isArray(excludeStatus)
-      ? excludeStatus
-      : [excludeStatus];
-    excl.forEach((e) => excluded.add(e));
-  }
-  excluded.add("not-published");
-
-  if (status) {
-    const statuses = Array.isArray(status) ? status : [status];
-    filter.status = {
-      $in: statuses,
-      $nin: Array.from(excluded)
-    };
-  } else {
-    filter.status = { $nin: Array.from(excluded) };
-  }
-
-  // 3. Dohvati artikle
-  const [items, itemCount] = await Promise.all([
-    ItemModel.find(filter)
-      .sort({ soldCount: -1, _id: 1 })
-      .select("title slug shortDescription price actionPrice categories tags featureImage status")
-      .populate("categories tags")
-      .skip(skip)
-      .limit(limit)
-      .lean(),
-    ItemModel.countDocuments(filter)
-  ]);
-
-  return {
-    items: ItemService.mapItemsForShop(items),
-    totalCount: itemCount,
-    metadata: {
-      metadata: {
-        title: categoryDocs[0]?.name || "",
-        description: categoryDocs[0]?.shortDescription || "",
-        longDescription: categoryDocs[0]?.longDescription || ""
-      }
-    }
-  };
-}
-
-  
-  /**
-   * Finds items by tag.
-   *
-   * @param {string} tag - The tag to filter items by.
-   * @returns {Promise<Array>} - A promise that resolves to an array of items.
-   */
-  static async findItemsByTag(
-    tag,
-    status = null,
-    excludeStatus = null,
-    limit = 10,
-    skip = 0
-  ) {
+  static async findItemsByCategory(category, status = null, excludeStatus = null, limit = 10, skip = 0) {
     const filter = {};
-
-    // 1. Mapiraj ulaz u niz slugova
     let slugs = [];
 
     try {
-      slugs = Array.isArray(tag)
-        ? tag
-        : tag.split(",").map((t) => t.trim());
-    } catch (err) {
+      slugs = Array.isArray(category) ? category : category.split(",").map(c => c.trim());
+    } catch {
+      slugs = [category];
+    }
+
+    slugs = slugs.map((c) => (typeof c === "object" && c.Slug ? c.Slug : c)).filter(Boolean);
+
+    const categoryIds = await CategoriesService.findCategoriesBySlugs(slugs, { returnIdsOnly: true });
+
+    if (!categoryIds.length) {
+      return { items: [], totalCount: 0 };
+    }
+
+    filter.categories = { $in: categoryIds };
+
+    const excluded = new Set(["not-published"]);
+    if (excludeStatus) (Array.isArray(excludeStatus) ? excludeStatus : [excludeStatus]).forEach(e => excluded.add(e));
+
+    filter.status = status
+      ? { $in: Array.isArray(status) ? status : [status], $nin: Array.from(excluded) }
+      : { $nin: Array.from(excluded) };
+
+    const [items, itemCount] = await Promise.all([
+      ItemModel.find(filter)
+        .sort({ soldCount: -1, _id: 1 })
+        .select("title slug shortDescription price actionPrice categories tags featureImage status")
+        .populate("categories tags")
+        .skip(skip)
+        .limit(limit)
+        .lean(),
+      ItemModel.countDocuments(filter)
+    ]);
+
+    const metadataCategory = (await CategoriesService.findCategoriesBySlugs(slugs))[0];
+
+    return {
+      items: ItemService.mapItemsForShop(items),
+      totalCount: itemCount,
+      metadata: {
+        title: metadataCategory?.name || "",
+        description: metadataCategory?.shortDescription || "",
+        longDescription: metadataCategory?.longDescription || ""
+      }
+    };
+  }
+  
+  static async findItemsByTag(tag, status = null, excludeStatus = null, limit = 10, skip = 0) {
+    const filter = {};
+    let slugs = [];
+
+    try {
+      slugs = Array.isArray(tag) ? tag : tag.split(",").map(t => t.trim());
+    } catch {
       slugs = [tag];
     }
 
-    slugs = slugs.map((t) => {
-      if (typeof t === "string") return t.toLowerCase();
-      if (typeof t === "object" && t.slug) return t.slug.toLowerCase();
-      return "";
-    }).filter(Boolean);
+    slugs = slugs.map((t) => (typeof t === "object" && t.Slug ? t.Slug : t)).filter(Boolean);
 
-    // 2. Dohvati Tag dokumente
-    const tagDocs = await TagModel.find({
-      slug: { $in: slugs }
-    }).select("_id");
-
-    const tagIds = tagDocs.map((t) => t._id);
+    const tagIds = await TagService.findTagsBySlugs(slugs, { returnIdsOnly: true });
 
     if (!tagIds.length) {
-      return {
-        items: [],
-        totalCount: 0
-      };
+      return { items: [], totalCount: 0 };
     }
 
     filter.tags = { $in: tagIds };
 
-    // 3. Status filtering
-    const excluded = new Set();
-    if (excludeStatus) {
-      const excl = Array.isArray(excludeStatus) ? excludeStatus : [excludeStatus];
-      excl.forEach(e => excluded.add(e));
-    }
-    excluded.add("not-published");
+    const excluded = new Set(["not-published"]);
+    if (excludeStatus) (Array.isArray(excludeStatus) ? excludeStatus : [excludeStatus]).forEach(e => excluded.add(e));
 
-    if (status) {
-      const statuses = Array.isArray(status) ? status : [status];
-      filter.status = {
-        $in: statuses,
-        $nin: Array.from(excluded)
-      };
-    } else {
-      filter.status = { $nin: Array.from(excluded) };
-    }
+    filter.status = status
+      ? { $in: Array.isArray(status) ? status : [status], $nin: Array.from(excluded) }
+      : { $nin: Array.from(excluded) };
 
-    // 4. Dohvati artikle
     const [items, itemCount] = await Promise.all([
       ItemModel.find(filter)
         .sort({ soldCount: -1, _id: 1 })
@@ -415,77 +291,62 @@ class ItemService {
       ItemModel.countDocuments(filter)
     ]);
 
+    const metadataTag = (await TagService.findTagsBySlugs(slugs))[0];
+
     return {
       items: ItemService.mapItemsForShop(items),
       totalCount: itemCount,
       metadata: {
-        title: tagDocs[0]?.name || "",
-        description: tagDocs[0]?.shortDescription || "",
-        longDescription: tagDocs[0]?.longDescription || ""
+        title: metadataTag?.name || "",
+        description: metadataTag?.shortDescription || "",
+        longDescription: metadataTag?.longDescription || ""
       }
     };
   }
 
-  /**
-   * Finds items by search query.
-   *
-   * @param {string} search - The search query to filter items by.
-   * @returns {Promise<Array>} - A promise that resolves to an array of items.
-   */
   static async findItemsBySearch(search, limit = 10, page = 1, cond = false) {
     const skip = (page - 1) * limit;
-    const filter = { $and: [] };
+    const filter = {};
+
+    const searchRegex = new RegExp(search, "i");
+    const andConditions = [];
 
     if (!cond) {
-      filter.$and.push({ status: { $ne: "not-published" } });
+      andConditions.push({ status: { $ne: "not-published" } });
     }
+
+    const orTextConditions = [];
 
     if (search) {
-      const searchNumber = parseFloat(search);
-      const conditions = [
-        { title: { $regex: search, $options: "i" } },
-        { slug: { $regex: search, $options: "i" } },
-        { sku: { $regex: search, $options: "i" } },
-        { status: { $elemMatch: { $regex: search, $options: "i" } } },
-        { keyWords: { $regex: search, $options: "i" } }
-      ];
+      orTextConditions.push({ title: { $regex: searchRegex } });
+      orTextConditions.push({ slug: { $regex: searchRegex } });
+      orTextConditions.push({ sku: { $regex: searchRegex } });
+      orTextConditions.push({ keyWords: { $regex: searchRegex } });
 
-      if (!isNaN(searchNumber)) {
-        conditions.push({ price: searchNumber });
-        conditions.push({ actionPrice: searchNumber });
+      const numberValue = parseFloat(search);
+      if (!isNaN(numberValue)) {
+        orTextConditions.push({ price: numberValue });
+        orTextConditions.push({ actionPrice: numberValue });
       }
 
-      // Pretraga po kategorijama (slug ili title)
-      const matchingCategories = await CategoryModel.find({
-        $or: [
-          { title: { $regex: search, $options: "i" } },
-          { slug: { $regex: search, $options: "i" } }
-        ]
-      }).select("_id");
-
-      if (matchingCategories.length > 0) {
-        const categoryIds = matchingCategories.map((cat) => cat._id);
-        conditions.push({ categories: { $in: categoryIds } });
+      if (orTextConditions.length > 0) {
+        andConditions.push({ $or: orTextConditions });
       }
 
-      // NOVO: Pretraga po tagovima (slug ili name)
-      const matchingTags = await TagModel.find({
-        $or: [
-          { name: { $regex: search, $options: "i" } },
-          { slug: { $regex: search, $options: "i" } }
-        ]
-      }).select("_id");
-
-      if (matchingTags.length > 0) {
-        const tagIds = matchingTags.map((tag) => tag._id);
-        conditions.push({ tags: { $in: tagIds } });
+      // Kategorije i tagovi
+      const categoryIds = await CategoriesService.searchCategoryIdsByTerm(search);
+      if (categoryIds.length > 0) {
+        andConditions.push({ categories: { $in: categoryIds } });
       }
 
-      filter.$and.push({ $or: conditions });
+      const tagIds = await TagService.searchTagIdsByTerm(search);
+      if (tagIds.length > 0) {
+        andConditions.push({ tags: { $in: tagIds } });
+      }
     }
 
-    if (filter.$and.length === 0) {
-      delete filter.$and;
+    if (andConditions.length > 0) {
+      filter.$and = andConditions;
     }
 
     const [items, itemCount] = await Promise.all([
@@ -504,9 +365,9 @@ class ItemService {
       ErrorHelper.throwNotFoundError("Artikli");
     }
 
+    // Metadata
     let metadata = null;
-
-    const foundCategory = await CategoryModel.findOne({ slug: search }).lean();
+    const foundCategory = await CategoriesService.findCategoryBySlug(search);
     if (foundCategory) {
       metadata = {
         title: foundCategory.name,
@@ -515,7 +376,7 @@ class ItemService {
       };
     }
 
-    const foundTag = await TagModel.findOne({ slug: search }).lean();
+    const foundTag = await TagService.findTagBySlug(search);
     if (foundTag) {
       metadata = {
         title: foundTag.name,
@@ -531,12 +392,6 @@ class ItemService {
     };
   }
 
-  /**
-   * Finds item details by ID or name.
-   *
-   * @param {string} idOrName - The ID or name of the item to find.
-   * @returns {Promise<Object>} - A promise that resolves to the item details.
-   */
   static async findItemDetailsByIdOrSlug(id, itemSlug = null) {
     if (itemSlug) {
       const item = await ItemModel.findOne({ slug: itemSlug }).select(
@@ -563,12 +418,6 @@ class ItemService {
     return ItemService.mapItemDetails(item);
   }
 
-  /**
-   * Finds admin items.
-   *
-   * @param {string} [search] - The search query to filter items by.
-   * @returns {Promise<Array>} - A promise that resolves to an array of admin items.
-   */
   static async findAdminItems(limit = 10, page = 1) {
     const skip = (page - 1) * limit;
 
@@ -595,12 +444,6 @@ class ItemService {
     }
   }
 
-  /**
-   * Finds item details by ID for admin.
-   *
-   * @param {string} itemId - The ID of the item to find.
-   * @returns {Promise<Object>} - A promise that resolves to the item details.
-   */
   static async findItemDetailsByIdForAdmin(id) {
     const item = await ItemModel.findById(id).populate("categories tags");
 
@@ -611,12 +454,6 @@ class ItemService {
     return ItemService.mapItemDetailsForAdmin(item);
   }
 
-  /**
-   * Finds an item for the cart by its ID.
-   *
-   * @param {string} itemId - The ID of the item to find.
-   * @returns {Promise<Object>} - A promise that resolves to the item details.
-   */
   static async findItemForCart(itemId, variationId, amount, code = null) {
     try {
       const item = await ItemModel.findById(itemId);
@@ -660,12 +497,6 @@ class ItemService {
     }
   }
 
-  /**
-   * Finds up-sell and cross-sell items.
-   *
-   * @param {string} itemId - The ID of the item to find related items for.
-   * @returns {Promise<Array>} - A promise that resolves to an array of related items.
-   */
   static async findItemDetailsForUpCrossSell(itemId) {
     try {
       const item = await ItemModel.findById(itemId).select(
@@ -744,25 +575,6 @@ class ItemService {
     }
   }
   
-  /**
-   * Creates a new item.
-   *
-   * @param {Object} itemData - The data of the item to create.
-   * @param {string} itemData.title - The title of the item.
-   * @param {string} itemData.sku - The SKU of the item.
-   * @param {number} itemData.price - The price of the item.
-   * @param {number} [itemData.actionPrice] - The action price of the item (optional).
-   * @param {string} itemData.shortDescription - The short description of the item.
-   * @param {string} itemData.description - The detailed description of the item.
-   * @param {Array<string>} itemData.keyWords - The keywords associated with the item.
-   * @param {Array<string>} itemData.categories - The categories the item belongs to.
-   * @param {Array<string>} itemData.tags - The tags associated with the item.
-   * @param {boolean} itemData.backorderAllowed - Whether backorders are allowed for the item.
-   * @param {Array<Object>} [itemData.variations] - The variations of the item (optional).
-   * @param {Array<string>} [itemData.upSellItems] - The IDs of up-sell items (optional).
-   * @param {Array<string>} [itemData.crossSellItems] - The IDs of cross-sell items (optional).
-   * @returns {Promise<Object>} - A promise that resolves to the created item.
-   */
   static async createNewItem(body, files) {
     const featureImageFile = files.find(file => file.fieldname === 'featureImage');
     const featureImage = {
@@ -856,13 +668,6 @@ class ItemService {
     return await newItem.save();
   }
 
-  /**
-   * Updates an item.
-   *
-   * @param {string} itemId - The ID of the item to update.
-   * @param {Object} itemData - The data of the item to update.
-   * @returns {Promise<Object>} - A promise that resolves to the updated item.
-   */
   static async updateItem(itemId, body, files) {
     const existingItem = await ItemModel.findById(itemId);
     if (!existingItem) {
@@ -920,7 +725,6 @@ class ItemService {
     existingItem.description = body.description || existingItem.description;
     existingItem.keyWords = body.keyWords || existingItem.keyWords;
 
-    // ✅ Kategorije i Tagovi kao ObjectId
     existingItem.categories = Array.isArray(body.categories)
       ? body.categories.map(id => sanitize(id))
       : [sanitize(body.categories)];
@@ -929,7 +733,6 @@ class ItemService {
       ? body.tags.map(id => sanitize(id))
       : [sanitize(body.tags)];
 
-    // ✅ Status
     const newStatus = Array.isArray(body.status) ? body.status : [body.status];
     const existingStatus = Array.isArray(existingItem.status) ? existingItem.status : [existingItem.status];
     if (newStatus.includes("action") && !existingStatus.includes("action")) {
@@ -937,7 +740,6 @@ class ItemService {
     }
     existingItem.status = newStatus;
 
-    // ✅ Ostala polja
     existingItem.price = Number(body.price);
     existingItem.actionPrice = Number(body.actionPrice);
 
@@ -965,7 +767,6 @@ class ItemService {
     }
   }
 
-  // Funkcija za dobijanje artikla na osnovu ID-ja
   static async findUpCrossSellItems(itemId) {
     const item = await ItemModel.findById(itemId).select(
       "_id title shortDescription featureImage"
@@ -973,15 +774,6 @@ class ItemService {
     return item;
   }
 
-  /**
-   * Adds a backorder to an item.
-   *
-   * @param {string} itemId - The ID of the item to add a backorder to.
-   * @param {string} variationId - The ID of the variation to add a backorder to.
-   * @param {number} amount - The amount of the backorder.
-   * @param {string|null} userId - The ID of the user placing the backorder (optional).
-   * @returns {Promise<Object>} - A promise that resolves to the updated item.
-   */
   static async addBackorderToItem(itemId, variationId, amount, userId = null) {
     try {
       const item = await ItemModel.findById(itemId).select(
@@ -1017,13 +809,6 @@ class ItemService {
     }
   }
 
-  /**
-   * Updates the amount of an item by its ID.
-   *
-   * @param {string} itemId - The ID of the item to update.
-   * @param {number} amount - The new amount of the item.
-   * @returns {Promise<Object>} - A promise that resolves to the updated item.
-   */
   static async updateItemAmountById(itemId, amount, variationId, session) {
     try {
       const item = await ItemModel.findById(itemId).select(
@@ -1096,10 +881,8 @@ class ItemService {
         ErrorHelper.throwNotFoundError("Varijacija");
       }
 
-      // Povećaj (ili smanji, ako je negativan) amount varijacije
       variation.amount = (variation.amount || 0) + Number(amount);
 
-      // Sačuvaj artikal unutar sesije
       await item.save({ session });
       return item;
     } catch (error) {
@@ -1107,13 +890,6 @@ class ItemService {
     }
   }
 
-  /**
-   * Detaches item references from upSellItems and crossSellItems.
-   *
-   * @param {string} itemId - The ID of the item to detach references from.
-   * @param {Object} session - The mongoose session object.
-   * @returns {Promise<Object>} - A promise that resolves to the item object.
-   */
   static async detachItemReferences(itemId, session) {
     const item = await ItemModel.findById(itemId)
       .select("_id")
@@ -1160,7 +936,7 @@ class ItemService {
     }
   }
 
-    static async removeTagFromItems(tagId, session) {
+  static async removeTagFromItems(tagId, session) {
     const filter = {
       tags: tagId
     };
@@ -1182,12 +958,6 @@ class ItemService {
     }
   }
 
-  /**
-   * Deletes an item by its ID.
-   *
-   * @param {string} itemId - The ID of the item to delete.
-   * @returns {Promise<void>}
-   */
   static async deleteItemById(itemId, session) {
     try {
       const item = await ItemModel.findByIdAndDelete(itemId).session(session);
@@ -1200,12 +970,6 @@ class ItemService {
     }
   }
 
-  /**
-   * Maps items for the shop.
-   *
-   * @param {Array} items - The array of items to map.
-   * @returns {Array} - An array of mapped items.
-   */
   static mapItemsForShop(items) {
     return items.map((item) => ({
       ID: { value: item._id },
@@ -1280,11 +1044,10 @@ class ItemService {
   }
 
   static mapItemDetails(item) {
-    // Prvo izvuci unikatne slike iz variations
     const uniqueVariationImages = Array.from(
       new Map(
         item.variations
-          .filter(v => v.image && v.image.img) // ignoriši ako nema slike
+          .filter(v => v.image && v.image.img)
           .map(v => [v.image.img, { URL: v.image.img, Opis: v.image.imgDesc }])
       ).values()
     );

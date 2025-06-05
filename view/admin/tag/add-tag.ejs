@@ -26,6 +26,14 @@
         </select>
       </div>
 
+      <div class="form__group">
+        <label for="type" class="form__label">Vrsta:</label>
+        <select name="type" id="typeSelect" class="form__select" required>
+          <option value="size" <% if (existingData && existingData.Tip.value === 'size') { %>selected<% } %>>Veličina</option>
+          <option value="color" <% if (existingData && existingData.Tip.value === 'color') { %>selected<% } %>>Boja</option>
+        </select>
+      </div>
+
       <!-- Kratak opis -->
       <div class="form__group">
         <label for="shortDescription" class="form__label">Kratak opis:</label>

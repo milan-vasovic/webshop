@@ -5,7 +5,6 @@ import {
   contactLimiter,
 } from '../middleware/rateLimiter.js';
 
-
 import DefaultController from '../controller/defaultController.js';
 
 const router = Router();

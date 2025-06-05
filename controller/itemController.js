@@ -9,14 +9,6 @@ import UserService from "../service/userService.js";
 import CategoriesService from "../service/categoriesService.js";
 import tagsService from "../service/tagService.js";
 
-/**
- * Renders the items page for the admin.
- *
- * @param {Object} req - The request object.
- * @param {Object} res - The response object.
- * @param {Function} next - The next middleware function.
- * @returns {Promise<void>}
- */
 async function getItemsPage(req, res, next) {
   try {
     const page = parseInt(sanitize(req.query.page)) || 1;
@@ -70,6 +62,7 @@ async function getSearchItemsPage(req, res, next) {
     next(error);
   }
 }
+
 /**
  * Renders the item details page for the admin.
  */
@@ -176,8 +169,6 @@ async function getEditItemPage(req, res, next) {
   }
 }
 
-// controllers/ItemController.js
-
 async function getAllUpSellItems(req, res, next) {
   try {
     const categoryIds = req.query.categories?.split(",") || [];
@@ -201,7 +192,7 @@ async function getAllCrossSellItems(req, res, next) {
     const itemId = req.query.itemId !== "undefined" ? req.query.itemId : null;
 
     const items = await ItemService.findItemsForAdminSelection({
-      includeCategories: false, // cross-sell → različite kategorije
+      includeCategories: false,
       categoryIds,
       excludeItemId: itemId
     });
@@ -304,7 +295,6 @@ async function postEditItem(req, res, next) {
     const body = sanitize(req.body);
     const files = sanitize(req.files);
 
-    // Sanitize osnovnih polja
     body.title = sanitizeHtml(body.title);
     body.sku = sanitizeHtml(body.sku);
     body.shortDescription = sanitizeHtml(body.shortDescription);
@@ -312,7 +302,6 @@ async function postEditItem(req, res, next) {
     body.featureImageDesc = sanitizeHtml(body.featureImageDesc);
     body.videoDesc = sanitizeHtml(body.videoDesc);
 
-    // Sanitize nizova
     if (Array.isArray(body.keyWords)) {
       body.keyWords = body.keyWords.map(k => sanitizeHtml(k));
     }
@@ -323,7 +312,6 @@ async function postEditItem(req, res, next) {
       body.tags = body.tags.map(t => sanitizeHtml(t));
     }
 
-    // Sanitize varijacija
     if (body.variations) {
       body.variations = body.variations.map((variation) => ({
         _id: sanitize(variation.variationId),
@@ -403,7 +391,6 @@ async function postEditItem(req, res, next) {
       });
     }
 
-    // UpSell i CrossSell: obogaćivanje
     if (Array.isArray(body.upSellItems)) {
       body.upSellItems = await Promise.all(
         body.upSellItems.map(async (itemId) => {
