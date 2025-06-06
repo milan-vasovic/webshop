@@ -146,49 +146,46 @@ class ForumService {
     static async findPostsBySearch(search, limit = 10, page = 1) {
         try {
             const skip = (page - 1) * limit;
-            const andConditions = [];
-
             const searchRegex = new RegExp(search, "i");
 
-            // Textual fields
-            const textSearchConditions = [
-                { title: { $regex: searchRegex } },
-                { slug: { $regex: searchRegex } },
-                { keyWords: { $regex: searchRegex } }
+            // Osnovni uslovi pretrage za tekstualna polja posta
+            const searchConditions = [
+            { title: { $regex: searchRegex } },
+            { slug: { $regex: searchRegex } },
+            { keyWords: { $regex: searchRegex } }
             ];
 
-            andConditions.push({ $or: textSearchConditions });
-
-            // Category match via slug or name
+            // Pretraga kategorija po imenu ili slug-u
             const categoryIds = await CategoriesService.searchCategoryIdsByTerm(search);
             if (categoryIds.length > 0) {
-                andConditions.push({ categories: { $in: categoryIds } });
+            searchConditions.push({ categories: { $in: categoryIds } });
             }
 
-            // Tag match via slug or name
+            // Pretraga tagova po imenu ili slug-u
             const tagIds = await TagService.searchTagIdsByTerm(search);
             if (tagIds.length > 0) {
-                andConditions.push({ tags: { $in: tagIds } });
+            searchConditions.push({ tags: { $in: tagIds } });
             }
 
-            const filter = andConditions.length > 0 ? { $and: andConditions } : {};
+            // Glavni MongoDB filter koristi OR logiku (poklapanje u bilo kojoj oblasti)
+            const filter = { $or: searchConditions };
 
             const [posts, postCount] = await Promise.all([
-                ForumModel.find(filter)
-                    .sort({ _id: 1 })
-                    .skip(skip)
-                    .limit(limit)
-                    .lean(),
-                ForumModel.countDocuments(filter)
+            ForumModel.find(filter)
+                .sort({ _id: -1 }) // najnovije prve
+                .skip(skip)
+                .limit(limit)
+                .lean(),
+            ForumModel.countDocuments(filter)
             ]);
 
             if (!posts || posts.length === 0) {
-                ErrorHelper.throwNotFoundError("Objave");
+            ErrorHelper.throwNotFoundError("Objave");
             }
 
             return {
-                posts: ForumService.mapPosts(posts),
-                totalPosts: postCount
+            posts: ForumService.mapPosts(posts),
+            totalPosts: postCount
             };
         } catch (error) {
             ErrorHelper.throwServerError(error);
@@ -321,14 +318,14 @@ class ForumService {
             },
             Kategorije: {
                 value: post.categories.map(cat => ({
-                Naziv: cat.name,
-                Slug: cat.slug
+                    Naziv: cat.name,
+                    Slug: cat.slug
                 }))
             },
             Tagovi: {
                 value: post.tags.map(tag => ({
-                Naziv: tag.name,
-                Slug: tag.slug
+                    Naziv: tag.name,
+                    Slug: tag.slug
                 }))
             },
         }))

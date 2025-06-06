@@ -35,7 +35,7 @@
           <h2 class="blog__subtitle">Kategorije:</h2>
           <ul class="blog__list">
             <% post.Kategorije.value.forEach(c => { %>
-              <li><a class="blog__list-link" href="/forum/kategorija/<%= c %>"><%= c %></a></li>
+              <li><a class="blog__list-link" href="/forum/kategorija/<%= c.Slug %>"><%= c.Naziv %></a></li>
             <% }) %>
           </ul>
         <% } %>
@@ -44,7 +44,7 @@
           <h2 class="blog__subtitle">Tagovi:</h2>
           <ul class="blog__list">
             <% post.Tagovi.value.forEach(t => { %>
-              <li><a class="blog__list-link" href="/forum/oznaka/<%= t %>"><%= t %></a></li>
+              <li><a class="blog__list-link" href="/forum/oznaka/<%= t.Slug %>"><%= t.Naziv %></a></li>
             <% }) %>
           </ul>
         <% } %>

@@ -25,7 +25,11 @@
                   <% } else if (field && typeof field === 'object' && field.link) { %>
                     <a class="card__link" href="<%= field.link %>"><%= field.value %></a>
                   <% } else if (field && typeof field === 'object' && field.value) { %>
-                    <%= field.value %>
+                    <% if (Array.isArray(field.value)) { %>
+                      <%= field.value.map(v => v?.Naziv || v).join(", ") %>
+                    <% } else { %>
+                      <%= field.value %>
+                    <% } %>
                   <% } else { %>
                     <%= field || "N/A" %>
                   <% } %>

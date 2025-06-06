@@ -1,0 +1,33 @@
+/* 📚 Sadržaj posta (HTML content) */
+.blog__content-container {
+  line-height: var(--line-height-loose);
+  color: var(--primary-text-color);
+  font-size: var(--font-size-md);
+}
+
+/* 🧱 Sidebar kontejner */
+.blog__sidebar {
+  padding: var(--space-4);
+  background-color: var(--neutral-background-color);
+  border-radius: var(--radius-md);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+/* 🏷️ Naslovi za sidebar sekcije */
+.blog__subtitle {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  margin-bottom: var(--space-2);
+  color: var(--primary-color);
+}
+
+/* 📋 Lista linkova */
+.blog__list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 var(--space-4) 0;
+}
+
+.blog__list li {
+  margin-bottom: var(--space-1);
+}

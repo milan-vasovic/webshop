@@ -306,47 +306,51 @@ class ItemService {
 
   static async findItemsBySearch(search, limit = 10, page = 1, cond = false) {
     const skip = (page - 1) * limit;
-    const filter = {};
-
     const searchRegex = new RegExp(search, "i");
-    const andConditions = [];
+
+    const baseConditions = [];
 
     if (!cond) {
-      andConditions.push({ status: { $ne: "not-published" } });
+      baseConditions.push({ status: { $ne: "not-published" } });
     }
 
-    const orTextConditions = [];
+    const orConditions = [];
 
     if (search) {
-      orTextConditions.push({ title: { $regex: searchRegex } });
-      orTextConditions.push({ slug: { $regex: searchRegex } });
-      orTextConditions.push({ sku: { $regex: searchRegex } });
-      orTextConditions.push({ keyWords: { $regex: searchRegex } });
+      // Tekstualna polja
+      orConditions.push({ title: { $regex: searchRegex } });
+      orConditions.push({ slug: { $regex: searchRegex } });
+      orConditions.push({ sku: { $regex: searchRegex } });
+      orConditions.push({ keyWords: { $regex: searchRegex } });
 
+      // Brojevi
       const numberValue = parseFloat(search);
       if (!isNaN(numberValue)) {
-        orTextConditions.push({ price: numberValue });
-        orTextConditions.push({ actionPrice: numberValue });
+        orConditions.push({ price: numberValue });
+        orConditions.push({ actionPrice: numberValue });
       }
 
-      if (orTextConditions.length > 0) {
-        andConditions.push({ $or: orTextConditions });
-      }
-
-      // Kategorije i tagovi
+      // Pretraga kategorija po slug/name
       const categoryIds = await CategoriesService.searchCategoryIdsByTerm(search);
       if (categoryIds.length > 0) {
-        andConditions.push({ categories: { $in: categoryIds } });
+        orConditions.push({ categories: { $in: categoryIds } });
       }
 
+      // Pretraga tagova po slug/name
       const tagIds = await TagService.searchTagIdsByTerm(search);
       if (tagIds.length > 0) {
-        andConditions.push({ tags: { $in: tagIds } });
+        orConditions.push({ tags: { $in: tagIds } });
       }
     }
 
-    if (andConditions.length > 0) {
-      filter.$and = andConditions;
+    const filter = {};
+    if (orConditions.length > 0) {
+      filter.$and = [
+        ...baseConditions,
+        { $or: orConditions }
+      ];
+    } else if (baseConditions.length > 0) {
+      filter.$and = baseConditions;
     }
 
     const [items, itemCount] = await Promise.all([
@@ -365,7 +369,7 @@ class ItemService {
       ErrorHelper.throwNotFoundError("Artikli");
     }
 
-    // Metadata
+    // SEO metadata ako postoji poklapanje po slug
     let metadata = null;
     const foundCategory = await CategoriesService.findCategoryBySlug(search);
     if (foundCategory) {
