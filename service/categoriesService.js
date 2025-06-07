@@ -197,10 +197,10 @@ class CategoriesService {
 
     static async findCategoriesBySlugs(slugs = [], { returnIdsOnly = false } = {}) {
         try {
-            const categories = await CategoryModel.find({ slug: { $in: slugs } }).select("_id").lean();
+            const categories = await CategoryModel.find({ slug: { $in: slugs } }).select("_id name slug shortDescription featureImage").lean();
 
             if (returnIdsOnly) {
-            return categories.map(cat => cat._id);
+                return categories.map(cat => cat._id);
             }
 
             return categories;

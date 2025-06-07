@@ -232,6 +232,10 @@ async function postAdminConfirmOrder(req, res, next) {
       await CustomerService.updateCustomerOrders(customer._id, newOrder._id, session);
     }
 
+    if (buyer.type === 'User') {
+      await UserService.updateUserAfterOrder(buyer.ref, newOrder._id, session, newOrder.telephone, newOrder.address);
+    }
+
     await EmailService.sendOrderInfo(tempOrder.buyer.firstName, tempOrder.email, newOrder);
     await OrderService.deleteTemporaryOrderById(tempOrder._id, session);
 

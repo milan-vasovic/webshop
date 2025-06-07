@@ -54,11 +54,11 @@ async function getShopPageByCategory(req, res, next) {
           });
 
         return res.render("shop/shop", {
-            path: `/prodavnica/kategorija/${category}`,
-            pageTitle: `Prodavnica - Kategorija: ${category}`,
-            pageDescription: `Istražite proizvode u kategoriji "${category}" u našoj online prodavnici. Kvalitetna ponuda helanki, sportske odeće i dodataka po pristupačnim cenama.`,
-            pageKeyWords: `${category}, helanke, sportska odeća, prodavnica, TopHelanke, online kupovina, sigurna kupovina, ženska odeća, ${category} modeli`,
-            featureImage: undefined,
+            path: `/prodavnica/kategorija/${shop.metadata[0].title}`,
+            pageTitle: `Prodavnica - Kategorija: ${shop.metadata[0].title}`,
+            pageDescription: `Istražite proizvode u kategoriji: "${shop.metadata[0].title}", u našoj online prodavnici. ${shop.metadata[0].shortDescription}`,
+            pageKeyWords: `${shop.metadata[0].title}, helanke, sportska odeća, prodavnica, TopHelanke, online kupovina, sigurna kupovina, ženska odeća, ${shop.metadata[0].title} modeli`,
+            featureImage: shop.metadata[0].featureImage || undefined,
             index: true,
             shop: shop,
             currentPage: page,
@@ -89,10 +89,10 @@ async function getShopPageByTag(req, res, next) {
         });
 
         return res.render("shop/shop", {
-            path: `/prodavnica/oznaka/${tag}`,
-            pageTitle: `Prodavnica - Oznaka: ${tag}`,
-            pageDescription: `Pregledajte proizvode označene sa "${tag}" u našoj online prodavnici. Otkrijte najtraženije artikle u kategoriji helanki i sportske odeće.`,
-            pageKeyWords: `${tag}, helanke, sportska odeća, online kupovina, oznaka, popularno, akcija, TopHelanke`,
+            path: `/prodavnica/oznaka/${shop.metadata[0].title}`,
+            pageTitle: `Prodavnica - Oznaka: ${shop.metadata[0].title}`,
+            pageDescription: `Pregledajte proizvode označene sa oznakom: "${shop.metadata[0].title}" u našoj online prodavnici. ${shop.metadata[0].shortDescription}`,
+            pageKeyWords: `${shop.metadata[0].title}, helanke, sportska odeća, online kupovina, oznaka, popularno, akcija, TopHelanke`,
             featureImage: undefined,
             index: true,
             shop: shop,
@@ -653,7 +653,6 @@ async function postTemporaryOrder(req, res, next) {
             featureImage: undefined,
         })
     } catch (error) {
-        console.log(error);
          // Rollback transaction on error
          await session.abortTransaction();
          next(error);
@@ -758,6 +757,7 @@ async function postConfirmOrder(req, res, next) {
             } else {
                 // Check does guest already have account with us, if yes creat order for him, otherwise creat new customer and order for him
                 const hasUserExist = await UserService.findUserByEmail(tempOrder.email);
+
                 if (hasUserExist) {
                     const newOrder = await OrderService.createNewOrder(
                         { type: 'User', ref: hasUserExist._id, firstName: tempOrder.buyer.firstName, lastName: tempOrder.buyer.lastName },
@@ -822,7 +822,6 @@ async function postConfirmOrder(req, res, next) {
             featureImage: undefined,
         })
     } catch (error) {
-        console.log(error);
         // Rollback transaction on error
         await session.abortTransaction();
         next(error);

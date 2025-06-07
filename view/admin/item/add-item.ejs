@@ -105,9 +105,9 @@
             <div class="form__group-inline">
               <select id="categories<%= index %>" name="categories[]" class="form__select" required>
                 <% allCategories.forEach(cat => { %>
-                  <option value="<%= cat.ID.value %>" 
-                    <%= String(cat.ID.value) === String(selectedCategory?.ID || selectedCategory) ? 'selected' : '' %>>
-                    <%= cat.Naziv.value %>
+                  <option value="<%= cat._id %>" 
+                    <%= String(cat._id) === String(selectedCategory?.ID || selectedCategory) ? 'selected' : '' %>>
+                    <%= cat.name %>
                   </option>
                 <% }) %>
               </select>
@@ -118,7 +118,7 @@
           <div class="form__group-inline">
             <select id="categories0" name="categories[]" class="form__select" required>
               <% allCategories.forEach(cat => { %>
-                <option value="<%= cat.ID.value %>"><%= cat.Naziv.value %></option>
+                <option value="<%= cat._id %>"><%= cat.name %></option>
               <% }) %>
             </select>
             <button type="button" class="button button--danger removeField">Izbriši</button>
@@ -138,9 +138,9 @@
             <div class="form__group-inline">
               <select id="tags<%= index %>" name="tags[]" class="form__select" required>
                 <% allTags.forEach(tag => { %>
-                  <option value="<%= tag.ID.value %>"
-                    <%= String(tag.ID.value) === String(selectedTag.ID?.toString?.() || selectedTag.ID) ? 'selected' : '' %>>
-                    <%= tag.Naziv.value %>
+                  <option value="<%= tag._id %>"
+                    <%= String(tag._id) === String(selectedTag.ID?.toString?.() || selectedTag.ID) ? 'selected' : '' %>>
+                    <%= tag.name %>
                   </option>
                 <% }) %>
               </select>
@@ -151,7 +151,7 @@
           <div class="form__group-inline">
             <select id="tags0" name="tags[]" class="form__select" required>
               <% allTags.forEach(tag => { %>
-                <option value="<%= tag.ID.value %>"><%= tag.Naziv.value %></option>
+                <option value="<%= tag._id %>"><%= tag.name %></option>
               <% }) %>
             </select>
             <button type="button" class="button button--danger removeField">Izbriši</button>

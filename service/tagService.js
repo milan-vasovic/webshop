@@ -172,12 +172,15 @@ class tagsService {
 
     static async findTagsBySlugs(slugs = [], { returnIdsOnly = false } = {}) {
         try {
-            const tags = await TagModel.find({ slug: { $in: slugs } }).select("_id").lean();
+            const tags = await TagModel.find({ slug: { $in: slugs } }).select("_id name shortDescription").lean();
+
             return returnIdsOnly ? tags.map(tag => tag._id) : tags;
         } catch (error) {
             ErrorHelper.throwServerError(error);
         }
     }
+
+    
 
     static async findTagBySlug(slug) {
       return await TagModel.findOne({ slug }).lean();

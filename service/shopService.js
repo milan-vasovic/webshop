@@ -1,6 +1,8 @@
 import ItemService from "../service/itemService.js";
 
 import ErrorHelper from "../helper/errorHelper.js";
+import CategoriesService from "./categoriesService.js";
+import TagsService from "./tagService.js";
 
 class ShopService {
     /**
@@ -57,12 +59,20 @@ class ShopService {
 
             const tags = await ItemService.findAllTags();
             
+            const categoriesInfo = await CategoriesService.findCategoriesBySlugs(category);
+            const metadata = categoriesInfo.map(cat => ({
+                title: cat.name,
+                featureImage: cat.featureImage.img,
+                shortDescription: cat.shortDescription
+            }));
+  
             const result = {
                 Tagovi: { value: tags.Tagovi },
                 "Istaknuti Artikli": featuredCategoryItems,
                 "Artikli Na Akciji": actionedCategoryItems,
                 Artikli: otherCategoryItems.items,
                 Ukupno: otherCategoryItems.totalCount,
+                metadata: metadata
             };
     
             return result;
@@ -86,12 +96,19 @@ class ShopService {
 
             const categories = await ItemService.findAllCategories();
 
+            const tagsInfo = await TagsService.findTagsBySlugs(tag);
+            const metadata = tagsInfo.map(tag => ({
+                title: tag.name,
+                shortDescription: tag.shortDescription
+            }));
+
             const result = {
                 Kategorije: { value: categories.Kategorije },
                 "Istaknuti Artikli": featuredTagItems,
                 "Artikli Na Akciji": actionedTagItems,
                 Artikli: otherTagItems.items,
                 Ukupno: otherTagItems.totalCount,
+                metadata: metadata
             };
     
             return result;
